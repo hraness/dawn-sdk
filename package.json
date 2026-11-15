@@ -1,9 +1,9 @@
 {
   "name": "@hraness/dawn-sdk",
-  "version": "0.59.0",
+  "version": "0.60.0",
   "license": "MIT",
   "type": "module",
-  "description": "Build sounds, sound packs and collections for DAWN, and write song scores with its TypeScript SDK",
+  "description": "Build sounds, sound packs and collections for DAWN, write song scores with its TypeScript SDK, and render them to audio",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hraness/dawn-sdk.git"
@@ -12,6 +12,7 @@
   "files": [
     "core",
     "src",
+    "assets",
     "docs",
     "examples",
     "extension-manifest.json"
@@ -21,12 +22,18 @@
   },
   "bin": {
     "dawn-palette": "./src/palette/main.ts",
-    "dawn-collection": "./src/collection/main.ts"
+    "dawn-collection": "./src/collection/main.ts",
+    "dawn-render": "./src/renderer/main.ts"
   },
   "exports": {
     ".": "./core/sdk/v1.ts",
     "./palette": "./core/palette.ts",
-    "./collection": "./core/collection.ts"
+    "./collection": "./core/collection.ts",
+    "./render": "./src/renderer/cli.ts"
+  },
+  "dependencies": {
+    "@jitl/quickjs-wasmfile-release-sync": "0.32.0",
+    "quickjs-emscripten-core": "0.32.0"
   },
   "engines": {
     "bun": ">=1.3.14"

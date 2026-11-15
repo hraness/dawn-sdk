@@ -1,4 +1,5 @@
 /** Declarative sound palettes: reusable patches and metadata, never composition code. */
+import { DEVICE_KINDS, type DeviceKind } from "./device.ts";
 import { validatePatch, type Patch } from "./patch.ts";
 import { patchContext } from "./score.ts";
 
@@ -13,6 +14,7 @@ export const PALETTE_LIMITS = Object.freeze({
   maxDepth: 24,
   maxValues: 100_000,
   maxString: 4096,
+  maxDevices: 16,
 });
 export const PALETTE_ROLES = [
   "bass",
@@ -41,6 +43,20 @@ export type PalettePack = Readonly<{
   author: string;
   license: string;
   sounds: readonly PaletteSound[];
+  /** WebAssembly devices the sounds name, shipped beside the manifest. */
+  devices?: readonly PaletteDevice[];
+}>;
+/**
+ * A `.wasm` file a palette carries (`dawn.device/v1`, docs/devices.md):
+ * `file` is `devices/<name>.wasm` beside the manifest, `sha256` its hex
+ * digest. Parsing checks the declaration; `dawn palette check` reads the
+ * file, verifies the hash and checks the module.
+ */
+export type PaletteDevice = Readonly<{
+  id: string;
+  kind: DeviceKind;
+  file: string;
+  sha256: string;
 }>;
 export class PaletteValidationError extends Error {
   constructor(message: string) {
@@ -146,7 +162,16 @@ function id(value: unknown, label: string): string {
 export function parsePalettePack(value: unknown): PalettePack {
   const r = record(
     jsonData(value),
-    ["schema", "id", "version", "title", "author", "license", "sounds"],
+    [
+      "schema",
+      "id",
+      "version",
+      "title",
+      "author",
+      "license",
+      "sounds",
+      "devices",
+    ],
     "palette",
   );
   if (r.schema !== PALETTE_SCHEMA)
@@ -260,6 +285,7 @@ export function parsePalettePack(value: unknown): PalettePack {
       patch: patch!,
     });
   });
+  const devices = paletteDevices(r.devices, sounds);
   return Object.freeze({
     schema: PALETTE_SCHEMA,
     id: id(r.id, "palette id"),
@@ -268,5 +294,92 @@ export function parsePalettePack(value: unknown): PalettePack {
     author: text(r.author, "palette author"),
     license: text(r.license, "palette license"),
     sounds: Object.freeze(sounds),
+    ...(devices ? { devices } : {}),
   });
+}
+
+/** The node type that plays each device kind. */
+const DEVICE_NODE: Readonly<Record<DeviceKind, string>> = {
+  fx: "device.fx",
+  synth: "device.synth",
+  notes: "device.notes",
+};
+
+/**
+ * Checks the `devices` declarations: unique ids, files and hashes,
+ * `devices/<name>.wasm` paths, and that every device node in a sound names
+ * a declared device of its kind and every declared device is used.
+ */
+function paletteDevices(
+  value: unknown,
+  sounds: readonly PaletteSound[],
+): readonly PaletteDevice[] | undefined {
+  const used = new Map<string, { kind: string; sound: string }>();
+  for (const sound of sounds)
+    for (const node of sound.patch.nodes)
+      if (node.type.startsWith("device.")) {
+        const prior = used.get(String(node.params?.device));
+        if (prior && prior.kind !== node.type)
+          fail(
+            `sounds ${prior.sound} and ${sound.id} play one device as ${prior.kind} and ${node.type}`,
+          );
+        used.set(String(node.params?.device), {
+          kind: node.type,
+          sound: sound.id,
+        });
+      }
+  if (value === undefined) {
+    if (used.size > 0)
+      fail(
+        `sound ${[...used.values()][0]!.sound} names a device; declare it under devices`,
+      );
+    return undefined;
+  }
+  if (
+    !Array.isArray(value) ||
+    value.length < 1 ||
+    value.length > PALETTE_LIMITS.maxDevices
+  )
+    fail(`palette devices must list 1..${PALETTE_LIMITS.maxDevices} devices`);
+  const ids = new Set<string>();
+  const files = new Set<string>();
+  const hashes = new Set<string>();
+  const devices = (value as unknown[]).map((raw, i): PaletteDevice => {
+    const label = `device ${i + 1}`;
+    const d = record(raw, ["id", "kind", "file", "sha256"], label);
+    const deviceId = id(d.id, `${label} id`);
+    if (!(DEVICE_KINDS as readonly unknown[]).includes(d.kind))
+      fail(`${label} kind must be fx, synth or notes`);
+    const file = text(d.file, `${label} file`, 100);
+    if (!/^devices\/[a-z0-9][a-z0-9._-]{0,63}\.wasm$/.test(file))
+      fail(`${label} file must be devices/<name>.wasm (lowercase)`);
+    if (typeof d.sha256 !== "string" || !/^[0-9a-f]{64}$/.test(d.sha256))
+      fail(`${label} sha256 must be 64 lowercase hex digits`);
+    for (const [seen, key, what] of [
+      [ids, deviceId, "id"],
+      [files, file, "file"],
+      [hashes, d.sha256 as string, "sha256"],
+    ] as const) {
+      if (seen.has(key)) fail(`two devices share the ${what} ${key}`);
+      seen.add(key);
+    }
+    const use = used.get(`sha256:${d.sha256}`);
+    if (!use) fail(`${label} (${deviceId}) is not used by any sound`);
+    if (use!.kind !== DEVICE_NODE[d.kind as DeviceKind])
+      fail(
+        `sound ${use!.sound} plays ${deviceId} as ${use!.kind}, but it is a ${d.kind as string} device`,
+      );
+    return Object.freeze({
+      id: deviceId,
+      kind: d.kind as DeviceKind,
+      file,
+      sha256: d.sha256 as string,
+    });
+  });
+  for (const [hash, use] of used)
+    if (!hashes.has(hash.slice(7)))
+      fail(
+        `sound ${use.sound} names an undeclared device ${hash.slice(0, 19)}…`,
+      );
+  return Object.freeze(devices);
 }

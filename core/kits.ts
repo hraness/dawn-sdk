@@ -408,6 +408,35 @@ export const SYNTH_KITS: readonly SynthKit[] = Object.freeze([
       hold: 2,
     },
   ),
+  kit(
+    "dnb",
+    "Drum and bass (synth)",
+    "tight punchy kick, body-heavy snare, bright hats",
+    {
+      kick: {
+        base: 58,
+        sweep: 130,
+        sweepRate: 40,
+        decay: 9,
+        click: 0.1,
+        clickDecay: 350,
+      },
+      tom: { base: 100, sweep: 60, sweepRate: 20, decay: 8 },
+      snare: {
+        tone: 168,
+        toneLevel: 0.75,
+        toneDecay: 14,
+        noise: 0.4,
+        noiseDecay: 22,
+        snap: 0,
+      },
+      clap: { gap: 0.011, tail: 16, band: 0.4 },
+      hat: { level: 0.4, decay: 70, tone: 1, metal: 0.3 },
+      openhat: { level: 0.32, decay: 8, tone: 1, metal: 0.3 },
+      seconds: 0.7,
+      drive: 0.1,
+    },
+  ),
 ]);
 
 const BY_NAME = new Map(SYNTH_KITS.map((entry) => [entry.name, entry]));

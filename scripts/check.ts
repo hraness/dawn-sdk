@@ -1,18 +1,23 @@
 /**
  * Release check for the exported SDK: every file matches the manifest, every
- * module loads, and the palette and collection tools work end to end on the
- * bundled example in a scratch folder.
+ * module loads, the palette and collection tools work end to end on the
+ * bundled example in a scratch folder, and dawn-render writes the exact WAV
+ * DAWN writes for the fixture song.
  */
 import { createHash } from "node:crypto";
 import {
+  copyFileSync,
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   readdirSync,
   rmSync,
+  writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { RENDER_SONG, RENDER_WAV_SHA256 } from "./render-fixture.ts";
 
 const root = resolve(import.meta.dir, "..");
 const fail = (message: string): never => {
@@ -26,6 +31,7 @@ const REPOSITORY_FILES = new Set([
   "CONTRIBUTING.md",
   "SECURITY.md",
   "scripts/check.ts",
+  "scripts/render-fixture.ts",
   ".github/workflows/ci.yml",
   ".github/workflows/release.yml",
   ".github/workflows/auto-tag.yml",
@@ -56,9 +62,15 @@ for (const path of walk("."))
   if (!listed.has(path) && !REPOSITORY_FILES.has(path))
     fail(`${path} is not in extension-manifest.json`);
 
-// The CLI entry points run when imported; the tool runs below cover them.
+// Entry points, workers and the evaluator subprocess run when imported;
+// the tool runs below cover them.
 for (const path of listed)
-  if (path.endsWith(".ts") && !path.endsWith("/main.ts"))
+  if (
+    path.endsWith(".ts") &&
+    !path.endsWith("/main.ts") &&
+    !path.endsWith("/eval-child.ts") &&
+    !path.endsWith("-worker.ts")
+  )
     await import(join(root, path));
 
 const sdk = await import(join(root, "core/sdk/v1.ts"));
@@ -123,6 +135,37 @@ try {
     "Check",
   );
   run(tool("collection"), "check", "my-library/dawn.collection.json");
+
+  // Render the fixture song from its source, in the sealed evaluator, with
+  // its device beside it: the WAV must be the one DAWN writes.
+  const song = join(scratch, "song");
+  mkdirSync(join(song, "devices"), { recursive: true });
+  writeFileSync(join(song, "song.ts"), RENDER_SONG);
+  copyFileSync(
+    join(root, "examples/devices/fold.wasm"),
+    join(song, "devices/fold.wasm"),
+  );
+  const rendered = run(
+    tool("renderer"),
+    "song/song.ts",
+    "--out",
+    "song.wav",
+    "--stems",
+    "stems",
+  );
+  const wav = readFileSync(join(scratch, "song.wav"));
+  const digest = createHash("sha256").update(wav).digest("hex");
+  if (digest !== RENDER_WAV_SHA256)
+    fail(`dawn-render wrote ${digest}, DAWN writes ${RENDER_WAV_SHA256}`);
+  if (!rendered.includes(digest)) fail("dawn-render did not report its digest");
+  for (const stem of ["drums", "bass", "keys", "glass", "premaster"])
+    if (!existsSync(join(scratch, "stems", `${stem}.wav`)))
+      fail(`dawn-render wrote no ${stem} stem`);
+  // A score as song() returns it renders from JSON too.
+  writeFileSync(join(scratch, "score.json"), JSON.stringify(score));
+  run(tool("renderer"), "score.json", "--out", "score.wav");
+  if (readFileSync(join(scratch, "score.wav")).length < 44_100)
+    fail("dawn-render wrote no audio for score.json");
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }

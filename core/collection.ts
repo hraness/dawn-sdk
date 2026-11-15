@@ -10,6 +10,7 @@ export const COLLECTION_LIMITS = Object.freeze({
   maxDepth: 16,
   maxValues: 100_000,
   maxArtifactBytes: 1024 ** 4,
+  maxFiles: 2048,
 });
 export const COLLECTION_KINDS = [
   "palette",
@@ -41,6 +42,12 @@ export type CollectionLicenses = Readonly<{
   samples?: string;
   trace?: string;
 }>;
+/** One declared file of a multi-file entry, relative to its source's folder. */
+export type CollectionFile = Readonly<{
+  path: string;
+  sha256: string;
+  bytes: number;
+}>;
 export type CollectionEntry = Readonly<{
   id: string;
   kind: CollectionKind;
@@ -49,6 +56,12 @@ export type CollectionEntry = Readonly<{
   credits: readonly string[];
   licenses: CollectionLicenses;
   source: CollectionSource;
+  /**
+   * Every file the entry consists of, relative to the folder holding
+   * `source`, including the source file itself. Without it the entry is the
+   * single source file.
+   */
+  files?: readonly CollectionFile[];
 }>;
 export type Collection = Readonly<{
   schema: typeof COLLECTION_SCHEMA;
@@ -203,6 +216,61 @@ function gitRef(value: unknown, label: string): string {
     );
   return s;
 }
+function digest(
+  r: Record<string, unknown>,
+  label: string,
+): { sha256: string; bytes: number } {
+  if (typeof r.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(r.sha256))
+    fail(`${label} sha256 must be 64 lowercase hexadecimal characters`);
+  if (
+    typeof r.bytes !== "number" ||
+    !Number.isSafeInteger(r.bytes) ||
+    r.bytes < 0 ||
+    r.bytes > COLLECTION_LIMITS.maxArtifactBytes
+  )
+    fail(
+      `${label} bytes must be a whole number from 0 to ${COLLECTION_LIMITS.maxArtifactBytes}`,
+    );
+  return { sha256: r.sha256 as string, bytes: r.bytes as number };
+}
+/** The last path segment of a source: the file named inside its folder. */
+export function sourceFileName(source: CollectionSource): string {
+  const path =
+    source.type === "https" ? new URL(source.url).pathname : source.path;
+  return decodeURIComponent(path.split("/").at(-1)!);
+}
+function parseFiles(
+  value: unknown,
+  source: CollectionSource,
+  label: string,
+): readonly CollectionFile[] {
+  if (
+    !Array.isArray(value) ||
+    value.length < 1 ||
+    value.length > COLLECTION_LIMITS.maxFiles
+  )
+    fail(`${label} must list 1..${COLLECTION_LIMITS.maxFiles} files`);
+  const seen = new Set<string>();
+  const files = (value as unknown[]).map((raw, i) => {
+    const r = record(raw, ["path", "sha256", "bytes"], `${label} ${i + 1}`);
+    const path = sourcePath(r.path, `${label} ${i + 1} path`, false);
+    // Case-insensitive file systems would merge two such names into one.
+    const key = path.normalize("NFC").toLowerCase();
+    if (seen.has(key)) fail(`${label} repeat the path "${path}"`);
+    seen.add(key);
+    return Object.freeze({ path, ...digest(r, `${label} ${i + 1}`) });
+  });
+  const own = files.find((f) => f.path === sourceFileName(source));
+  if (!own) fail(`${label} must include the source file itself`);
+  if (
+    source.sha256 !== undefined &&
+    (source.sha256 !== own.sha256 || source.bytes !== own.bytes)
+  )
+    fail(`${label} and the source disagree about the source file's digest`);
+  return Object.freeze(
+    files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0)),
+  );
+}
 function parseSource(value: unknown, label: string): CollectionSource {
   const first = record(
     value,
@@ -222,21 +290,7 @@ function parseSource(value: unknown, label: string): CollectionSource {
   const integrity: { sha256?: string; bytes?: number } = {};
   if ((r.sha256 === undefined) !== (r.bytes === undefined))
     fail(`${label} sha256 and bytes must be supplied together`);
-  if (r.sha256 !== undefined) {
-    if (typeof r.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(r.sha256))
-      fail(`${label} sha256 must be 64 lowercase hexadecimal characters`);
-    if (
-      typeof r.bytes !== "number" ||
-      !Number.isSafeInteger(r.bytes) ||
-      r.bytes < 0 ||
-      r.bytes > COLLECTION_LIMITS.maxArtifactBytes
-    )
-      fail(
-        `${label} bytes must be a whole number from 0 to ${COLLECTION_LIMITS.maxArtifactBytes}`,
-      );
-    integrity.sha256 = r.sha256;
-    integrity.bytes = r.bytes as number;
-  }
+  if (r.sha256 !== undefined) Object.assign(integrity, digest(r, label));
   const selector =
     r.entry === undefined ? {} : { entry: id(r.entry, `${label} entry`) };
   if (r.type === "local")
@@ -289,6 +343,14 @@ function parseSource(value: unknown, label: string): CollectionSource {
   });
 }
 
+/** Validate one source descriptor on its own, as a catalog entry would. */
+export function parseCollectionSource(
+  value: unknown,
+  label = "source",
+): CollectionSource {
+  return parseSource(copyJson(value), label);
+}
+
 /** Validate metadata only. Source existence, containment and identity need separate checks. */
 export function parseCollection(value: unknown): Collection {
   const r = record(
@@ -313,7 +375,16 @@ export function parseCollection(value: unknown): Collection {
     const label = `entry ${i + 1}`;
     const e = record(
       raw,
-      ["id", "kind", "title", "description", "credits", "licenses", "source"],
+      [
+        "id",
+        "kind",
+        "title",
+        "description",
+        "credits",
+        "licenses",
+        "source",
+        "files",
+      ],
       label,
     );
     const entryId = id(e.id, `${label} id`);
@@ -342,6 +413,7 @@ export function parseCollection(value: unknown): Collection {
     for (const key of keys)
       if (licenses[key] !== undefined)
         licenseData[key] = text(licenses[key], `${label} ${key} license`);
+    const source = parseSource(e.source, `${label} source`);
     return Object.freeze({
       id: entryId,
       kind: e.kind as CollectionKind,
@@ -357,7 +429,10 @@ export function parseCollection(value: unknown): Collection {
           }),
       credits: Object.freeze(credits),
       licenses: Object.freeze(licenseData),
-      source: parseSource(e.source, `${label} source`),
+      source,
+      ...(e.files === undefined
+        ? {}
+        : { files: parseFiles(e.files, source, `${label} files`) }),
     });
   });
   return Object.freeze({

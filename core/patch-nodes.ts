@@ -659,13 +659,93 @@ const ENGINE_NODES: readonly NodeSpec[] = ENGINE_TABLES.map((table) =>
   }),
 );
 
+/** The eight generic controls of a WebAssembly device (core/device.ts). */
+const DEVICE_CONTROLS: readonly PortSpec[] = Array.from({ length: 8 }, (_, i) =>
+  controlIn(
+    `p${i + 1}`,
+    num(0, 1, 0, `device control ${i + 1}, read once per 128-frame block`),
+  ),
+);
+/** The content hash naming a device's `.wasm` file. */
+const DEVICE_PARAM: Readonly<Record<string, ParamSpec>> = Object.freeze({
+  device: enumParam(
+    [],
+    "",
+    "the device's content hash, sha256:<64 hex digits> of its .wasm file",
+  ),
+});
+
+/**
+ * `device.*`: a sandboxed WebAssembly module (`dawn.device/v1`,
+ * docs/devices.md) as one node. It has no imports and runs under fixed
+ * instruction, memory and depth budgets, so it is deterministic.
+ */
+const DEVICE_NODES: readonly NodeSpec[] = [
+  node({
+    type: "device.fx",
+    family: "effect",
+    doc: "a WebAssembly effect device: stereo in, stereo out",
+    inputs: [
+      audioIn("left", "left in"),
+      audioIn("right", "right in; unwired, left feeds both"),
+      ...DEVICE_CONTROLS,
+    ],
+    outputs: [audioOut("left", "left out"), audioOut("right", "right out")],
+    settings: DEVICE_PARAM,
+    rate: "global",
+    process: "buffer",
+    cost: 60,
+  }),
+  node({
+    type: "device.synth",
+    family: "source",
+    doc: "a WebAssembly synth device: plays the patch's notes",
+    inputs: [
+      Object.freeze({
+        name: "notes",
+        kind: "notes" as const,
+        doc: "the notes to play (wire in.notes)",
+      }),
+      ...DEVICE_CONTROLS,
+    ],
+    outputs: [audioOut("out", "left out"), audioOut("right", "right out")],
+    settings: DEVICE_PARAM,
+    rate: "global",
+    process: "buffer",
+    cost: 120,
+  }),
+  node({
+    type: "device.notes",
+    family: "logic",
+    doc: "a WebAssembly note device: rewrites the notes the whole patch plays",
+    inputs: [
+      Object.freeze({
+        name: "notes",
+        kind: "notes" as const,
+        doc: "the track's notes (wire in.notes)",
+      }),
+      ...DEVICE_CONTROLS,
+    ],
+    outputs: [
+      Object.freeze({
+        name: "notes",
+        kind: "notes" as const,
+        doc: "the rewritten notes, which every voice and device.synth plays",
+      }),
+    ],
+    settings: DEVICE_PARAM,
+    rate: "global",
+    process: "buffer",
+    cost: 0,
+  }),
+];
+
 /** Every node type by name, in family order. */
 export const NODE_SPECS: Readonly<Record<string, NodeSpec>> = Object.freeze(
   Object.fromEntries(
-    [...HAND_NODES, ...ENGINE_NODES, ...FX_NODES].map((spec) => [
-      spec.type,
-      spec,
-    ]),
+    [...HAND_NODES, ...ENGINE_NODES, ...FX_NODES, ...DEVICE_NODES].map(
+      (spec) => [spec.type, spec],
+    ),
   ),
 );
 
