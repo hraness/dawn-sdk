@@ -1,0 +1,34 @@
+{
+  "name": "@hraness/dawn-sdk",
+  "version": "0.59.0",
+  "license": "MIT",
+  "type": "module",
+  "description": "Build sounds, sound packs and collections for DAWN, and write song scores with its TypeScript SDK",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hraness/dawn-sdk.git"
+  },
+  "homepage": "https://github.com/hraness/dawn-sdk#readme",
+  "files": [
+    "core",
+    "src",
+    "docs",
+    "examples",
+    "extension-manifest.json"
+  ],
+  "scripts": {
+    "check": "bun scripts/check.ts"
+  },
+  "bin": {
+    "dawn-palette": "./src/palette/main.ts",
+    "dawn-collection": "./src/collection/main.ts"
+  },
+  "exports": {
+    ".": "./core/sdk/v1.ts",
+    "./palette": "./core/palette.ts",
+    "./collection": "./core/collection.ts"
+  },
+  "engines": {
+    "bun": ">=1.3.14"
+  }
+}

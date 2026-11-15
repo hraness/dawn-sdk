@@ -1,0 +1,551 @@
+{
+  "schema": "dawn.palette/v1",
+  "id": "glass-weather",
+  "version": "1.0.0",
+  "title": "Glass Weather \u2014 Sound Ingredients",
+  "author": "DAWN",
+  "license": "MIT",
+  "sounds": [
+    {
+      "id": "supersaw-bed",
+      "title": "Supersaw Bed",
+      "role": "bed",
+      "description": "Wide sustained supersaw ingredient. The original arrangement, ducking, sends and mix are not included.",
+      "tags": ["glass-weather", "synthesized"],
+      "range": {
+        "min": 48,
+        "max": 84
+      },
+      "patch": {
+        "kind": "patch",
+        "role": "instrument",
+        "name": "supersaw-bed",
+        "nodes": [
+          {
+            "id": "engine",
+            "type": "engine.synth",
+            "params": {
+              "instrument": "supersaw",
+              "settings": {
+                "synth": {
+                  "attack": 0.12,
+                  "decay": 1,
+                  "sustain": 0.8,
+                  "release": 0.9,
+                  "unison": 7,
+                  "detune": 0.17,
+                  "spread": 0.9,
+                  "lpf": 9000
+                }
+              }
+            }
+          }
+        ],
+        "cables": [
+          {
+            "id": "notes",
+            "from": "in.notes",
+            "to": "engine.notes"
+          },
+          {
+            "id": "left",
+            "from": "engine.out",
+            "to": "out.audio"
+          },
+          {
+            "id": "right",
+            "from": "engine.right",
+            "to": "out.right"
+          }
+        ],
+        "macros": [
+          {
+            "id": "attack",
+            "label": "Attack",
+            "min": 0.005,
+            "max": 2,
+            "default": 0.12,
+            "to": [
+              {
+                "port": "engine.attack"
+              }
+            ]
+          },
+          {
+            "id": "cutoff",
+            "label": "Cutoff",
+            "min": 200,
+            "max": 16000,
+            "default": 9000,
+            "to": [
+              {
+                "port": "engine.lpf"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "growl-bass",
+      "title": "Growl Bass",
+      "role": "bass",
+      "description": "Synth bass with vowel movement and distortion; no bassline or composition rules.",
+      "tags": ["glass-weather", "synthesized"],
+      "range": {
+        "min": 36,
+        "max": 72
+      },
+      "patch": {
+        "kind": "patch",
+        "role": "instrument",
+        "name": "growl-bass",
+        "nodes": [
+          {
+            "id": "synth",
+            "type": "engine.synth",
+            "params": {
+              "instrument": "sawtooth",
+              "settings": {
+                "synth": {
+                  "attack": 0.005,
+                  "sustain": 1,
+                  "release": 0.1,
+                  "lpf": 4000,
+                  "lpq": 1,
+                  "fm": 1.5,
+                  "fmh": 0.5
+                }
+              }
+            }
+          },
+          {
+            "id": "distort",
+            "type": "fx.distort",
+            "params": {
+              "type": "hard",
+              "drive": 1.5,
+              "tone": 6000,
+              "mix": 0.5
+            }
+          },
+          {
+            "id": "vowel",
+            "type": "fx.vowel",
+            "params": {
+              "vowel": "o",
+              "to": "a",
+              "mix": 0.65,
+              "morph": 0.5
+            }
+          },
+          {
+            "id": "filter",
+            "type": "fx.filter",
+            "params": {
+              "type": "lpf",
+              "cutoff": 5000,
+              "resonance": 0.1
+            }
+          },
+          {
+            "id": "level",
+            "type": "fx.postgain",
+            "params": {
+              "gain": 3.754
+            },
+            "label": "level"
+          },
+          {
+            "id": "lfo",
+            "type": "lfo",
+            "params": {
+              "shape": "sine",
+              "sync": 1
+            }
+          }
+        ],
+        "cables": [
+          {
+            "id": "c2",
+            "from": "synth.out",
+            "to": "distort.in"
+          },
+          {
+            "id": "c4",
+            "from": "vowel.out",
+            "to": "filter.in"
+          },
+          {
+            "id": "c5",
+            "from": "filter.out",
+            "to": "level.left"
+          },
+          {
+            "id": "c6",
+            "from": "filter.out",
+            "to": "level.right"
+          },
+          {
+            "id": "c7",
+            "from": "level.left",
+            "to": "out.audio"
+          },
+          {
+            "id": "c8",
+            "from": "level.right",
+            "to": "out.right"
+          },
+          {
+            "id": "c1",
+            "from": "in.notes",
+            "to": "synth.notes"
+          },
+          {
+            "id": "c3",
+            "from": "distort.out",
+            "to": "vowel.in"
+          },
+          {
+            "id": "c9",
+            "from": "lfo.out",
+            "to": "vowel.morph",
+            "amount": 0.5
+          }
+        ],
+        "macros": [
+          {
+            "id": "growl",
+            "label": "Growl",
+            "min": 0,
+            "max": 6,
+            "default": 1.5,
+            "to": [
+              {
+                "port": "synth.fm"
+              }
+            ]
+          },
+          {
+            "id": "vowel",
+            "label": "Vowel",
+            "min": 0,
+            "max": 1,
+            "default": 0.5,
+            "to": [
+              {
+                "port": "vowel.morph"
+              }
+            ]
+          },
+          {
+            "id": "rate",
+            "label": "Rate",
+            "min": 0.25,
+            "max": 4,
+            "default": 1,
+            "curve": "exp",
+            "to": [
+              {
+                "port": "lfo.sync"
+              }
+            ]
+          },
+          {
+            "id": "drive",
+            "label": "Drive",
+            "min": 0,
+            "max": 5,
+            "default": 1.5,
+            "to": [
+              {
+                "port": "distort.drive"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "felt-keys",
+      "title": "Felt Keys",
+      "role": "keys",
+      "description": "Felt piano with its instrument compression and room; no voicings or melody.",
+      "tags": ["glass-weather", "synthesized"],
+      "range": {
+        "min": 48,
+        "max": 84
+      },
+      "patch": {
+        "kind": "patch",
+        "role": "instrument",
+        "name": "felt-keys",
+        "nodes": [
+          {
+            "id": "keys",
+            "type": "engine.keys",
+            "params": {
+              "instrument": "felt",
+              "settings": {
+                "keys": {
+                  "preset": "felt"
+                }
+              }
+            }
+          },
+          {
+            "id": "compressor",
+            "type": "fx.compressor",
+            "params": {
+              "threshold": -42,
+              "ratio": 4,
+              "attack": 0.008,
+              "release": 0.25,
+              "makeup": 20
+            }
+          },
+          {
+            "id": "reverb",
+            "type": "fx.reverb",
+            "params": {
+              "mix": 0.18,
+              "size": 0.5,
+              "fade": 1.6,
+              "lowpass": 7000
+            }
+          },
+          {
+            "id": "level",
+            "type": "fx.postgain",
+            "params": {
+              "gain": 0.2124
+            },
+            "label": "level"
+          },
+          {
+            "id": "level2",
+            "type": "fx.postgain",
+            "params": {
+              "gain": 2.773
+            },
+            "label": "level trim"
+          },
+          {
+            "id": "guardl",
+            "type": "fx.distort",
+            "params": {
+              "type": "soft",
+              "drive": 0,
+              "tone": 20000,
+              "mix": 1,
+              "postgain": 0.85
+            },
+            "label": "peak guard"
+          },
+          {
+            "id": "guardr",
+            "type": "fx.distort",
+            "params": {
+              "type": "soft",
+              "drive": 0,
+              "tone": 20000,
+              "mix": 1,
+              "postgain": 0.85
+            },
+            "label": "peak guard"
+          }
+        ],
+        "cables": [
+          {
+            "id": "c2",
+            "from": "keys.out",
+            "to": "compressor.in"
+          },
+          {
+            "id": "c9",
+            "from": "level2.left",
+            "to": "guardl.in"
+          },
+          {
+            "id": "c10",
+            "from": "level2.right",
+            "to": "guardr.in"
+          },
+          {
+            "id": "c1",
+            "from": "in.notes",
+            "to": "keys.notes"
+          },
+          {
+            "id": "c5",
+            "from": "reverb.left",
+            "to": "level.left"
+          },
+          {
+            "id": "c6",
+            "from": "reverb.right",
+            "to": "level.right"
+          },
+          {
+            "id": "c7",
+            "from": "level.left",
+            "to": "level2.left"
+          },
+          {
+            "id": "c8",
+            "from": "level.right",
+            "to": "level2.right"
+          },
+          {
+            "id": "c11",
+            "from": "guardl.out",
+            "to": "out.audio"
+          },
+          {
+            "id": "c12",
+            "from": "guardr.out",
+            "to": "out.right"
+          },
+          {
+            "id": "c3",
+            "from": "compressor.out",
+            "to": "reverb.left"
+          },
+          {
+            "id": "c4",
+            "from": "compressor.out",
+            "to": "reverb.right"
+          }
+        ],
+        "macros": [
+          {
+            "id": "felt",
+            "label": "Felt",
+            "min": 0,
+            "max": 1,
+            "default": 0.8,
+            "to": [
+              {
+                "port": "keys.felt"
+              }
+            ]
+          },
+          {
+            "id": "noise",
+            "label": "Noise",
+            "min": 0,
+            "max": 1,
+            "default": 0.25,
+            "to": [
+              {
+                "port": "keys.noise"
+              }
+            ]
+          },
+          {
+            "id": "knock",
+            "label": "Knock",
+            "min": 0,
+            "max": 1,
+            "default": 0.5,
+            "to": [
+              {
+                "port": "keys.knock"
+              }
+            ]
+          },
+          {
+            "id": "room",
+            "label": "Room",
+            "min": 0,
+            "max": 0.6,
+            "default": 0.18,
+            "to": [
+              {
+                "port": "reverb.mix"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "chip-pulse",
+      "title": "Chip Pulse",
+      "role": "lead",
+      "description": "Short pulse lead ingredient; no arpeggio or note-generation rules.",
+      "tags": ["glass-weather", "synthesized"],
+      "range": {
+        "min": 48,
+        "max": 84
+      },
+      "patch": {
+        "kind": "patch",
+        "role": "instrument",
+        "name": "chip-pulse",
+        "nodes": [
+          {
+            "id": "engine",
+            "type": "engine.synth",
+            "params": {
+              "instrument": "pulse",
+              "settings": {
+                "synth": {
+                  "attack": 0.001,
+                  "decay": 0.1,
+                  "sustain": 0.1,
+                  "release": 0.06,
+                  "pw": 0.3,
+                  "lpf": 7000
+                }
+              }
+            }
+          }
+        ],
+        "cables": [
+          {
+            "id": "notes",
+            "from": "in.notes",
+            "to": "engine.notes"
+          },
+          {
+            "id": "left",
+            "from": "engine.out",
+            "to": "out.audio"
+          },
+          {
+            "id": "right",
+            "from": "engine.right",
+            "to": "out.right"
+          }
+        ],
+        "macros": [
+          {
+            "id": "width",
+            "label": "Pulse Width",
+            "min": 0.05,
+            "max": 0.95,
+            "default": 0.3,
+            "to": [
+              {
+                "port": "engine.pw"
+              }
+            ]
+          },
+          {
+            "id": "cutoff",
+            "label": "Cutoff",
+            "min": 200,
+            "max": 16000,
+            "default": 7000,
+            "to": [
+              {
+                "port": "engine.lpf"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

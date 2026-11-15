@@ -1,0 +1,522 @@
+{
+  "schema": "dawn.extension-source-candidate/v1",
+  "version": "0.59.0",
+  "entrypoints": [
+    "core/collection.ts",
+    "src/collection/main.ts",
+    "core/palette.ts",
+    "core/sdk/v1.ts",
+    "src/palette/main.ts"
+  ],
+  "publication": "public: github.com/hraness/dawn-sdk, npm @hraness/dawn-sdk",
+  "scope": "palette and collection authoring and score SDK; no composer or renderer",
+  "admission": {
+    "publicationApproved": true,
+    "approval": "owner, 2026-11-15: publish as MIT; sound presets confirmed original",
+    "licenseBasis": "MIT, declared by the DAWN repository and its owner"
+  },
+  "files": [
+    {
+      "path": "core/autotune.ts",
+      "bytes": 34625,
+      "sha256": "8b4d6cb28c8d70c739e626efb49ddf0b99fb046174fe19b6d7b9320aa69a57af",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/autotune.ts",
+        "sourceSha256": "8b4d6cb28c8d70c739e626efb49ddf0b99fb046174fe19b6d7b9320aa69a57af",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/chords.ts",
+      "bytes": 95916,
+      "sha256": "f439f83782c2441aeec3b765b40dcaae3bf28450563e9138aeedab5708f218fe",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/chords.ts",
+        "sourceSha256": "f439f83782c2441aeec3b765b40dcaae3bf28450563e9138aeedab5708f218fe",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/collection.ts",
+      "bytes": 12236,
+      "sha256": "cee1fcc8214a72cc9eff5c8fb5e0e50b7e28abbee57ffb55b2eae668a94bda19",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/collection.ts",
+        "sourceSha256": "cee1fcc8214a72cc9eff5c8fb5e0e50b7e28abbee57ffb55b2eae668a94bda19",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/drums.ts",
+      "bytes": 3348,
+      "sha256": "9bd8d5fa95903eb36e584388aee65e0461cb41b01e853854dc97e4e7b02d6e2a",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/drums.ts",
+        "sourceSha256": "9bd8d5fa95903eb36e584388aee65e0461cb41b01e853854dc97e4e7b02d6e2a",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/euclid.ts",
+      "bytes": 23186,
+      "sha256": "b47ceb95926dfbf9aee47187e38c4519b6f963f2cfbb5ae673be6949b2d8be45",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/euclid.ts",
+        "sourceSha256": "b47ceb95926dfbf9aee47187e38c4519b6f963f2cfbb5ae673be6949b2d8be45",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/expression.ts",
+      "bytes": 47889,
+      "sha256": "0cdc4e335bdb21ee2726758eb4eb5152052867a07a34eab0d4563e8a1f8887c4",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/expression.ts",
+        "sourceSha256": "0cdc4e335bdb21ee2726758eb4eb5152052867a07a34eab0d4563e8a1f8887c4",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/fx.ts",
+      "bytes": 55797,
+      "sha256": "6adbfd1fedd2ec92b7d44b95e8f22d60b6c5d1cc83f8c48e05355f7fd63273b3",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/fx.ts",
+        "sourceSha256": "6adbfd1fedd2ec92b7d44b95e8f22d60b6c5d1cc83f8c48e05355f7fd63273b3",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/granular.ts",
+      "bytes": 17271,
+      "sha256": "2c5ce17375787a4404784f2aa94f577f47d5aca40b5d3376847acbb51ef57626",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/granular.ts",
+        "sourceSha256": "2c5ce17375787a4404784f2aa94f577f47d5aca40b5d3376847acbb51ef57626",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/ids.ts",
+      "bytes": 1720,
+      "sha256": "f085da3df386b6364e90142359628301f2309a7e021c1ead0971fcd318f9537e",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/ids.ts",
+        "sourceSha256": "f085da3df386b6364e90142359628301f2309a7e021c1ead0971fcd318f9537e",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/instruments.ts",
+      "bytes": 19030,
+      "sha256": "5dd5ff3cb09f9706bf919e78e4490f3eee87ae173bf980cf41b47372bd469639",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/instruments.ts",
+        "sourceSha256": "5dd5ff3cb09f9706bf919e78e4490f3eee87ae173bf980cf41b47372bd469639",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/keys.ts",
+      "bytes": 29320,
+      "sha256": "8f80651320fe9a2911ea77afd3ec3db51b6b926ece21337ef269c2710d7b3c80",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/keys.ts",
+        "sourceSha256": "8f80651320fe9a2911ea77afd3ec3db51b6b926ece21337ef269c2710d7b3c80",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/kits.ts",
+      "bytes": 11494,
+      "sha256": "5676f0bf65e8f39365e690ee47ea7287b99b0b7c177e3e49331b4e9248a0aa09",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/kits.ts",
+        "sourceSha256": "5676f0bf65e8f39365e690ee47ea7287b99b0b7c177e3e49331b4e9248a0aa09",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/master.ts",
+      "bytes": 21915,
+      "sha256": "e7da331a71084a3523d4cc36bb9b4a3f5271183553944a2a84827a7347a60ec0",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/master.ts",
+        "sourceSha256": "e7da331a71084a3523d4cc36bb9b4a3f5271183553944a2a84827a7347a60ec0",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/nearest.ts",
+      "bytes": 1794,
+      "sha256": "03d65dfaffa7517fcdadea0cc367b91ba03957b99c4ba6d0ecb99c26bfa7b56c",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/nearest.ts",
+        "sourceSha256": "03d65dfaffa7517fcdadea0cc367b91ba03957b99c4ba6d0ecb99c26bfa7b56c",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/palette.ts",
+      "bytes": 9154,
+      "sha256": "d9190a11832203928a9039a2f946efce32681726adc222e9255edba4d31bcbad",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/palette.ts",
+        "sourceSha256": "d9190a11832203928a9039a2f946efce32681726adc222e9255edba4d31bcbad",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/params.ts",
+      "bytes": 3386,
+      "sha256": "e74107cd825e37361e55f4840d60848dd55b4ab5fef3f9fc4b6fb0cc520aa661",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/params.ts",
+        "sourceSha256": "e74107cd825e37361e55f4840d60848dd55b4ab5fef3f9fc4b6fb0cc520aa661",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/patch-nodes.ts",
+      "bytes": 23790,
+      "sha256": "ebfc875638dac6e19d5bde83d90739b8de88bef7c9354888e4222ad66f01814f",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/patch-nodes.ts",
+        "sourceSha256": "ebfc875638dac6e19d5bde83d90739b8de88bef7c9354888e4222ad66f01814f",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/patch.ts",
+      "bytes": 52938,
+      "sha256": "c3cf8a134c57136cf6d3ac4f7ca2450c29a0fbc76cdc3b56d70dce3787fdcd62",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/patch.ts",
+        "sourceSha256": "c3cf8a134c57136cf6d3ac4f7ca2450c29a0fbc76cdc3b56d70dce3787fdcd62",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/pitch.ts",
+      "bytes": 1773,
+      "sha256": "42bebb82bd4c155eaec10276b1d7d629622d364b1f6e782c89d6444a9ce5cd55",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/pitch.ts",
+        "sourceSha256": "42bebb82bd4c155eaec10276b1d7d629622d364b1f6e782c89d6444a9ce5cd55",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/resonators.ts",
+      "bytes": 24969,
+      "sha256": "9b527b077768df185d1a5963990e71daca9273d6ae451767e98515bb9749a45a",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/resonators.ts",
+        "sourceSha256": "9b527b077768df185d1a5963990e71daca9273d6ae451767e98515bb9749a45a",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/routing.ts",
+      "bytes": 6521,
+      "sha256": "678c0516b708ca7705d5b0be6cec71db315850145bad6f69f091d73d36540a09",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/routing.ts",
+        "sourceSha256": "678c0516b708ca7705d5b0be6cec71db315850145bad6f69f091d73d36540a09",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/score-versions.ts",
+      "bytes": 5759,
+      "sha256": "6a66e89350942a2479dfb3a2215397b3a1297f5dabb76f880f8dddd28c38e8a8",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/score-versions.ts",
+        "sourceSha256": "6a66e89350942a2479dfb3a2215397b3a1297f5dabb76f880f8dddd28c38e8a8",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/score.ts",
+      "bytes": 153177,
+      "sha256": "9c5f89c7878a4107edc707f9394122968da0d9324fe6b47bd5cd89e83b8132d8",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/score.ts",
+        "sourceSha256": "9c5f89c7878a4107edc707f9394122968da0d9324fe6b47bd5cd89e83b8132d8",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/sdk/v1.ts",
+      "bytes": 559078,
+      "sha256": "5a54a0947abb8dd8dd2c83f8b9060ff93af8e2225f526238a2656013dcc97dec",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/sdk/v1.ts",
+        "sourceSha256": "5a54a0947abb8dd8dd2c83f8b9060ff93af8e2225f526238a2656013dcc97dec",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/sing.ts",
+      "bytes": 24316,
+      "sha256": "a9f9bf75de44cb4965d11bd3ac593cd5e5f8e967eb759dc7ad549f654b308b2a",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/sing.ts",
+        "sourceSha256": "a9f9bf75de44cb4965d11bd3ac593cd5e5f8e967eb759dc7ad549f654b308b2a",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/slug.ts",
+      "bytes": 605,
+      "sha256": "d90954ab901b91a0b864a94a32c37d040b82b8f0e5826f55086f7ed530631b00",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/slug.ts",
+        "sourceSha256": "d90954ab901b91a0b864a94a32c37d040b82b8f0e5826f55086f7ed530631b00",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/strings.ts",
+      "bytes": 25458,
+      "sha256": "34dabe0abd767c8e9dc6dc46b2588096196b4de22109c45b9d097907b078daca",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/strings.ts",
+        "sourceSha256": "34dabe0abd767c8e9dc6dc46b2588096196b4de22109c45b9d097907b078daca",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/style-provenance.ts",
+      "bytes": 2711,
+      "sha256": "699b3f7ab9eb8f60934f1e98f5b22e85174089c3ce8e07abfe58a88b2b57faec",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/style-provenance.ts",
+        "sourceSha256": "699b3f7ab9eb8f60934f1e98f5b22e85174089c3ce8e07abfe58a88b2b57faec",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/synth.ts",
+      "bytes": 25116,
+      "sha256": "d762265eef9f86c3f8afb601ddeb81253c61d0d35d49eef984f70f7211a51be6",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/synth.ts",
+        "sourceSha256": "d762265eef9f86c3f8afb601ddeb81253c61d0d35d49eef984f70f7211a51be6",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/tempo.ts",
+      "bytes": 44701,
+      "sha256": "92cebf0d398a774bbb77a64d45ad7419ad4bb92d4d2a6490065a3e9fb8d3b488",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/tempo.ts",
+        "sourceSha256": "92cebf0d398a774bbb77a64d45ad7419ad4bb92d4d2a6490065a3e9fb8d3b488",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/texture.ts",
+      "bytes": 9145,
+      "sha256": "4a725d1392cf51ce439e331657d381b4d1471629ba403fcb8e3ff935bc56372f",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/texture.ts",
+        "sourceSha256": "4a725d1392cf51ce439e331657d381b4d1471629ba403fcb8e3ff935bc56372f",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/tuning.ts",
+      "bytes": 37843,
+      "sha256": "57b0289a45274b312b6f7a45cd897cb8cee561977e8f8b099d49300b6d8e356a",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/tuning.ts",
+        "sourceSha256": "57b0289a45274b312b6f7a45cd897cb8cee561977e8f8b099d49300b6d8e356a",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/vocoder.ts",
+      "bytes": 15550,
+      "sha256": "67a9494e6a11cec48fc1588326fb15d3bcbdb067eb0276fcba1e26773cbd922c",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/vocoder.ts",
+        "sourceSha256": "67a9494e6a11cec48fc1588326fb15d3bcbdb067eb0276fcba1e26773cbd922c",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/vox.ts",
+      "bytes": 17382,
+      "sha256": "9aaa3bec9328383bf279f64197c5160b193c3d9eec910558626b5c02571712dc",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/vox.ts",
+        "sourceSha256": "9aaa3bec9328383bf279f64197c5160b193c3d9eec910558626b5c02571712dc",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/winds.ts",
+      "bytes": 16714,
+      "sha256": "d58401118b762398c02199af36051c600ba3974126c24ba56fc08bfe34e32032",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/winds.ts",
+        "sourceSha256": "d58401118b762398c02199af36051c600ba3974126c24ba56fc08bfe34e32032",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "docs/collections.md",
+      "bytes": 6655,
+      "sha256": "8cb653627d6ca91c9859fb02392fcdd922fa44be581f3fda55f6a36c1b271b15",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "docs/collections.md",
+        "sourceSha256": "65289456876303a635eaa6436499de6ed197da160150cc5cfd7074bbf79436a9",
+        "adaptation": "SDK command names"
+      }
+    },
+    {
+      "path": "docs/palettes.md",
+      "bytes": 5286,
+      "sha256": "3c41762e8c270dbc5ca968e2f63219b8e37c6bf6012e1d011bea404c1edc68ac",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "docs/palettes.md",
+        "sourceSha256": "c3ab438d1801f97f73797637bc5f77a51ef42afce39986bada83559e79833072",
+        "adaptation": "reference link targets included SDK source; SDK command names"
+      }
+    },
+    {
+      "path": "examples/palettes/glass-weather.json",
+      "bytes": 12736,
+      "sha256": "52df444180187978a812b9123591f76daea407d9c7a2ea9e7235b337bafc4010",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "examples/palettes/glass-weather.json",
+        "sourceSha256": "52df444180187978a812b9123591f76daea407d9c7a2ea9e7235b337bafc4010",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1064,
+      "sha256": "74b69bf37c8f340c9c2a54d431a15218738d9c463d0e014fa6a8bb8edce4e539",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "LICENSE",
+        "sourceSha256": "74b69bf37c8f340c9c2a54d431a15218738d9c463d0e014fa6a8bb8edce4e539",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "package.json",
+      "bytes": 812,
+      "sha256": "9f4b9bbb4dd41acec2f23c3e33bf0d66b70418164615b4d9bc6da8b19f2f0b36",
+      "license": "MIT",
+      "provenance": {
+        "generatedBy": "scripts/export-extension-sdk.ts"
+      }
+    },
+    {
+      "path": "README.md",
+      "bytes": 4586,
+      "sha256": "2a6c180f99b2e82a9c2ce6fbc79632b8514356406530cb909e3b5c721c3d2ed1",
+      "license": "MIT",
+      "provenance": {
+        "generatedBy": "scripts/export-extension-sdk.ts"
+      }
+    },
+    {
+      "path": "src/collection/cli.ts",
+      "bytes": 12662,
+      "sha256": "e98bc1379ad32a4d5743b9899bd39ff6409dd3a5c38a4b37da9361f9112e896e",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/collection/cli.ts",
+        "sourceSha256": "c836b4b5100e761b20f1544550074a66342cf71ce64056c6927e40e50064c63d",
+        "adaptation": "SDK command names"
+      }
+    },
+    {
+      "path": "src/collection/main.ts",
+      "bytes": 288,
+      "sha256": "5e2f4b3b5a602d59995efe05580f19891f204de046903da6d2c22e3658a45c95",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/collection/main.ts",
+        "sourceSha256": "5e2f4b3b5a602d59995efe05580f19891f204de046903da6d2c22e3658a45c95",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/fs/durable.ts",
+      "bytes": 1577,
+      "sha256": "ced6391b7350355d87e025b4b6e40ede6b9effe54cb7dfe160a1c4d948b09a37",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/fs/durable.ts",
+        "sourceSha256": "ced6391b7350355d87e025b4b6e40ede6b9effe54cb7dfe160a1c4d948b09a37",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/palette/cli.ts",
+      "bytes": 7092,
+      "sha256": "00485a76051c135b99f51a24877d61c211e93b0c618b32627f7115b3f65bf047",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/palette/cli.ts",
+        "sourceSha256": "5f9f0311197263bb034cafa07c31995e238f5f2b77ec27138dde5aa416d66b67",
+        "adaptation": "SDK command names"
+      }
+    },
+    {
+      "path": "src/palette/main.ts",
+      "bytes": 288,
+      "sha256": "8b4d69f2154467c3a0735e5ccd783f48e00a2c027ccc70b60027a27bc34ce241",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/palette/main.ts",
+        "sourceSha256": "8b4d69f2154467c3a0735e5ccd783f48e00a2c027ccc70b60027a27bc34ce241",
+        "adaptation": null
+      }
+    }
+  ]
+}
