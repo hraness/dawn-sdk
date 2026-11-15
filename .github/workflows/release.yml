@@ -4,6 +4,14 @@ on:
   push:
     tags:
       - "v*"
+  # Mirrors an existing, immutable GitHub Release to npm again, for when the
+  # npm job failed after the release was published. Run it from main.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to mirror to npm, such as v0.60.0
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -17,6 +25,7 @@ jobs:
     # Checks the tag, then packs the tarball once. The GitHub Release and npm
     # both receive these exact bytes.
     name: Build
+    if: github.event_name == 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -92,6 +101,7 @@ jobs:
 
   publish:
     name: GitHub Release
+    if: github.event_name == 'push'
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -135,15 +145,19 @@ jobs:
     # no npm token is stored. CONTRIBUTING.md lists the one-time setup.
     name: npm mirror
     needs: [build, publish]
+    if: >-
+      always() && (github.event_name == 'workflow_dispatch' ||
+      needs.publish.result == 'success')
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
       id-token: write
+      attestations: read
     env:
       NAME: "@hraness/dawn-sdk"
-      TAG: ${{ needs.build.outputs.tag }}
-      TARBALL: ${{ needs.build.outputs.tarball }}
+      TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || needs.build.outputs.tag }}
+      EVENT: ${{ github.event_name }}
     steps:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -155,19 +169,39 @@ jobs:
           set -euo pipefail
           npm install --global npm@11.19.0 --ignore-scripts
           test "$(npm --version)" = "11.19.0"
-      - name: Download the published release
+      - name: Download and verify the published release
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
-        run: gh release download "$TAG" --dir dist
-      - name: Publish the release tarball
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           set -euo pipefail
-          if [[ -z "$TAG" || "$TAG" != "$GITHUB_REF_NAME" ]]; then
+          if [[ ! "$TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "::error::$TAG is not a stable release tag"
+            exit 1
+          fi
+          if [[ "$EVENT" == "push" && "$TAG" != "$GITHUB_REF_NAME" ]]; then
             echo "::error::Publish request does not match the verified tag"
             exit 1
           fi
+          if [[ "$EVENT" == "workflow_dispatch" && "$GITHUB_REF_NAME" != "$DEFAULT_BRANCH" ]]; then
+            echo "::error::Run the npm mirror from the default branch"
+            exit 1
+          fi
+          state="$(gh release view "$TAG" --json isDraft,isPrerelease,isImmutable --jq '[.isDraft, .isPrerelease, .isImmutable] | @tsv')"
+          if [[ "$state" != $'false\tfalse\ttrue' ]]; then
+            echo "::error::Release $TAG is not published and immutable"
+            exit 1
+          fi
+          gh release download "$TAG" --dir dist
           (cd dist && sha256sum -c SHA256SUMS)
+          tarball="hraness-dawn-sdk-${TAG#v}.tgz"
+          test -f "dist/$tarball"
+          gh attestation verify "dist/$tarball" --repo "$GITHUB_REPOSITORY" >/dev/null
+          echo "TARBALL=$tarball" >> "$GITHUB_ENV"
+      - name: Publish the release tarball
+        run: |
+          set -euo pipefail
           version="${TAG#v}"
           probe="$RUNNER_TEMP/npm-view.txt"
           if ! npm view "$NAME" name --json >/dev/null 2>"$probe"; then
@@ -183,7 +217,8 @@ jobs:
           elif ! grep -q E404 "$probe"; then
             cat "$probe"; exit 1
           fi
-          npm publish "dist/$TARBALL" --access public --provenance --ignore-scripts
+          # "./" keeps npm from reading dist/<file> as a GitHub owner/repo.
+          npm publish "./dist/$TARBALL" --access public --provenance --ignore-scripts
           for _ in $(seq 1 10); do
             predicate="$(npm view "$NAME@$version" dist.attestations.provenance.predicateType --prefer-online 2>/dev/null || true)"
             if [[ "$predicate" == "https://slsa.dev/provenance/v1" ]]; then
