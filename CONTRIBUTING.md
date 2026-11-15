@@ -14,8 +14,11 @@ the tree with a fresh export, so a change made only here would be lost.
   own repository with a `dawn.collection.json`, and run `dawn-collection check`
   before you share it. See [docs/collections.md](docs/collections.md).
 
-Run `bun run check` before you open a pull request. It verifies the manifest
-and runs the palette and collection tools on the bundled example.
+Run `bun install --frozen-lockfile` and `bun run check` before you open a
+pull request. The check verifies the manifest, runs the palette and collection
+tools on the bundled example and renders a test song, whose WAV must match the
+digest DAWN's own render of it has. A change that alters that sound belongs in
+DAWN, which updates the digest in `scripts/render-fixture.ts`.
 
 ## Releases
 

@@ -63,6 +63,7 @@ jobs:
             exit 1
           fi
           echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+      - run: bun install --frozen-lockfile --ignore-scripts
       - run: bun run check
       - name: Pin npm
         run: |

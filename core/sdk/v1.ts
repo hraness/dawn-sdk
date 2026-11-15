@@ -27,7 +27,7 @@
  */
 
 /** SDK release; DAWN refreshes the vendored copy when its own is newer. */
-export const SDK_VERSION = "1.48.0";
+export const SDK_VERSION = "1.49.0";
 /** Major of `SDK_VERSION`; `dawn.json` records it as `sdk`. */
 export const SDK_MAJOR = 1;
 
@@ -14450,6 +14450,156 @@ export type PatchNodeTable = {
       right: "a";
     };
   };
+  /** a WebAssembly effect device: stereo in, stereo out */
+  "device.fx": {
+    main: "a";
+    params: {
+      /** the device's content hash, sha256:<64 hex digits> of its .wasm file (default "") */
+      device?: string;
+      /** device control 1, read once per 128-frame block (0..1, default 0) */
+      p1?: number;
+      /** device control 2, read once per 128-frame block (0..1, default 0) */
+      p2?: number;
+      /** device control 3, read once per 128-frame block (0..1, default 0) */
+      p3?: number;
+      /** device control 4, read once per 128-frame block (0..1, default 0) */
+      p4?: number;
+      /** device control 5, read once per 128-frame block (0..1, default 0) */
+      p5?: number;
+      /** device control 6, read once per 128-frame block (0..1, default 0) */
+      p6?: number;
+      /** device control 7, read once per 128-frame block (0..1, default 0) */
+      p7?: number;
+      /** device control 8, read once per 128-frame block (0..1, default 0) */
+      p8?: number;
+    };
+    inputs: {
+      /** left in */
+      left: "a";
+      /** right in; unwired, left feeds both */
+      right: "a";
+      /** device control 1, read once per 128-frame block */
+      p1: "c";
+      /** device control 2, read once per 128-frame block */
+      p2: "c";
+      /** device control 3, read once per 128-frame block */
+      p3: "c";
+      /** device control 4, read once per 128-frame block */
+      p4: "c";
+      /** device control 5, read once per 128-frame block */
+      p5: "c";
+      /** device control 6, read once per 128-frame block */
+      p6: "c";
+      /** device control 7, read once per 128-frame block */
+      p7: "c";
+      /** device control 8, read once per 128-frame block */
+      p8: "c";
+    };
+    outputs: {
+      /** left out */
+      left: "a";
+      /** right out */
+      right: "a";
+    };
+  };
+  /** a WebAssembly synth device: plays the patch's notes */
+  "device.synth": {
+    main: "a";
+    params: {
+      /** the device's content hash, sha256:<64 hex digits> of its .wasm file (default "") */
+      device?: string;
+      /** device control 1, read once per 128-frame block (0..1, default 0) */
+      p1?: number;
+      /** device control 2, read once per 128-frame block (0..1, default 0) */
+      p2?: number;
+      /** device control 3, read once per 128-frame block (0..1, default 0) */
+      p3?: number;
+      /** device control 4, read once per 128-frame block (0..1, default 0) */
+      p4?: number;
+      /** device control 5, read once per 128-frame block (0..1, default 0) */
+      p5?: number;
+      /** device control 6, read once per 128-frame block (0..1, default 0) */
+      p6?: number;
+      /** device control 7, read once per 128-frame block (0..1, default 0) */
+      p7?: number;
+      /** device control 8, read once per 128-frame block (0..1, default 0) */
+      p8?: number;
+    };
+    inputs: {
+      /** the notes to play (wire in.notes) */
+      notes: "n";
+      /** device control 1, read once per 128-frame block */
+      p1: "c";
+      /** device control 2, read once per 128-frame block */
+      p2: "c";
+      /** device control 3, read once per 128-frame block */
+      p3: "c";
+      /** device control 4, read once per 128-frame block */
+      p4: "c";
+      /** device control 5, read once per 128-frame block */
+      p5: "c";
+      /** device control 6, read once per 128-frame block */
+      p6: "c";
+      /** device control 7, read once per 128-frame block */
+      p7: "c";
+      /** device control 8, read once per 128-frame block */
+      p8: "c";
+    };
+    outputs: {
+      /** left out */
+      out: "a";
+      /** right out */
+      right: "a";
+    };
+  };
+  /** a WebAssembly note device: rewrites the notes the whole patch plays */
+  "device.notes": {
+    main: "n";
+    params: {
+      /** the device's content hash, sha256:<64 hex digits> of its .wasm file (default "") */
+      device?: string;
+      /** device control 1, read once per 128-frame block (0..1, default 0) */
+      p1?: number;
+      /** device control 2, read once per 128-frame block (0..1, default 0) */
+      p2?: number;
+      /** device control 3, read once per 128-frame block (0..1, default 0) */
+      p3?: number;
+      /** device control 4, read once per 128-frame block (0..1, default 0) */
+      p4?: number;
+      /** device control 5, read once per 128-frame block (0..1, default 0) */
+      p5?: number;
+      /** device control 6, read once per 128-frame block (0..1, default 0) */
+      p6?: number;
+      /** device control 7, read once per 128-frame block (0..1, default 0) */
+      p7?: number;
+      /** device control 8, read once per 128-frame block (0..1, default 0) */
+      p8?: number;
+    };
+    inputs: {
+      /** the track's notes (wire in.notes) */
+      notes: "n";
+      /** device control 1, read once per 128-frame block */
+      p1: "c";
+      /** device control 2, read once per 128-frame block */
+      p2: "c";
+      /** device control 3, read once per 128-frame block */
+      p3: "c";
+      /** device control 4, read once per 128-frame block */
+      p4: "c";
+      /** device control 5, read once per 128-frame block */
+      p5: "c";
+      /** device control 6, read once per 128-frame block */
+      p6: "c";
+      /** device control 7, read once per 128-frame block */
+      p7: "c";
+      /** device control 8, read once per 128-frame block */
+      p8: "c";
+    };
+    outputs: {
+      /** the rewritten notes, which every voice and device.synth plays */
+      notes: "n";
+    };
+  };
 };
 
 /** The boundary nodes every patch has: `in`, `out`, `voice` and `song`. */
@@ -15574,6 +15724,61 @@ export const PATCH_NODE_PORTS: Readonly<
       ["right", "a"],
     ],
   },
+  "device.fx": {
+    rate: "global",
+    params: ["device", "p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"],
+    inputs: [
+      ["left", "a"],
+      ["right", "a"],
+      ["p1", "c", 0, 1, 0],
+      ["p2", "c", 0, 1, 0],
+      ["p3", "c", 0, 1, 0],
+      ["p4", "c", 0, 1, 0],
+      ["p5", "c", 0, 1, 0],
+      ["p6", "c", 0, 1, 0],
+      ["p7", "c", 0, 1, 0],
+      ["p8", "c", 0, 1, 0],
+    ],
+    outputs: [
+      ["left", "a"],
+      ["right", "a"],
+    ],
+  },
+  "device.synth": {
+    rate: "global",
+    params: ["device", "p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"],
+    inputs: [
+      ["notes", "n"],
+      ["p1", "c", 0, 1, 0],
+      ["p2", "c", 0, 1, 0],
+      ["p3", "c", 0, 1, 0],
+      ["p4", "c", 0, 1, 0],
+      ["p5", "c", 0, 1, 0],
+      ["p6", "c", 0, 1, 0],
+      ["p7", "c", 0, 1, 0],
+      ["p8", "c", 0, 1, 0],
+    ],
+    outputs: [
+      ["out", "a"],
+      ["right", "a"],
+    ],
+  },
+  "device.notes": {
+    rate: "global",
+    params: ["device", "p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"],
+    inputs: [
+      ["notes", "n"],
+      ["p1", "c", 0, 1, 0],
+      ["p2", "c", 0, 1, 0],
+      ["p3", "c", 0, 1, 0],
+      ["p4", "c", 0, 1, 0],
+      ["p5", "c", 0, 1, 0],
+      ["p6", "c", 0, 1, 0],
+      ["p7", "c", 0, 1, 0],
+      ["p8", "c", 0, 1, 0],
+    ],
+    outputs: [["notes", "n"]],
+  },
   in: {
     rate: "global",
     params: [],
@@ -15806,6 +16011,18 @@ export type PatchKit = {
   engine: {
     [T in keyof PatchNodeTable as T extends `engine.${infer S}` ? S : never]: (
       params?: PatchNodeOptions<T> | Readonly<{ kind: string }>,
+    ) => PatchNode<T>;
+  };
+  /**
+   * WebAssembly devices (`dawn.device/v1`, SDK 1.49.0) as nodes:
+   * `device.fx({ device: fold.device, p1: 0.4 })`. Each takes the
+   * content hash of its `.wasm` file; see `wasmDevice`.
+   *
+   * @since 1.49.0
+   */
+  device: {
+    [T in keyof PatchNodeTable as T extends `device.${infer S}` ? S : never]: (
+      params: PatchNodeOptions<T> & Readonly<{ device: DeviceHash }>,
     ) => PatchNode<T>;
   };
   /** Per-voice values: `pitch`, `gate`, `velocity`, … */
@@ -16284,7 +16501,7 @@ function boundary(rec: PatchRecorder, id: "voice" | "song" | "in"): unknown {
 }
 
 function patchKit(rec: PatchRecorder): PatchKit {
-  const kit: Record<string, unknown> = { fx: {}, engine: {} };
+  const kit: Record<string, unknown> = { fx: {}, engine: {}, device: {} };
   for (const type of Object.keys(PATCH_NODE_PORTS)) {
     if (["in", "out", "voice", "song"].includes(type)) continue;
     const make = (input?: unknown) =>
@@ -16626,6 +16843,86 @@ export function patchSignals(
   value: PatchSpec | PatchRefSpec,
 ): readonly (readonly [string, PatternSignal])[] {
   return PATCH_SIGNALS.get(value) ?? [];
+}
+
+/**
+ * The ABI WebAssembly devices implement (docs/devices.md): a module with no
+ * imports that exports `memory`, `init` and one of `process` (fx), `render`
+ * (synth) or `transform` (notes).
+ *
+ * @since 1.49.0
+ */
+export const DEVICE_ABI = "dawn.device/v1";
+
+/**
+ * A device's content hash: `sha256:` and the 64 lowercase hex digits of its
+ * `.wasm` file. DAWN finds the file by this hash in the project's
+ * `devices/` folder, so renaming the file changes nothing.
+ *
+ * @since 1.49.0
+ */
+export type DeviceHash = `sha256:${string}`;
+
+/**
+ * What a device does: `fx` processes stereo audio, `synth` plays notes into
+ * stereo audio, `notes` rewrites the notes a patch plays.
+ *
+ * @since 1.49.0
+ */
+export type DeviceKind = "fx" | "synth" | "notes";
+
+/**
+ * A device a patch can name: its kind and content hash, plus the file it
+ * came from (documentation only; DAWN resolves by hash).
+ *
+ * @since 1.49.0
+ */
+export type WasmDevice = Readonly<{
+  kind: DeviceKind;
+  device: DeviceHash;
+  file?: string;
+}>;
+
+/**
+ * Names a WebAssembly device for a patch node. `dawn palette check` and
+ * `dawn render` verify the hash against the file and check the module
+ * before it runs:
+ *
+ *     const fold = wasmDevice("fx", "sha256:3f…", { file: "devices/fold.wasm" });
+ *     fxPatch("folded", ({ input, device }) =>
+ *       input.to(device.fx({ device: fold.device, p1: 0.4 })));
+ *
+ * @since 1.49.0
+ */
+export function wasmDevice(
+  kind: DeviceKind,
+  sha256: string,
+  options: Readonly<{ file?: string }> = {},
+): WasmDevice {
+  if (kind !== "fx" && kind !== "synth" && kind !== "notes")
+    throw new DawnSdkError("wasmDevice kind must be fx, synth or notes");
+  const hash = typeof sha256 === "string" ? sha256.trim().toLowerCase() : "";
+  const device = (
+    /^sha256:[0-9a-f]{64}$/.test(hash)
+      ? hash
+      : /^[0-9a-f]{64}$/.test(hash)
+        ? `sha256:${hash}`
+        : undefined
+  ) as DeviceHash | undefined;
+  if (!device)
+    throw new DawnSdkError(
+      "wasmDevice takes sha256:<64 hex digits> (shasum -a 256 <file>.wasm)",
+    );
+  const file = options.file;
+  if (
+    file !== undefined &&
+    (typeof file !== "string" ||
+      file.length === 0 ||
+      file.length > 200 ||
+      !file.endsWith(".wasm"))
+  )
+    throw new DawnSdkError("wasmDevice file must be a .wasm path");
+  return Object.freeze({ kind, device, ...(file ? { file } : {}) });
 }
 
 // ------------------------------------------------------------ song styles

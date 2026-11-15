@@ -1,21 +1,24 @@
 # @hraness/dawn-sdk
 
 Build sounds, sound packs and community collections for
-[DAWN](https://dawnav.com), and write song scores with the same TypeScript SDK
-that DAWN projects use. The package is MIT licensed and has no dependencies.
+[DAWN](https://dawnav.com), write song scores with the same TypeScript SDK
+that DAWN projects use, and render them to audio with DAWN's own renderer. The
+package is MIT licensed. Its one runtime dependency is the QuickJS engine
+(`quickjs-emscripten`, MIT) that runs song source in a sealed sandbox.
 
 A palette is a JSON file of instrument and effect patches with names, roles and
 playable ranges. A collection is a catalog that points at palettes, packs,
 loops, songs or albums in whatever repository layout you already have. Both are
-data: checking, exporting or packing them runs no author code and makes no
-network request.
+data: checking, exporting, packing or building them runs no author code and
+makes no network request. Installing an entry fetches only its declared files,
+verifies them and runs none of them.
 
 ## Install
 
 Bun 1.3.14 or newer runs the tools. Install a tagged release from GitHub:
 
 ```sh
-bun add github:hraness/dawn-sdk#v0.59.0
+bun add github:hraness/dawn-sdk#v0.60.0
 ```
 
 The same bytes are mirrored to npm as `@hraness/dawn-sdk`. Each
@@ -62,10 +65,20 @@ bunx dawn-collection check my-library/dawn.collection.json
 A catalog lives at `dawn.collection.json` by convention. Entries name a kind
 (`palette`, `patch-pack`, `sample-pack`, `loop`, `song`, `album` or
 `collection`), credits, licenses and a source: a local file, an HTTPS URL or a
-Git repository pinned to a commit. `check` verifies local files against their
-hashes and reports remote entries it did not fetch. The
-[collection guide](docs/collections.md) covers sharing a catalog on GitHub and
-accepting contributions.
+Git repository pinned to a commit. `add` proposes an entry from a manifest or a
+project folder, `check` verifies local files against their hashes, and `build`
+writes a portable copy with an integrity inventory and an optional static page.
+
+```sh
+bunx dawn-collection install https://github.com/OWNER/REPOSITORY warm-keys
+bunx dawn-collection update --dry-run
+```
+
+`install` pins the repository's current commit, copies the selected entries'
+files into `collections/` and records every digest in `collections.lock.json`;
+later installs work offline from the cache. The
+[collection guide](docs/collections.md) covers sharing a catalog on GitHub,
+accepting contributions and updating installed entries.
 
 ## Write a score
 
@@ -91,17 +104,47 @@ export default song({
 });
 ```
 
-The SDK builds score data. Rendering audio needs DAWN itself, which evaluates
-song source in a sealed engine with no file, network, clock or randomness
-access.
+## Render a score
+
+`dawn-render` turns a song into a WAV file:
+
+```sh
+bunx dawn-render song.ts --out song.wav
+bunx dawn-render song.ts --out song.wav --stems stems
+bunx dawn-render score.json --out song.wav
+```
+
+```text
+rendered · song.wav · 8.35 s · 22050 Hz · 736516 bytes · 794cdceb…
+```
+
+It is the renderer DAWN uses, so a song renders to the same bytes as
+`dawn render` writes for it, on any machine. `song.ts` runs in the same sealed
+engine as in DAWN: it can import `dawn` and files beside it, and has no file,
+network, process, clock or randomness access. `score.json` is a score as
+`song()` returns it, written with `JSON.stringify`. Patches and palettes are
+part of the score; samples, WebAssembly devices (in `devices/`) and a
+`mix.patch.json` are read from the song's folder. `--stems` also writes one
+WAV per track and the premaster. `--rate` sets the sample rate; by default a
+song with a master renders at 48 kHz and one without at 22,050 Hz.
+
+The renderer never opens an audio device and never changes your files. It
+writes the output, the stems and a cache of decoded samples under the song's
+`.dawn/assets/`. A song that uses `pack:` samples from a sample-pack URL
+downloads those files on first use; the eight studio sounds in
+`assets/samples/studio/` are included and need no network. DAWN's sung hooks
+and vocal books are not included.
+
+Rendering takes the reference TypeScript DSP path. DAWN can also load a native
+reverb kernel, which produces the same samples faster; the SDK ships no native
+code.
 
 ## What this package does not include
 
-It has no renderer, no audio engine and no song or album generator. DAWN's
-composer, which chooses melodies, harmony, arrangement and mix, stays part of
-the DAWN app. The SDK does include the musical building blocks an author
-selects by hand: chord parsing, progressions, voicing, strumming and Euclidean
-rhythms.
+It has no song or album generator. DAWN's composer, which chooses melodies,
+harmony, arrangement and mix, stays part of the DAWN app. The SDK does include
+the musical building blocks an author selects by hand: chord parsing,
+progressions, voicing, strumming and Euclidean rhythms.
 
 ## Check a release
 
@@ -113,8 +156,9 @@ shasum -a 256 -c SHA256SUMS
 gh attestation verify hraness-dawn-sdk-<version>.tgz --repo hraness/dawn-sdk
 ```
 
-`bun run check` in a clone verifies the manifest and runs the palette and
-collection tools end to end.
+`bun install --frozen-lockfile` and then `bun run check` in a clone verify the
+manifest, run the palette and collection tools end to end and render a test
+song, whose WAV must match the SHA-256 that DAWN's own render of it has.
 
 ## Contributing
 

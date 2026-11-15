@@ -1,21 +1,140 @@
 {
   "schema": "dawn.extension-source-candidate/v1",
-  "version": "0.59.0",
+  "version": "0.60.0",
   "entrypoints": [
     "core/collection.ts",
     "src/collection/main.ts",
     "core/palette.ts",
     "core/sdk/v1.ts",
-    "src/palette/main.ts"
+    "src/palette/main.ts",
+    "src/renderer/main.ts",
+    "core/sdk/eval-child.ts"
   ],
   "publication": "public: github.com/hraness/dawn-sdk, npm @hraness/dawn-sdk",
-  "scope": "palette and collection authoring and score SDK; no composer or renderer",
+  "scope": "palette and collection authoring, score SDK and offline renderer; no composer",
   "admission": {
     "publicationApproved": true,
-    "approval": "owner, 2026-11-15: publish as MIT; sound presets confirmed original",
-    "licenseBasis": "MIT, declared by the DAWN repository and its owner"
+    "approval": "owner, 2026-11-15: publish as MIT; sound presets confirmed original; publish the renderer",
+    "licenseBasis": "MIT, declared by core/sdk/LICENSE for the SDK, extension and renderer sources and by the owner; the studio sounds are CC0-1.0"
   },
   "files": [
+    {
+      "path": "assets/samples/studio/glass-hit.wav",
+      "bytes": 38444,
+      "sha256": "d9b0785e8172cba4e6fa5e57320a70392e6c1a9db8f3737d087704a86812086b",
+      "license": "CC0-1.0",
+      "provenance": {
+        "sourcePath": "assets/samples/studio/glass-hit.wav",
+        "sourceSha256": "d9b0785e8172cba4e6fa5e57320a70392e6c1a9db8f3737d087704a86812086b",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "assets/samples/studio/hold-on.wav",
+      "bytes": 96044,
+      "sha256": "2ba6611084af627e05e375ef5d35e3947a004969d04202b4c0bf7814d85184d1",
+      "license": "CC0-1.0",
+      "provenance": {
+        "sourcePath": "assets/samples/studio/hold-on.wav",
+        "sourceSha256": "2ba6611084af627e05e375ef5d35e3947a004969d04202b4c0bf7814d85184d1",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "assets/samples/studio/manifest.json",
+      "bytes": 1306,
+      "sha256": "d3627be200e3108fef658e37083cfec8ba1f80d8afbc084635ef28ba22a79137",
+      "license": "CC0-1.0",
+      "provenance": {
+        "generatedBy": "scripts/export-extension-sdk.ts"
+      }
+    },
+    {
+      "path": "assets/samples/studio/metal-hit.wav",
+      "bytes": 38444,
+      "sha256": "d6a80299a60b764d538e041c4c7ff3c6d11237182336217d28cf27202145a454",
+      "license": "CC0-1.0",
+      "provenance": {
+        "sourcePath": "assets/samples/studio/metal-hit.wav",
+        "sourceSha256": "d6a80299a60b764d538e041c4c7ff3c6d11237182336217d28cf27202145a454",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "assets/samples/studio/README.md",
+      "bytes": 1801,
+      "sha256": "54c3909d1de38eab7f72900c30d00ebaa911cb30e38c7deefc7cf7857b679003",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "sdk-public/editions/assets/samples/studio/README.md",
+        "sourceSha256": "54c3909d1de38eab7f72900c30d00ebaa911cb30e38c7deefc7cf7857b679003",
+        "adaptation": "SDK edition: the generated sounds only"
+      }
+    },
+    {
+      "path": "assets/samples/studio/riser.wav",
+      "bytes": 96044,
+      "sha256": "5a57894a109dc4fd117cee9acd9ea15c48a61fcfd27a9ba262e852ef9cff2108",
+      "license": "CC0-1.0",
+      "provenance": {
+        "sourcePath": "assets/samples/studio/riser.wav",
+        "sourceSha256": "5a57894a109dc4fd117cee9acd9ea15c48a61fcfd27a9ba262e852ef9cff2108",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "assets/samples/studio/stay-up.wav",
+      "bytes": 96044,
+      "sha256": "86e53719fdc7a28ab1f4062fd6160be51c067a64226f5ad3576f65ea08ec3d80",
+      "license": "CC0-1.0",
+      "provenance": {
+        "sourcePath": "assets/samples/studio/stay-up.wav",
+        "sourceSha256": "86e53719fdc7a28ab1f4062fd6160be51c067a64226f5ad3576f65ea08ec3d80",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "assets/samples/studio/tape-hit.wav",
+      "bytes": 21644,
+      "sha256": "7abfa46ffbd43ee40bba87a8bfe59db2eceb15b0e78e57c05600c1452399645f",
+      "license": "CC0-1.0",
+      "provenance": {
+        "sourcePath": "assets/samples/studio/tape-hit.wav",
+        "sourceSha256": "7abfa46ffbd43ee40bba87a8bfe59db2eceb15b0e78e57c05600c1452399645f",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "assets/samples/studio/vowel-ah.wav",
+      "bytes": 48044,
+      "sha256": "fc2203d1b567348baee1aeafad74e0c980a5bb3a730ad21ced80572399c024eb",
+      "license": "CC0-1.0",
+      "provenance": {
+        "sourcePath": "assets/samples/studio/vowel-ah.wav",
+        "sourceSha256": "fc2203d1b567348baee1aeafad74e0c980a5bb3a730ad21ced80572399c024eb",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "assets/samples/studio/vowel-oh.wav",
+      "bytes": 48044,
+      "sha256": "c98b8f9b8683d8eab3f1420e88ee6e7aef01fa0bdf7564f5d09ddc9c724980e8",
+      "license": "CC0-1.0",
+      "provenance": {
+        "sourcePath": "assets/samples/studio/vowel-oh.wav",
+        "sourceSha256": "c98b8f9b8683d8eab3f1420e88ee6e7aef01fa0bdf7564f5d09ddc9c724980e8",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "bun.lock",
+      "bytes": 942,
+      "sha256": "92f3548267a0c39d957c915bb1a302edc4689b62bf7aad6fd204776947c7230d",
+      "license": "MIT",
+      "provenance": {
+        "generatedBy": "scripts/export-extension-sdk.ts"
+      }
+    },
     {
       "path": "core/autotune.ts",
       "bytes": 34625,
@@ -25,6 +144,28 @@
         "sourcePath": "core/autotune.ts",
         "sourceSha256": "8b4d6cb28c8d70c739e626efb49ddf0b99fb046174fe19b6d7b9320aa69a57af",
         "adaptation": null
+      }
+    },
+    {
+      "path": "core/bundled-samples.ts",
+      "bytes": 4792,
+      "sha256": "bc247ec6ef3cf2b874b956b279a0fcccab5e6a35422df027a11863bb4aba0bf3",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/bundled-samples.ts",
+        "sourceSha256": "bc247ec6ef3cf2b874b956b279a0fcccab5e6a35422df027a11863bb4aba0bf3",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/bundled-vocals.ts",
+      "bytes": 376,
+      "sha256": "8d55ad60086e046867e1cf134d7cf93cc96f9dbe18d9d424b46195454561b723",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "sdk-public/editions/core/bundled-vocals.ts",
+        "sourceSha256": "8d55ad60086e046867e1cf134d7cf93cc96f9dbe18d9d424b46195454561b723",
+        "adaptation": "SDK edition: studio vocals omitted"
       }
     },
     {
@@ -39,13 +180,35 @@
       }
     },
     {
+      "path": "core/clips.ts",
+      "bytes": 17026,
+      "sha256": "6c328cc544509c3e9e9331a200f6cfcfcbd10408c55208f012eb901798e4ef7f",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/clips.ts",
+        "sourceSha256": "6c328cc544509c3e9e9331a200f6cfcfcbd10408c55208f012eb901798e4ef7f",
+        "adaptation": null
+      }
+    },
+    {
       "path": "core/collection.ts",
-      "bytes": 12236,
-      "sha256": "cee1fcc8214a72cc9eff5c8fb5e0e50b7e28abbee57ffb55b2eae668a94bda19",
+      "bytes": 14743,
+      "sha256": "4a8577a32167f943f337ca89d0481662fec4eaee05dd137a18cecf2e4cec57f7",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/collection.ts",
-        "sourceSha256": "cee1fcc8214a72cc9eff5c8fb5e0e50b7e28abbee57ffb55b2eae668a94bda19",
+        "sourceSha256": "4a8577a32167f943f337ca89d0481662fec4eaee05dd137a18cecf2e4cec57f7",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/device.ts",
+      "bytes": 34206,
+      "sha256": "f5f731f4acc0f7839e444e4540b76d502ace4f5f670a137c3800531ac4a198d5",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/device.ts",
+        "sourceSha256": "f5f731f4acc0f7839e444e4540b76d502ace4f5f670a137c3800531ac4a198d5",
         "adaptation": null
       }
     },
@@ -90,6 +253,17 @@
       "provenance": {
         "sourcePath": "core/fx.ts",
         "sourceSha256": "6adbfd1fedd2ec92b7d44b95e8f22d60b6c5d1cc83f8c48e05355f7fd63273b3",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/g2p.ts",
+      "bytes": 19784,
+      "sha256": "787da7725b4cf335a4eed226ed3bacdfbb868baa1f102e578ac12b0e7f8d6810",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/g2p.ts",
+        "sourceSha256": "787da7725b4cf335a4eed226ed3bacdfbb868baa1f102e578ac12b0e7f8d6810",
         "adaptation": null
       }
     },
@@ -139,12 +313,34 @@
     },
     {
       "path": "core/kits.ts",
-      "bytes": 11494,
-      "sha256": "5676f0bf65e8f39365e690ee47ea7287b99b0b7c177e3e49331b4e9248a0aa09",
+      "bytes": 12185,
+      "sha256": "28ebc53a08137098698548b68bc955df462e2fb553ecf6022ea261f95fddda57",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/kits.ts",
-        "sourceSha256": "5676f0bf65e8f39365e690ee47ea7287b99b0b7c177e3e49331b4e9248a0aa09",
+        "sourceSha256": "28ebc53a08137098698548b68bc955df462e2fb553ecf6022ea261f95fddda57",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/loop.ts",
+      "bytes": 4071,
+      "sha256": "198e3730e6edb7e585a33d0dbe4d04847ba683c284d5c42037f0f9249802c7da",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/loop.ts",
+        "sourceSha256": "198e3730e6edb7e585a33d0dbe4d04847ba683c284d5c42037f0f9249802c7da",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/lyrics.ts",
+      "bytes": 14847,
+      "sha256": "bbd32e988817d50a131d74e9b5806966bcca9ed79107aae9e8e7403dd7bbad9a",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/lyrics.ts",
+        "sourceSha256": "bbd32e988817d50a131d74e9b5806966bcca9ed79107aae9e8e7403dd7bbad9a",
         "adaptation": null
       }
     },
@@ -172,12 +368,12 @@
     },
     {
       "path": "core/palette.ts",
-      "bytes": 9154,
-      "sha256": "d9190a11832203928a9039a2f946efce32681726adc222e9255edba4d31bcbad",
+      "bytes": 13018,
+      "sha256": "064afef7f0fbbd1af78b5555386e8b22f6ab58cf13286144f71ae3dd34b4a32f",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/palette.ts",
-        "sourceSha256": "d9190a11832203928a9039a2f946efce32681726adc222e9255edba4d31bcbad",
+        "sourceSha256": "064afef7f0fbbd1af78b5555386e8b22f6ab58cf13286144f71ae3dd34b4a32f",
         "adaptation": null
       }
     },
@@ -194,23 +390,23 @@
     },
     {
       "path": "core/patch-nodes.ts",
-      "bytes": 23790,
-      "sha256": "ebfc875638dac6e19d5bde83d90739b8de88bef7c9354888e4222ad66f01814f",
+      "bytes": 26081,
+      "sha256": "7bc6f9a7d43c7f4992b2b3dc41d4f2d196b41b625da45c08c81af52abb7329a1",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/patch-nodes.ts",
-        "sourceSha256": "ebfc875638dac6e19d5bde83d90739b8de88bef7c9354888e4222ad66f01814f",
+        "sourceSha256": "7bc6f9a7d43c7f4992b2b3dc41d4f2d196b41b625da45c08c81af52abb7329a1",
         "adaptation": null
       }
     },
     {
       "path": "core/patch.ts",
-      "bytes": 52938,
-      "sha256": "c3cf8a134c57136cf6d3ac4f7ca2450c29a0fbc76cdc3b56d70dce3787fdcd62",
+      "bytes": 54182,
+      "sha256": "8a6a309daf17d499c2463b3a7d5c04aecaaece8cce40faa1304543a41926d09c",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/patch.ts",
-        "sourceSha256": "c3cf8a134c57136cf6d3ac4f7ca2450c29a0fbc76cdc3b56d70dce3787fdcd62",
+        "sourceSha256": "8a6a309daf17d499c2463b3a7d5c04aecaaece8cce40faa1304543a41926d09c",
         "adaptation": null
       }
     },
@@ -233,6 +429,17 @@
       "provenance": {
         "sourcePath": "core/resonators.ts",
         "sourceSha256": "9b527b077768df185d1a5963990e71daca9273d6ae451767e98515bb9749a45a",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/rhythm.ts",
+      "bytes": 10228,
+      "sha256": "813b9dddc8474b775792fa6e1f37172e0f15b7b86eb1705077c5c300b221d256",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/rhythm.ts",
+        "sourceSha256": "813b9dddc8474b775792fa6e1f37172e0f15b7b86eb1705077c5c300b221d256",
         "adaptation": null
       }
     },
@@ -270,13 +477,79 @@
       }
     },
     {
+      "path": "core/sdk/eval-child.ts",
+      "bytes": 5531,
+      "sha256": "46b4b8dd98e1c1640e818e044a3108664720c2a5a86c600722533642cbe2e281",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/sdk/eval-child.ts",
+        "sourceSha256": "46b4b8dd98e1c1640e818e044a3108664720c2a5a86c600722533642cbe2e281",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/sdk/eval.ts",
+      "bytes": 10916,
+      "sha256": "82a7ef904995aba3d2da8434318a032f94591df17b382409c4c8c629b43c93d1",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/sdk/eval.ts",
+        "sourceSha256": "82a7ef904995aba3d2da8434318a032f94591df17b382409c4c8c629b43c93d1",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/sdk/print.ts",
+      "bytes": 63819,
+      "sha256": "8322e7bd7650410bfe6c94b835d6d6b406b0c4f362ebc2361efc7466e2b3d10b",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/sdk/print.ts",
+        "sourceSha256": "8322e7bd7650410bfe6c94b835d6d6b406b0c4f362ebc2361efc7466e2b3d10b",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/sdk/sandbox-positions.ts",
+      "bytes": 10139,
+      "sha256": "638a1316200039699abbafb0e29d35a5910669fb6eef19d3d5c4a2a0089a7481",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/sdk/sandbox-positions.ts",
+        "sourceSha256": "638a1316200039699abbafb0e29d35a5910669fb6eef19d3d5c4a2a0089a7481",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/sdk/sandbox.ts",
+      "bytes": 23529,
+      "sha256": "f834eb5f24c895b96a590a04eaebd16d466a830fc082bffb2a2df480e16b853d",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/sdk/sandbox.ts",
+        "sourceSha256": "f834eb5f24c895b96a590a04eaebd16d466a830fc082bffb2a2df480e16b853d",
+        "adaptation": null
+      }
+    },
+    {
       "path": "core/sdk/v1.ts",
-      "bytes": 559078,
-      "sha256": "5a54a0947abb8dd8dd2c83f8b9060ff93af8e2225f526238a2656013dcc97dec",
+      "bytes": 568740,
+      "sha256": "509e5421658bf227e55c31565b4e0182654db56d7b877042d538428ccafac9ac",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/sdk/v1.ts",
-        "sourceSha256": "5a54a0947abb8dd8dd2c83f8b9060ff93af8e2225f526238a2656013dcc97dec",
+        "sourceSha256": "509e5421658bf227e55c31565b4e0182654db56d7b877042d538428ccafac9ac",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/sections.ts",
+      "bytes": 83376,
+      "sha256": "ecf5a783579b74afae998aa3492885d44719d3cccda3b45a7a41893d1b1d14d7",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/sections.ts",
+        "sourceSha256": "ecf5a783579b74afae998aa3492885d44719d3cccda3b45a7a41893d1b1d14d7",
         "adaptation": null
       }
     },
@@ -380,6 +653,17 @@
       }
     },
     {
+      "path": "core/vox-phones.ts",
+      "bytes": 10583,
+      "sha256": "8d53c31f77ed28831aa3e72b4edee617e6ebc9d254d984046761c883706e9507",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/vox-phones.ts",
+        "sourceSha256": "8d53c31f77ed28831aa3e72b4edee617e6ebc9d254d984046761c883706e9507",
+        "adaptation": null
+      }
+    },
+    {
       "path": "core/vox.ts",
       "bytes": 17382,
       "sha256": "9aaa3bec9328383bf279f64197c5160b193c3d9eec910558626b5c02571712dc",
@@ -403,24 +687,57 @@
     },
     {
       "path": "docs/collections.md",
-      "bytes": 6655,
-      "sha256": "8cb653627d6ca91c9859fb02392fcdd922fa44be581f3fda55f6a36c1b271b15",
+      "bytes": 19509,
+      "sha256": "0dc7e5cf405e75575a2b81cf5cb9cda69c0b62f66b5fb2eb5b9a6b7ea16efb71",
       "license": "MIT",
       "provenance": {
         "sourcePath": "docs/collections.md",
-        "sourceSha256": "65289456876303a635eaa6436499de6ed197da160150cc5cfd7074bbf79436a9",
+        "sourceSha256": "eb46379cbd04b025bd5485f2a1996c8b1ec0256b09bcf73447fad82993d7369c",
+        "adaptation": "SDK command names"
+      }
+    },
+    {
+      "path": "docs/devices.md",
+      "bytes": 13134,
+      "sha256": "882d8451c6736976b01e59b72eea1dd1506a03d3f8aeb112509a116ad1d18152",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "docs/devices.md",
+        "sourceSha256": "840aea53fc1217f18d87063e2f5484ec556d22a4c507c7ff49644747db1b0af3",
         "adaptation": "SDK command names"
       }
     },
     {
       "path": "docs/palettes.md",
-      "bytes": 5286,
-      "sha256": "3c41762e8c270dbc5ca968e2f63219b8e37c6bf6012e1d011bea404c1edc68ac",
+      "bytes": 9466,
+      "sha256": "bdc3dfa2e8f346be8617c69a40a6573adf6fab31d6f32dc8edc8e4f4d19b3ee9",
       "license": "MIT",
       "provenance": {
         "sourcePath": "docs/palettes.md",
-        "sourceSha256": "c3ab438d1801f97f73797637bc5f77a51ef42afce39986bada83559e79833072",
+        "sourceSha256": "edb0c1e0d7753dbddd236989abef713b0ffb0daeedcb829f97044be27faa90c1",
         "adaptation": "reference link targets included SDK source; SDK command names"
+      }
+    },
+    {
+      "path": "examples/devices/fold.wasm",
+      "bytes": 284,
+      "sha256": "fe0563ee921a5d01c5f7780aa0471950000cc67a92be18e57c1b29c39b3ae989",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "examples/devices/fold.wasm",
+        "sourceSha256": "fe0563ee921a5d01c5f7780aa0471950000cc67a92be18e57c1b29c39b3ae989",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "examples/devices/fold.wat",
+      "bytes": 2385,
+      "sha256": "4b636e0c331542404d4c0a203dc164d67652386be81a1add015307d19b80001b",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "examples/devices/fold.wat",
+        "sourceSha256": "4b636e0c331542404d4c0a203dc164d67652386be81a1add015307d19b80001b",
+        "adaptation": null
       }
     },
     {
@@ -440,15 +757,15 @@
       "sha256": "74b69bf37c8f340c9c2a54d431a15218738d9c463d0e014fa6a8bb8edce4e539",
       "license": "MIT",
       "provenance": {
-        "sourcePath": "LICENSE",
+        "sourcePath": "core/sdk/LICENSE",
         "sourceSha256": "74b69bf37c8f340c9c2a54d431a15218738d9c463d0e014fa6a8bb8edce4e539",
         "adaptation": null
       }
     },
     {
       "path": "package.json",
-      "bytes": 812,
-      "sha256": "9f4b9bbb4dd41acec2f23c3e33bf0d66b70418164615b4d9bc6da8b19f2f0b36",
+      "bytes": 1052,
+      "sha256": "076bf6f0b3b8cf39976c0836e56fad2fb261e432140ab899f942fd02205713f4",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
@@ -456,22 +773,1342 @@
     },
     {
       "path": "README.md",
-      "bytes": 4586,
-      "sha256": "2a6c180f99b2e82a9c2ce6fbc79632b8514356406530cb909e3b5c721c3d2ed1",
+      "bytes": 6752,
+      "sha256": "fac53cfc049d6d21a968ac1efac3724da8e7b48ac556857dd0681fe8b7bc8b5f",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
       }
     },
     {
+      "path": "src/audio/analysis.ts",
+      "bytes": 8665,
+      "sha256": "e18f2ccaec3f939e1de8a0a4eeb2dcc1f03310443f4938faf7dc1c2b48387e14",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/analysis.ts",
+        "sourceSha256": "e18f2ccaec3f939e1de8a0a4eeb2dcc1f03310443f4938faf7dc1c2b48387e14",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/arrange.ts",
+      "bytes": 35202,
+      "sha256": "0ba736cc521e0fbd24ce5ede194be21a306341e11b937fdd4b000d24d32be60a",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/arrange.ts",
+        "sourceSha256": "0ba736cc521e0fbd24ce5ede194be21a306341e11b937fdd4b000d24d32be60a",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/autotune-engine.ts",
+      "bytes": 3395,
+      "sha256": "1e821337f6a29f8818b6c1a3b325503ca483ac5c54ee23e8139d6b11e2d8257b",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/autotune-engine.ts",
+        "sourceSha256": "1e821337f6a29f8818b6c1a3b325503ca483ac5c54ee23e8139d6b11e2d8257b",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/autotune.ts",
+      "bytes": 20089,
+      "sha256": "554e833bd0ac96b6d72e55a69aacfabd0d2e5e950322caf7380dcf8e5e8e3987",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/autotune.ts",
+        "sourceSha256": "554e833bd0ac96b6d72e55a69aacfabd0d2e5e950322caf7380dcf8e5e8e3987",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/bundled-samples.ts",
+      "bytes": 1145,
+      "sha256": "26300b961403c087b0c97e471d3adafe7a85ce2d5e0172870eb710dfe57f033b",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/bundled-samples.ts",
+        "sourceSha256": "26300b961403c087b0c97e471d3adafe7a85ce2d5e0172870eb710dfe57f033b",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/cache.ts",
+      "bytes": 6488,
+      "sha256": "105e68ae121e70637a7ad025ea5da5e82fda0ce0a2ecca98dcbf4c63c5856171",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/cache.ts",
+        "sourceSha256": "105e68ae121e70637a7ad025ea5da5e82fda0ce0a2ecca98dcbf4c63c5856171",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/clips.ts",
+      "bytes": 8547,
+      "sha256": "f6ed98a27a8bd3a0ff085698da3ad2c946223f968e021493a3d033e850ae81b0",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/clips.ts",
+        "sourceSha256": "f6ed98a27a8bd3a0ff085698da3ad2c946223f968e021493a3d033e850ae81b0",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/bandbank.ts",
+      "bytes": 3956,
+      "sha256": "f4abab5bff99b66163ba248b63b8d917532132236b3d1279e97e3a75a5c8e03a",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/bandbank.ts",
+        "sourceSha256": "f4abab5bff99b66163ba248b63b8d917532132236b3d1279e97e3a75a5c8e03a",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/bank.ts",
+      "bytes": 7753,
+      "sha256": "6964d0651c75b6da7532a8c9d562bac430e9957e3fc02f613099a152c0d33866",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/bank.ts",
+        "sourceSha256": "6964d0651c75b6da7532a8c9d562bac430e9957e3fc02f613099a152c0d33866",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/envelope.ts",
+      "bytes": 6301,
+      "sha256": "fb5e41e622e2301a492f87e826d8dfdf8e6eaae1334dbc7f6184ca2e76056c38",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/envelope.ts",
+        "sourceSha256": "fb5e41e622e2301a492f87e826d8dfdf8e6eaae1334dbc7f6184ca2e76056c38",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/fft.ts",
+      "bytes": 272,
+      "sha256": "b0686190d1cb0caba4926969defb9bc77a55f540cdaa0c5825c289022f33f152",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/fft.ts",
+        "sourceSha256": "b0686190d1cb0caba4926969defb9bc77a55f540cdaa0c5825c289022f33f152",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/filters.ts",
+      "bytes": 1222,
+      "sha256": "ffc0d264d03400579a2597da2e26a75b6f77bfce30d4d2fa29f251ba2f753109",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/filters.ts",
+        "sourceSha256": "ffc0d264d03400579a2597da2e26a75b6f77bfce30d4d2fa29f251ba2f753109",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/follow.ts",
+      "bytes": 4203,
+      "sha256": "e257b0874e30cd7cf55bc8ed06ec14f53ac006dc4ff73edb9bbd9ef56e9e5bfd",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/follow.ts",
+        "sourceSha256": "e257b0874e30cd7cf55bc8ed06ec14f53ac006dc4ff73edb9bbd9ef56e9e5bfd",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/formant.ts",
+      "bytes": 12148,
+      "sha256": "df34108814b8ffcbec190337718987f3a0fc9944f4bfcb662b32d373b7a6b016",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/formant.ts",
+        "sourceSha256": "df34108814b8ffcbec190337718987f3a0fc9944f4bfcb662b32d373b7a6b016",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/glottal.ts",
+      "bytes": 8013,
+      "sha256": "8267f51f3edccf192aaf9253268ee31e441e1f92ab6bc4ca6ad5bed2fc88fc78",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/glottal.ts",
+        "sourceSha256": "8267f51f3edccf192aaf9253268ee31e441e1f92ab6bc4ca6ad5bed2fc88fc78",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/interp.ts",
+      "bytes": 3711,
+      "sha256": "587824a54ec402313fe94a18badc7adcb6e232b60064b5a9820143bb987de239",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/interp.ts",
+        "sourceSha256": "587824a54ec402313fe94a18badc7adcb6e232b60064b5a9820143bb987de239",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/lpc.ts",
+      "bytes": 1346,
+      "sha256": "69e698f0a9612470b2a7622e3b4628f79b060741daaf1f1eaa9eefae36504707",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/lpc.ts",
+        "sourceSha256": "69e698f0a9612470b2a7622e3b4628f79b060741daaf1f1eaa9eefae36504707",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/modal.ts",
+      "bytes": 21924,
+      "sha256": "16791079d27d0442bdbaabcd57a9df96ee6f80553d82885005ef63eae5ae0824",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/modal.ts",
+        "sourceSha256": "16791079d27d0442bdbaabcd57a9df96ee6f80553d82885005ef63eae5ae0824",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/onset.ts",
+      "bytes": 6906,
+      "sha256": "64437b32cdde0e808fcb135929329a5b61c4a49e880ff8f55ad3f94c4a8aa4c4",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/onset.ts",
+        "sourceSha256": "64437b32cdde0e808fcb135929329a5b61c4a49e880ff8f55ad3f94c4a8aa4c4",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/oversample.ts",
+      "bytes": 6115,
+      "sha256": "5a4f4e448fa6bc9397154d8fb8c50e79137e0a15219f82330ebb2d57ac3d0245",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/oversample.ts",
+        "sourceSha256": "5a4f4e448fa6bc9397154d8fb8c50e79137e0a15219f82330ebb2d57ac3d0245",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/periodicity.ts",
+      "bytes": 2011,
+      "sha256": "f084d2a9fc44eb6bab318e44b85361acf91a91ff512aa1962106a5f6a03273f3",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/periodicity.ts",
+        "sourceSha256": "f084d2a9fc44eb6bab318e44b85361acf91a91ff512aa1962106a5f6a03273f3",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/pitch.ts",
+      "bytes": 31216,
+      "sha256": "19d4d5ff9384e84dc3a587b5fcf54b8e692997a90a14efbdbe7f754da1513510",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/pitch.ts",
+        "sourceSha256": "19d4d5ff9384e84dc3a587b5fcf54b8e692997a90a14efbdbe7f754da1513510",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/psola.ts",
+      "bytes": 7147,
+      "sha256": "2138d5783a08c57bbe6fe45a72d6a952cce6c0f44fd50dfac92c77948fbe3062",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/psola.ts",
+        "sourceSha256": "2138d5783a08c57bbe6fe45a72d6a952cce6c0f44fd50dfac92c77948fbe3062",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/rng.ts",
+      "bytes": 1336,
+      "sha256": "02fd3d1046d7c46a0a8ca052cd9c057f016926026c694b265d6bd2281cee1c2e",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/rng.ts",
+        "sourceSha256": "02fd3d1046d7c46a0a8ca052cd9c057f016926026c694b265d6bd2281cee1c2e",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/shape.ts",
+      "bytes": 2072,
+      "sha256": "962a98510fdf55ca8a2eebd24df704e729a97affdf2519b63120bb7ccbe2c964",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/shape.ts",
+        "sourceSha256": "962a98510fdf55ca8a2eebd24df704e729a97affdf2519b63120bb7ccbe2c964",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/shift.ts",
+      "bytes": 8348,
+      "sha256": "390c9d5fba145558a5799088412ec2411cda15b92a6313f0bc3a39d1e5feded6",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/shift.ts",
+        "sourceSha256": "390c9d5fba145558a5799088412ec2411cda15b92a6313f0bc3a39d1e5feded6",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/stft.ts",
+      "bytes": 2295,
+      "sha256": "4f811202b5c9237e928a1a955dabd07888f7707dd479d3e3b0f1719de4693839",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/stft.ts",
+        "sourceSha256": "4f811202b5c9237e928a1a955dabd07888f7707dd479d3e3b0f1719de4693839",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/dsp/window.ts",
+      "bytes": 2513,
+      "sha256": "b48bc0e59864866e748d6e03ddb33fa1be6be18b304983ad49fb5b6f9267c49d",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/dsp/window.ts",
+        "sourceSha256": "b48bc0e59864866e748d6e03ddb33fa1be6be18b304983ad49fb5b6f9267c49d",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/bus.ts",
+      "bytes": 4453,
+      "sha256": "215e1c0902ac17476d0aec1b4e3a2dc21aeaeee2db15e64a56622ab33a6da1bd",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/bus.ts",
+        "sourceSha256": "215e1c0902ac17476d0aec1b4e3a2dc21aeaeee2db15e64a56622ab33a6da1bd",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/chain.ts",
+      "bytes": 4119,
+      "sha256": "7e5733932cd0cf4bad154e7a5643802199b0873d860529660c87e7e84c227734",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/chain.ts",
+        "sourceSha256": "7e5733932cd0cf4bad154e7a5643802199b0873d860529660c87e7e84c227734",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/common.ts",
+      "bytes": 10841,
+      "sha256": "9f684fa7a09c09896415559c843e33caf52608bb3aafbdf2c317928690f3e902",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/common.ts",
+        "sourceSha256": "9f684fa7a09c09896415559c843e33caf52608bb3aafbdf2c317928690f3e902",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/convolution.ts",
+      "bytes": 15005,
+      "sha256": "5f84f3d7db409a9064a67097c0477c8bd1e1deaf08ec0f5420a49b196c0e8b5d",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/convolution.ts",
+        "sourceSha256": "5f84f3d7db409a9064a67097c0477c8bd1e1deaf08ec0f5420a49b196c0e8b5d",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/drive.ts",
+      "bytes": 5220,
+      "sha256": "11c905a74fadebe184bcfbc2e789a5963fafb068061ae76225b3aa03cff42b99",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/drive.ts",
+        "sourceSha256": "11c905a74fadebe184bcfbc2e789a5963fafb068061ae76225b3aa03cff42b99",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/duck.ts",
+      "bytes": 6046,
+      "sha256": "9c81c8ce45bce5d0c8363abd29f90bc59a3f9dd0be4431ebf35319e8b25b0995",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/duck.ts",
+        "sourceSha256": "9c81c8ce45bce5d0c8363abd29f90bc59a3f9dd0be4431ebf35319e8b25b0995",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/dynamics.ts",
+      "bytes": 6254,
+      "sha256": "ce1e6495bc9cbd6a03efdcdfe1fe8dc3272a83e1c7598ffd7d9e11a22ea8584d",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/dynamics.ts",
+        "sourceSha256": "ce1e6495bc9cbd6a03efdcdfe1fe8dc3272a83e1c7598ffd7d9e11a22ea8584d",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/eq.ts",
+      "bytes": 3095,
+      "sha256": "0af25482db2476662a18e760bf40a846286c4fc2dd81aa09cbff91f806acd3e8",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/eq.ts",
+        "sourceSha256": "0af25482db2476662a18e760bf40a846286c4fc2dd81aa09cbff91f806acd3e8",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/filter.ts",
+      "bytes": 10115,
+      "sha256": "65faa5f3b6261afd065dc4525ea12493d1f8edad7cd72e6439d7275cceed07cf",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/filter.ts",
+        "sourceSha256": "65faa5f3b6261afd065dc4525ea12493d1f8edad7cd72e6439d7275cceed07cf",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/formant.ts",
+      "bytes": 9092,
+      "sha256": "288312e437df023e7f78c2706b4266e2e031f768f2de7d4689e5d17ac48807b6",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/formant.ts",
+        "sourceSha256": "288312e437df023e7f78c2706b4266e2e031f768f2de7d4689e5d17ac48807b6",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/gaze.ts",
+      "bytes": 12906,
+      "sha256": "2d9ed5b6d1b057d751ea2bc9e5989de139f950296bda8957278e52093d45be04",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/gaze.ts",
+        "sourceSha256": "2d9ed5b6d1b057d751ea2bc9e5989de139f950296bda8957278e52093d45be04",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/modulation.ts",
+      "bytes": 5794,
+      "sha256": "c1cc5d71acbb19fbbd6ecf45521a745d9c454494f6b11287545652850a3947b6",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/modulation.ts",
+        "sourceSha256": "c1cc5d71acbb19fbbd6ecf45521a745d9c454494f6b11287545652850a3947b6",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/rig/cab.ts",
+      "bytes": 2444,
+      "sha256": "67d34082694a3201231d4b5004d2be5b259caad74a7b1eaadae6e2427ebb1c92",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/rig/cab.ts",
+        "sourceSha256": "67d34082694a3201231d4b5004d2be5b259caad74a7b1eaadae6e2427ebb1c92",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/rig/filters.ts",
+      "bytes": 3700,
+      "sha256": "b2cd07b4b641160c4875f2f4bc912d474038640f597ecc5ad4baee83327c38ca",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/rig/filters.ts",
+        "sourceSha256": "b2cd07b4b641160c4875f2f4bc912d474038640f597ecc5ad4baee83327c38ca",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/rig/gate.ts",
+      "bytes": 1271,
+      "sha256": "c2158a1e0be59234a45a939fe81701aca1d7476a5a48c1ffd6ad02fa2f268cec",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/rig/gate.ts",
+        "sourceSha256": "c2158a1e0be59234a45a939fe81701aca1d7476a5a48c1ffd6ad02fa2f268cec",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/rig/head.ts",
+      "bytes": 13941,
+      "sha256": "4ed12d284c27397b9f87f48839349229c6fde5f7e4e01b058dc12f377ffcd9a9",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/rig/head.ts",
+        "sourceSha256": "4ed12d284c27397b9f87f48839349229c6fde5f7e4e01b058dc12f377ffcd9a9",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/rig/index.ts",
+      "bytes": 5260,
+      "sha256": "9cc3618eb3a9e421a1c0e56809a4e4e5fae3bf11ab1aa28c5dc0b2ff3077048d",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/rig/index.ts",
+        "sourceSha256": "9cc3618eb3a9e421a1c0e56809a4e4e5fae3bf11ab1aa28c5dc0b2ff3077048d",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/rig/section.ts",
+      "bytes": 2647,
+      "sha256": "cdba4221edd0283fa72db37fbf72e07184d309aa80200aa02ea0fb1fb5029bb2",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/rig/section.ts",
+        "sourceSha256": "cdba4221edd0283fa72db37fbf72e07184d309aa80200aa02ea0fb1fb5029bb2",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/rig/stomp.ts",
+      "bytes": 7123,
+      "sha256": "c4f59549a258a3c172175994a398a01781dd9fa98368313b0f43729d9d9aa8f2",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/rig/stomp.ts",
+        "sourceSha256": "c4f59549a258a3c172175994a398a01781dd9fa98368313b0f43729d9d9aa8f2",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/effects/space.ts",
+      "bytes": 19980,
+      "sha256": "9ecbedd73e140bf1b6b8a25f44f42ce08bf739746befb5e6a07181b95bf77060",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/effects/space.ts",
+        "sourceSha256": "9ecbedd73e140bf1b6b8a25f44f42ce08bf739746befb5e6a07181b95bf77060",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/export-audio.ts",
+      "bytes": 2224,
+      "sha256": "e1425f8574c57a17afe5ae132ec5721b0688e169cd2b34a846ab45ac1441d0f4",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/export-audio.ts",
+        "sourceSha256": "e1425f8574c57a17afe5ae132ec5721b0688e169cd2b34a846ab45ac1441d0f4",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/fit.ts",
+      "bytes": 15503,
+      "sha256": "1e498c412cccd71321c986f5a0d51cb64538eded8855770f37fd319f575e918a",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/fit.ts",
+        "sourceSha256": "1e498c412cccd71321c986f5a0d51cb64538eded8855770f37fd319f575e918a",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/granular.ts",
+      "bytes": 34915,
+      "sha256": "874d8b445236b40f1efa49ad375f50683cebad9d67084f196f5577cd2fbc1fbf",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/granular.ts",
+        "sourceSha256": "874d8b445236b40f1efa49ad375f50683cebad9d67084f196f5577cd2fbc1fbf",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/instruments.ts",
+      "bytes": 5318,
+      "sha256": "75ad8fc94553e662b6a9c48e0713125a1af18d183f6923731377ef9d769f0063",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/instruments.ts",
+        "sourceSha256": "75ad8fc94553e662b6a9c48e0713125a1af18d183f6923731377ef9d769f0063",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/keys/calibration.ts",
+      "bytes": 2663,
+      "sha256": "ee2efd3d802e9c8fe655f8a874e80fb4eb4d6a57866545638264b5e7190cfa90",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/keys/calibration.ts",
+        "sourceSha256": "ee2efd3d802e9c8fe655f8a874e80fb4eb4d6a57866545638264b5e7190cfa90",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/keys/dsp.ts",
+      "bytes": 9989,
+      "sha256": "5f849a2ee4f213b911656a05337950103490ed729f7d56376a1330f712fadb4f",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/keys/dsp.ts",
+        "sourceSha256": "5f849a2ee4f213b911656a05337950103490ed729f7d56376a1330f712fadb4f",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/keys/electric.ts",
+      "bytes": 14722,
+      "sha256": "3d4d84012bc287646d518b4242675ab71a2b77e4a6757f18e0b9c502d30dc347",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/keys/electric.ts",
+        "sourceSha256": "3d4d84012bc287646d518b4242675ab71a2b77e4a6757f18e0b9c502d30dc347",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/keys/engine.ts",
+      "bytes": 16677,
+      "sha256": "f1339e9ec66704d1bc8da4faae409a65e2121a72a96859bc123c64d9682086fe",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/keys/engine.ts",
+        "sourceSha256": "f1339e9ec66704d1bc8da4faae409a65e2121a72a96859bc123c64d9682086fe",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/keys/organ.ts",
+      "bytes": 44615,
+      "sha256": "84e573a9d907bd8cfea0ecdfdb1bf1e235298637bab3b9b5d65f1f028d636d96",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/keys/organ.ts",
+        "sourceSha256": "84e573a9d907bd8cfea0ecdfdb1bf1e235298637bab3b9b5d65f1f028d636d96",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/keys/piano.ts",
+      "bytes": 17094,
+      "sha256": "ef42019ebb355c76bf8b5a8aad983961d756b44f86e267e32a5326ecd1fa38a5",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/keys/piano.ts",
+        "sourceSha256": "ef42019ebb355c76bf8b5a8aad983961d756b44f86e267e32a5326ecd1fa38a5",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/keys/sympathetic.ts",
+      "bytes": 4365,
+      "sha256": "a016ba279a94286a6c7880f7b788f6e9f5ed47a0c6255b186a4c30224f0b2bf1",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/keys/sympathetic.ts",
+        "sourceSha256": "a016ba279a94286a6c7880f7b788f6e9f5ed47a0c6255b186a4c30224f0b2bf1",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/kits.ts",
+      "bytes": 11762,
+      "sha256": "ffdb3a004099f618d9e1d25a83e5df2079a8e6c69153aa6ae845fcb8e41da024",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/kits.ts",
+        "sourceSha256": "ffdb3a004099f618d9e1d25a83e5df2079a8e6c69153aa6ae845fcb8e41da024",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/loop-cache.ts",
+      "bytes": 2004,
+      "sha256": "1dd32a5a44777c1f8c591b85c8e5302e0e560478e892995dab6e4a00ea54a2c1",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/loop-cache.ts",
+        "sourceSha256": "1dd32a5a44777c1f8c591b85c8e5302e0e560478e892995dab6e4a00ea54a2c1",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/loudness.ts",
+      "bytes": 19134,
+      "sha256": "085ff972ae629bce080f15404c6d60303f5310cc738b7f6f166c0aca4cabcdd0",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/loudness.ts",
+        "sourceSha256": "085ff972ae629bce080f15404c6d60303f5310cc738b7f6f166c0aca4cabcdd0",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/master.ts",
+      "bytes": 48759,
+      "sha256": "e84e9b7389d1b667686c88733011eb9ee3560de284ea03089487a1756f1aa1d3",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/master.ts",
+        "sourceSha256": "e84e9b7389d1b667686c88733011eb9ee3560de284ea03089487a1756f1aa1d3",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/measure-worker.ts",
+      "bytes": 1616,
+      "sha256": "26d8b2874eaf6192bbf452b134502f98c25e7b44ad32f023d4a0c35d7a4c2997",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/measure-worker.ts",
+        "sourceSha256": "26d8b2874eaf6192bbf452b134502f98c25e7b44ad32f023d4a0c35d7a4c2997",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/measure.ts",
+      "bytes": 3549,
+      "sha256": "705916baa691c6353dc95c96c0cbc36e98fa74cf59fa365be9b4804f4d7302fb",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/measure.ts",
+        "sourceSha256": "705916baa691c6353dc95c96c0cbc36e98fa74cf59fa365be9b4804f4d7302fb",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/native-dsp.ts",
+      "bytes": 571,
+      "sha256": "09d61ad1296cc235acf2a86e027fb5ab5e0284239ce1d95b8932c5ee544c0352",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "sdk-public/editions/src/audio/native-dsp.ts",
+        "sourceSha256": "09d61ad1296cc235acf2a86e027fb5ab5e0284239ce1d95b8932c5ee544c0352",
+        "adaptation": "SDK edition: reference DSP only, no native code"
+      }
+    },
+    {
+      "path": "src/audio/packs.ts",
+      "bytes": 60638,
+      "sha256": "8d9875e8c593b45809a87f60acaba2f605ebf3fcfa44b6c183c9fd080d597599",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/packs.ts",
+        "sourceSha256": "8d9875e8c593b45809a87f60acaba2f605ebf3fcfa44b6c183c9fd080d597599",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/patch/compile.ts",
+      "bytes": 40010,
+      "sha256": "bfa74e1a22fde520628fdc495d08f87d7dd27a16b21b104caa034fe73c925177",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/patch/compile.ts",
+        "sourceSha256": "bfa74e1a22fde520628fdc495d08f87d7dd27a16b21b104caa034fe73c925177",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/patch/device.ts",
+      "bytes": 12934,
+      "sha256": "2fbb3d7e2f668693c642443944b6a542f88076d9b4508f2362ebb1e527d5d019",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/patch/device.ts",
+        "sourceSha256": "2fbb3d7e2f668693c642443944b6a542f88076d9b4508f2362ebb1e527d5d019",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/patch/engine.ts",
+      "bytes": 22559,
+      "sha256": "2243768c3eb5b1b47c0f387a382826d17e218b0427cd28a754bfad291cffe013",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/patch/engine.ts",
+        "sourceSha256": "2243768c3eb5b1b47c0f387a382826d17e218b0427cd28a754bfad291cffe013",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/patch/fuse.ts",
+      "bytes": 17488,
+      "sha256": "8b9cd9da84b9e1d587257ceab9e0ae058288f55002d81ef7ebb54ec104cf7e63",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/patch/fuse.ts",
+        "sourceSha256": "8b9cd9da84b9e1d587257ceab9e0ae058288f55002d81ef7ebb54ec104cf7e63",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/patch/kernels.ts",
+      "bytes": 9721,
+      "sha256": "791f33994e8ad9f91c5e5d42dfdff1a1635e5113a2a86b3fe9c5e6c006c7a25e",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/patch/kernels.ts",
+        "sourceSha256": "791f33994e8ad9f91c5e5d42dfdff1a1635e5113a2a86b3fe9c5e6c006c7a25e",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/patch/nodes/envelopes.ts",
+      "bytes": 3658,
+      "sha256": "1ab773cfe9e3852f0ccfe51e1be78e30e654029954aae39c07940ce68b1d42f3",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/patch/nodes/envelopes.ts",
+        "sourceSha256": "1ab773cfe9e3852f0ccfe51e1be78e30e654029954aae39c07940ce68b1d42f3",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/patch/nodes/filters.ts",
+      "bytes": 2429,
+      "sha256": "69ea66254cd233cd17bc9e052c3e881265e90829e3f871fcc33bcb58be3155d2",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/patch/nodes/filters.ts",
+        "sourceSha256": "69ea66254cd233cd17bc9e052c3e881265e90829e3f871fcc33bcb58be3155d2",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/patch/nodes/frame.ts",
+      "bytes": 2445,
+      "sha256": "6f29994cfe71369e614e6fc6248fd4536762615c8a40fef23c6937df4fe29c05",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/patch/nodes/frame.ts",
+        "sourceSha256": "6f29994cfe71369e614e6fc6248fd4536762615c8a40fef23c6937df4fe29c05",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/patch/nodes/math.ts",
+      "bytes": 2955,
+      "sha256": "6c23c69f9db8cd6813c0035e688f7856ad062fe57aae05cd72287818e4203341",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/patch/nodes/math.ts",
+        "sourceSha256": "6c23c69f9db8cd6813c0035e688f7856ad062fe57aae05cd72287818e4203341",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/patch/nodes/mix.ts",
+      "bytes": 2762,
+      "sha256": "4f6595f343289eae49ba818d09a9d0b8c6d024fbd79bd87c48e6ef05ccae8ed2",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/patch/nodes/mix.ts",
+        "sourceSha256": "4f6595f343289eae49ba818d09a9d0b8c6d024fbd79bd87c48e6ef05ccae8ed2",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/patch/nodes/modulators.ts",
+      "bytes": 2720,
+      "sha256": "c3e5428c14be52d801ba86e9df5e67f2b913f8666da0e6dbfe5fc2b08d3e78ac",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/patch/nodes/modulators.ts",
+        "sourceSha256": "c3e5428c14be52d801ba86e9df5e67f2b913f8666da0e6dbfe5fc2b08d3e78ac",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/patch/nodes/sources.ts",
+      "bytes": 3730,
+      "sha256": "45eac34bd39411b8b39df23d4c1a4f5478b24ac0f154d82bbb0c8859798eb4c9",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/patch/nodes/sources.ts",
+        "sourceSha256": "45eac34bd39411b8b39df23d4c1a4f5478b24ac0f154d82bbb0c8859798eb4c9",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/patch/run.ts",
+      "bytes": 28558,
+      "sha256": "5cd2c9672996820e271fde97280cbcbfa70191c0c3d1cb93fd842df4768ccd11",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/patch/run.ts",
+        "sourceSha256": "5cd2c9672996820e271fde97280cbcbfa70191c0c3d1cb93fd842df4768ccd11",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/random.ts",
+      "bytes": 589,
+      "sha256": "43e8faab58f2a02185c4e176ace408e830680d2679cf61d022901939ad1bf0a2",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/random.ts",
+        "sourceSha256": "43e8faab58f2a02185c4e176ace408e830680d2679cf61d022901939ad1bf0a2",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/render-cache.ts",
+      "bytes": 20108,
+      "sha256": "fbe993a509550954fe326f289410a4827d2e93ca735128b2c8f184a5fac10834",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/render-cache.ts",
+        "sourceSha256": "fbe993a509550954fe326f289410a4827d2e93ca735128b2c8f184a5fac10834",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/resonators.ts",
+      "bytes": 10715,
+      "sha256": "4cc6f887df6469ac62b49cb7afb3511717767c8fb20ca0bf8e02892f682a76e0",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/resonators.ts",
+        "sourceSha256": "4cc6f887df6469ac62b49cb7afb3511717767c8fb20ca0bf8e02892f682a76e0",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/sampler.ts",
+      "bytes": 32075,
+      "sha256": "3ccbd52fe8aae13fd4b6f0881d61aedd1811f14e14e8e91f8f42ae65dd5321f5",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/sampler.ts",
+        "sourceSha256": "3ccbd52fe8aae13fd4b6f0881d61aedd1811f14e14e8e91f8f42ae65dd5321f5",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/samples.ts",
+      "bytes": 40575,
+      "sha256": "adeec8c31934b748a6c585d81fa6e8c3ab0af2eb0797a8f2fbb7cfda8948506f",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/samples.ts",
+        "sourceSha256": "adeec8c31934b748a6c585d81fa6e8c3ab0af2eb0797a8f2fbb7cfda8948506f",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/sing/engine.ts",
+      "bytes": 36718,
+      "sha256": "bbfbeb90b3f4f52e1733719ef73a354c573137371cc071103d79167e2a6248ea",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/sing/engine.ts",
+        "sourceSha256": "bbfbeb90b3f4f52e1733719ef73a354c573137371cc071103d79167e2a6248ea",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/sing/vox.ts",
+      "bytes": 16309,
+      "sha256": "a4f1f9d0de4bfbd7cb38a20668da870e12bb3514b6e89ad16b411d3c6c26a4e4",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/sing/vox.ts",
+        "sourceSha256": "a4f1f9d0de4bfbd7cb38a20668da870e12bb3514b6e89ad16b411d3c6c26a4e4",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/stems.ts",
+      "bytes": 7864,
+      "sha256": "567749c709b06810860a6afca8e66117205dbb12013b56f3f3e478b711741dc3",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/stems.ts",
+        "sourceSha256": "567749c709b06810860a6afca8e66117205dbb12013b56f3f3e478b711741dc3",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/strings/body.ts",
+      "bytes": 6936,
+      "sha256": "c689409d1f8d64981439eb9e5450a300f7f7093f882a05b409f6be6b37df00a2",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/strings/body.ts",
+        "sourceSha256": "c689409d1f8d64981439eb9e5450a300f7f7093f882a05b409f6be6b37df00a2",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/strings/bow.ts",
+      "bytes": 25089,
+      "sha256": "c1841212f7e67e340ce2e44e363af7f8333462de83283147ccd6a810688699c6",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/strings/bow.ts",
+        "sourceSha256": "c1841212f7e67e340ce2e44e363af7f8333462de83283147ccd6a810688699c6",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/strings/engine.ts",
+      "bytes": 22814,
+      "sha256": "315a9944032318640c346765ba2e6a6dca3b349b3e98da5cddfc6f7f4449d79f",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/strings/engine.ts",
+        "sourceSha256": "315a9944032318640c346765ba2e6a6dca3b349b3e98da5cddfc6f7f4449d79f",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/strings/loop.ts",
+      "bytes": 3808,
+      "sha256": "0ae5150c15096520f98733e838697b266ec7f50dc22ac46b279f8d57ad11c3c0",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/strings/loop.ts",
+        "sourceSha256": "0ae5150c15096520f98733e838697b266ec7f50dc22ac46b279f8d57ad11c3c0",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/strings/pluck.ts",
+      "bytes": 12110,
+      "sha256": "5ccfb3570f888c81033c90f313a72328582d1e4a2ab50dfbac26362beb9a3527",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/strings/pluck.ts",
+        "sourceSha256": "5ccfb3570f888c81033c90f313a72328582d1e4a2ab50dfbac26362beb9a3527",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/synth/oscillators.ts",
+      "bytes": 9622,
+      "sha256": "36d2b561c75d41e3245f0a02e2403c544693c8da4de2543a7cc871931c6890df",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/synth/oscillators.ts",
+        "sourceSha256": "36d2b561c75d41e3245f0a02e2403c544693c8da4de2543a7cc871931c6890df",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/synth/voice.ts",
+      "bytes": 22364,
+      "sha256": "fb340d74b246bfa0c647d17b956684f2620ddbbf8f7cc75c24f362dcb9a26364",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/synth/voice.ts",
+        "sourceSha256": "fb340d74b246bfa0c647d17b956684f2620ddbbf8f7cc75c24f362dcb9a26364",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/synth/zzfx.ts",
+      "bytes": 4662,
+      "sha256": "3bf79b2bfed8696158fd0364cf636a95c16df34a9d83976adef007912dc9873f",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/synth/zzfx.ts",
+        "sourceSha256": "3bf79b2bfed8696158fd0364cf636a95c16df34a9d83976adef007912dc9873f",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/texture/dsp.ts",
+      "bytes": 9787,
+      "sha256": "1e05a3eecdebd531b18f937a0ad61a53d7524dbc8424d17ebf0e9deab0d059bd",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/texture/dsp.ts",
+        "sourceSha256": "1e05a3eecdebd531b18f937a0ad61a53d7524dbc8424d17ebf0e9deab0d059bd",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/texture/engine.ts",
+      "bytes": 14264,
+      "sha256": "76661b1fc35e8a59a86cb5c208659787679fea85bfef51be870531971adeb247",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/texture/engine.ts",
+        "sourceSha256": "76661b1fc35e8a59a86cb5c208659787679fea85bfef51be870531971adeb247",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/texture/sources.ts",
+      "bytes": 41444,
+      "sha256": "1db60183cff46fd2b4d992a58248ca14c12551b64488c9f40d63574efac617e7",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/texture/sources.ts",
+        "sourceSha256": "1db60183cff46fd2b4d992a58248ca14c12551b64488c9f40d63574efac617e7",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/vocoder/bank.ts",
+      "bytes": 10493,
+      "sha256": "3b8182957fbc55aa7065234a63f1510af44a95a69f5f342026215adf8cd3ca7a",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/vocoder/bank.ts",
+        "sourceSha256": "3b8182957fbc55aa7065234a63f1510af44a95a69f5f342026215adf8cd3ca7a",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/vocoder/carrier.ts",
+      "bytes": 5818,
+      "sha256": "e376a4bc8559baceb522bffcf14692a1bd158fec1a07b95bfa697a6d5527656d",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/vocoder/carrier.ts",
+        "sourceSha256": "e376a4bc8559baceb522bffcf14692a1bd158fec1a07b95bfa697a6d5527656d",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/vocoder/control.ts",
+      "bytes": 1796,
+      "sha256": "67cf5d5c4b4d67c75e811c87dfcef8ddde193a98e0b11cb64d9266344063b73c",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/vocoder/control.ts",
+        "sourceSha256": "67cf5d5c4b4d67c75e811c87dfcef8ddde193a98e0b11cb64d9266344063b73c",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/vocoder/detect.ts",
+      "bytes": 1779,
+      "sha256": "8582b4fffe81c5c39daeefaf9f245d0770b133a1da22516606e2dd9fb9910d88",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/vocoder/detect.ts",
+        "sourceSha256": "8582b4fffe81c5c39daeefaf9f245d0770b133a1da22516606e2dd9fb9910d88",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/vocoder/index.ts",
+      "bytes": 9618,
+      "sha256": "62826c3229adb7a98d6ededbd834a123544f626d46fe9e5d1d82469d33470cda",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/vocoder/index.ts",
+        "sourceSha256": "62826c3229adb7a98d6ededbd834a123544f626d46fe9e5d1d82469d33470cda",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/vocoder/talkbox.ts",
+      "bytes": 5268,
+      "sha256": "0a3a607b5138d74755c4caa064cf1d8c94682a105d537e8e8402e591db2d70b0",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/vocoder/talkbox.ts",
+        "sourceSha256": "0a3a607b5138d74755c4caa064cf1d8c94682a105d537e8e8402e591db2d70b0",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/warp.ts",
+      "bytes": 4875,
+      "sha256": "825799f81ccf7d1319a1b92684e76bce008240819e6379ba037f967db42712ea",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/warp.ts",
+        "sourceSha256": "825799f81ccf7d1319a1b92684e76bce008240819e6379ba037f967db42712ea",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/wav.ts",
+      "bytes": 81958,
+      "sha256": "c2312e436e82b413f35d18563511c9a3f9ef05c2077e78b5a51e045545da9dda",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/wav.ts",
+        "sourceSha256": "c2312e436e82b413f35d18563511c9a3f9ef05c2077e78b5a51e045545da9dda",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/wavetable.ts",
+      "bytes": 21285,
+      "sha256": "b10f2cf44fe826126a1e2827e32a96fa1635f585dc9930b7590bad640d1fb1bf",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/wavetable.ts",
+        "sourceSha256": "b10f2cf44fe826126a1e2827e32a96fa1635f585dc9930b7590bad640d1fb1bf",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/window-cache.ts",
+      "bytes": 2911,
+      "sha256": "264de0871c826ba5ce53acc26ed2b6308a167a2ad8dc23eb835d0c11332e49db",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/window-cache.ts",
+        "sourceSha256": "264de0871c826ba5ce53acc26ed2b6308a167a2ad8dc23eb835d0c11332e49db",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/winds/engine.ts",
+      "bytes": 10680,
+      "sha256": "d4fab0f560dec93bc10df1b151497198acf50998d0cdaf9f38e0eaa67fab55bd",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/winds/engine.ts",
+        "sourceSha256": "d4fab0f560dec93bc10df1b151497198acf50998d0cdaf9f38e0eaa67fab55bd",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/winds/filters.ts",
+      "bytes": 4252,
+      "sha256": "bd395bd3d024b8df889f5f54f7cc1a40a3a25965fd34eac770096f39bfcef3ae",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/winds/filters.ts",
+        "sourceSha256": "bd395bd3d024b8df889f5f54f7cc1a40a3a25965fd34eac770096f39bfcef3ae",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/winds/trim.ts",
+      "bytes": 3790,
+      "sha256": "58ea8d6849c7b8be1f276b918fc962d5b97cddf6ca8610be998d6ac15865a4de",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/winds/trim.ts",
+        "sourceSha256": "58ea8d6849c7b8be1f276b918fc962d5b97cddf6ca8610be998d6ac15865a4de",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/winds/trims.ts",
+      "bytes": 33283,
+      "sha256": "d02f144279ef8803f76b4105a5bdbc82c7dff8dd9c1cb3ff3bc5e946d3da0d29",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/winds/trims.ts",
+        "sourceSha256": "d02f144279ef8803f76b4105a5bdbc82c7dff8dd9c1cb3ff3bc5e946d3da0d29",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/winds/trims1.ts",
+      "bytes": 11056,
+      "sha256": "a93921e66235acc6e71f3821619278d8c6be4db2baaf0d8df04bdee0aabed5b4",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/winds/trims1.ts",
+        "sourceSha256": "a93921e66235acc6e71f3821619278d8c6be4db2baaf0d8df04bdee0aabed5b4",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/audio/winds/voice.ts",
+      "bytes": 18138,
+      "sha256": "177e49bc5174617f6a8618c9b801cec8a33a483db4d4cfb18d1c4e6b7fb884cb",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/winds/voice.ts",
+        "sourceSha256": "177e49bc5174617f6a8618c9b801cec8a33a483db4d4cfb18d1c4e6b7fb884cb",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/collection/author.ts",
+      "bytes": 21536,
+      "sha256": "401419faca644ef90d4a31e9bbad7cf8b60d3dd31fbf26b77f8050c7821c616f",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/collection/author.ts",
+        "sourceSha256": "401419faca644ef90d4a31e9bbad7cf8b60d3dd31fbf26b77f8050c7821c616f",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/collection/cache.ts",
+      "bytes": 3374,
+      "sha256": "f098463e48c68beaa71ffd87a2a91794a649c123cc08ee14bd66b1fef86f5f79",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/collection/cache.ts",
+        "sourceSha256": "f098463e48c68beaa71ffd87a2a91794a649c123cc08ee14bd66b1fef86f5f79",
+        "adaptation": null
+      }
+    },
+    {
       "path": "src/collection/cli.ts",
-      "bytes": 12662,
-      "sha256": "e98bc1379ad32a4d5743b9899bd39ff6409dd3a5c38a4b37da9361f9112e896e",
+      "bytes": 17478,
+      "sha256": "ddb503534eca209c1f654286c3ebba56f86be509998bc5c9066557feaabbf7a1",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/collection/cli.ts",
-        "sourceSha256": "c836b4b5100e761b20f1544550074a66342cf71ce64056c6927e40e50064c63d",
+        "sourceSha256": "56b13ec98b78f889829dff27e7a8086ea7f5373f4ccffd9eefc8a785a3d34e4d",
         "adaptation": "SDK command names"
+      }
+    },
+    {
+      "path": "src/collection/install.ts",
+      "bytes": 41866,
+      "sha256": "6804c98794e5335e28a5d6d982d439685e484da763ef57fdc526e67ea26acad6",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/collection/install.ts",
+        "sourceSha256": "5d101c0b872d9ec0d944077eeffa81f455a6c75c9ec5df1f73825f7dac6da9b3",
+        "adaptation": "SDK command names"
+      }
+    },
+    {
+      "path": "src/collection/local.ts",
+      "bytes": 6133,
+      "sha256": "f4592fd58a9edd37bfac54deaba5c7324c99ae07dae972c019da5762bace6b6d",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/collection/local.ts",
+        "sourceSha256": "f4592fd58a9edd37bfac54deaba5c7324c99ae07dae972c019da5762bace6b6d",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/collection/lock.ts",
+      "bytes": 10514,
+      "sha256": "a9c9b53ee98c5176a48427fc7a76e21a3848fffba2b89d138ea515965776b2e3",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/collection/lock.ts",
+        "sourceSha256": "a9c9b53ee98c5176a48427fc7a76e21a3848fffba2b89d138ea515965776b2e3",
+        "adaptation": null
       }
     },
     {
@@ -486,6 +2123,50 @@
       }
     },
     {
+      "path": "src/collection/net.ts",
+      "bytes": 12585,
+      "sha256": "02205a31470aa3b8af427c9fbf0f8caddb1c3e95e1db114e8291e8ab63dd3ed1",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/collection/net.ts",
+        "sourceSha256": "02205a31470aa3b8af427c9fbf0f8caddb1c3e95e1db114e8291e8ab63dd3ed1",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/collection/policy.ts",
+      "bytes": 4065,
+      "sha256": "afcbcdb4e89deafb0ceeaf981c86ca95484e085d9197728625fd4edbf788549d",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/collection/policy.ts",
+        "sourceSha256": "afcbcdb4e89deafb0ceeaf981c86ca95484e085d9197728625fd4edbf788549d",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/collection/site.ts",
+      "bytes": 6952,
+      "sha256": "857d401934031d572bf84abf2de34f277b06974e0f040c5a696cf1f130edec40",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/collection/site.ts",
+        "sourceSha256": "bc9b49c588bc6f428d486a727b2d36530c46b31ae06c897c0a3126e50c48941a",
+        "adaptation": "SDK command names"
+      }
+    },
+    {
+      "path": "src/collection/templates.ts",
+      "bytes": 6162,
+      "sha256": "a41d919c0f1756ea6a6fa0fcd5625f2785feb804c3bae2323d0fe212fed2b5ae",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/collection/templates.ts",
+        "sourceSha256": "5d695fa98c0c0ec459c79c9928f18dcb8e6ed5429b9fd2309388672c411b7c12",
+        "adaptation": "SDK command names"
+      }
+    },
+    {
       "path": "src/fs/durable.ts",
       "bytes": 1577,
       "sha256": "ced6391b7350355d87e025b4b6e40ede6b9effe54cb7dfe160a1c4d948b09a37",
@@ -497,13 +2178,68 @@
       }
     },
     {
+      "path": "src/fs/workspace.ts",
+      "bytes": 29118,
+      "sha256": "aceb68e8f6c129975f13a84af615ac21194cc4d555b5c3057503ef66b4af1d29",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/fs/workspace.ts",
+        "sourceSha256": "aceb68e8f6c129975f13a84af615ac21194cc4d555b5c3057503ef66b4af1d29",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/install-hints.ts",
+      "bytes": 595,
+      "sha256": "8b12fdbd9403c385d388d350967afe228527f6eaf40dd78e68a9e6c14460e4e0",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/install-hints.ts",
+        "sourceSha256": "8b12fdbd9403c385d388d350967afe228527f6eaf40dd78e68a9e6c14460e4e0",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/measure/audio.ts",
+      "bytes": 5848,
+      "sha256": "e67a494b6c38a1a7336d23d007055f85dac863050a42115db07c1ef281e65a99",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/measure/audio.ts",
+        "sourceSha256": "e67a494b6c38a1a7336d23d007055f85dac863050a42115db07c1ef281e65a99",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/media/vendor/wav.ts",
+      "bytes": 7280,
+      "sha256": "ea16cb05218985d7f268604779d240568d9d11a7c793ca807b17e31fb68dcd18",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/media/vendor/wav.ts",
+        "sourceSha256": "ea16cb05218985d7f268604779d240568d9d11a7c793ca807b17e31fb68dcd18",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/mixqa/patch.ts",
+      "bytes": 17758,
+      "sha256": "2d58696ee7917db40d91dd85b626387da25bf70da13726f9802ac28b0f086db4",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/mixqa/patch.ts",
+        "sourceSha256": "2d58696ee7917db40d91dd85b626387da25bf70da13726f9802ac28b0f086db4",
+        "adaptation": null
+      }
+    },
+    {
       "path": "src/palette/cli.ts",
-      "bytes": 7092,
-      "sha256": "00485a76051c135b99f51a24877d61c211e93b0c618b32627f7115b3f65bf047",
+      "bytes": 10595,
+      "sha256": "3fa431c6c9528c44f53f9f4a91da7a4de82b21de0abd62b0192994bf222e5aff",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/palette/cli.ts",
-        "sourceSha256": "5f9f0311197263bb034cafa07c31995e238f5f2b77ec27138dde5aa416d66b67",
+        "sourceSha256": "bd7661e8eab3bd383605c6768b8d4ca4fc90cfae44a056d89a04bc7727b08849",
         "adaptation": "SDK command names"
       }
     },
@@ -515,6 +2251,28 @@
       "provenance": {
         "sourcePath": "src/palette/main.ts",
         "sourceSha256": "8b4d69f2154467c3a0735e5ccd783f48e00a2c027ccc70b60027a27bc34ce241",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/renderer/cli.ts",
+      "bytes": 7297,
+      "sha256": "014e2c569a6728c04eac551ac9d0494a099641d489736490676f29591ef346d3",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/renderer/cli.ts",
+        "sourceSha256": "014e2c569a6728c04eac551ac9d0494a099641d489736490676f29591ef346d3",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/renderer/main.ts",
+      "bytes": 265,
+      "sha256": "a08b3e2812f993a430bd18653f63c58024c29e68c61c88145c2636c2bd78bdb5",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/renderer/main.ts",
+        "sourceSha256": "a08b3e2812f993a430bd18653f63c58024c29e68c61c88145c2636c2bd78bdb5",
         "adaptation": null
       }
     }

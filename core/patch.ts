@@ -14,6 +14,7 @@
  * writers adding cables at once never fight over a name, and the score diff
  * emits node-, cable- and macro-level operations.
  */
+import { DEVICE_HASH } from "./device.ts";
 import { newId } from "./ids.ts";
 import { nearest } from "./nearest.ts";
 import { FxValidationError, isRecord, normalizeParam } from "./params.ts";
@@ -346,6 +347,8 @@ function normalizeNode(
     fail(`node ${id}: unknown node type "${type}"${suggest(type, NODE_TYPES)}`);
   }
   const params = normalizeNodeParams(id, spec, input.params, context);
+  if (type.startsWith("device.") && typeof params?.device !== "string")
+    fail(`node ${id} (${type}) needs a device: its sha256:<hash>`);
   const rate = input.rate;
   if (rate !== undefined && rate !== "global")
     fail(`node ${id} rate must be "global"`);
@@ -398,6 +401,15 @@ function normalizeNodeParams(
           `node ${id}.instrument must be an instrument word (at most ${PATCH_LIMITS.maxNameLength} characters)`,
         );
       out[name] = value.trim();
+      continue;
+    }
+    // A WebAssembly device names its module by content hash (core/device.ts).
+    if (name === "device" && spec.type.startsWith("device.")) {
+      if (typeof value !== "string" || !DEVICE_HASH.test(value))
+        fail(
+          `node ${id}.device must be sha256:<64 lowercase hex digits>, the hash of the device's .wasm file`,
+        );
+      out[name] = value;
       continue;
     }
     try {
@@ -678,7 +690,27 @@ export function validatePatch(
       fail(
         `node ${node.id}: an effect patch cannot hold an engine (${node.type})`,
       );
+    if (
+      role === "effect" &&
+      (node.type === "device.synth" || node.type === "device.notes")
+    )
+      fail(
+        `node ${node.id}: an effect patch cannot hold ${node.type}; it plays notes`,
+      );
   }
+  const noteDevices = nodes.filter((node) => node.type === "device.notes");
+  if (noteDevices.length > 1)
+    fail(`${name} holds at most one device.notes node`);
+  if (
+    noteDevices.length > 0 &&
+    nodes.some(
+      (node) =>
+        node.type.startsWith("engine.") || node.type.startsWith("patch."),
+    )
+  )
+    fail(
+      `${name}: a device.notes node cannot sit beside engine.* or nested patch nodes, which play the track's own notes`,
+    );
   const cables = cablesIn.map((cable: unknown, index: number) =>
     normalizeCable(cable, index, specs),
   );
