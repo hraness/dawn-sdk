@@ -219,7 +219,7 @@ jobs:
           fi
           # "./" keeps npm from reading dist/<file> as a GitHub owner/repo.
           npm publish "./dist/$TARBALL" --access public --provenance --ignore-scripts
-          for _ in $(seq 1 10); do
+          for _ in $(seq 1 40); do
             predicate="$(npm view "$NAME@$version" dist.attestations.provenance.predicateType --prefer-online 2>/dev/null || true)"
             if [[ "$predicate" == "https://slsa.dev/provenance/v1" ]]; then
               echo "Published $NAME@$version with provenance"
