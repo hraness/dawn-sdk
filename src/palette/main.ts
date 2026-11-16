@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env -S bun --config=/dev/null --no-env-file --no-install
 /** Standalone extension authoring entry: no composition or product commands. */
 import { runPaletteCommand } from "./cli.ts";
 

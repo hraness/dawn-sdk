@@ -29,14 +29,15 @@ dawn-collection add my-library/dawn.collection.json my-library/projects/night --
 
 It prints the entry and changes nothing. Run the same command with `--apply` to append it to the catalog. The kind comes from what it finds:
 
-| Path                                               | Kind         | Files              |
-| -------------------------------------------------- | ------------ | ------------------ |
-| A folder with `dawn.json`, or its `song.ts`        | `song`       | The project folder |
-| A folder with `album.json`, or a `dawn.album/v1`   | `album`      | The album folder   |
-| A `dawn.palette/v1` JSON file                      | `palette`    | The file           |
-| `patches.json`, or a folder holding one            | `patch-pack` | The file           |
-| `dawn.collection.json`, or a folder holding one    | `collection` | The file           |
-| An audio file (`.wav`, `.flac`, `.ogg`, `.mp3`, …) | `loop`       | The file           |
+| Path                                               | Kind         | Files               |
+| -------------------------------------------------- | ------------ | ------------------- |
+| A folder with `dawn.json`, or its `song.ts`        | `song`       | The project folder  |
+| A folder with `album.json`, or a `dawn.album/v1`   | `album`      | The album folder    |
+| A `dawn.palette/v1` JSON file                      | `palette`    | The file            |
+| A folder with `dawn.composer.json`, or that file   | `composer`   | The composer folder |
+| `patches.json`, or a folder holding one            | `patch-pack` | The file            |
+| `dawn.collection.json`, or a folder holding one    | `collection` | The file            |
+| An audio file (`.wav`, `.flac`, `.ogg`, `.mp3`, …) | `loop`       | The file            |
 
 Pass `--kind`, `--id` or `--title` to override what it found. A palette's title, author and license fill the entry's title, credits and license unless you pass `--credit` or `--license`. `--license` takes `content=`, `software=`, `samples=` or `trace=` followed by a label, and may be repeated. `--apply` refuses an entry without credits or licenses, or one whose ID the catalog already has.
 
@@ -144,7 +145,7 @@ dawn-collection update
 dawn-collection update my-library night-song
 ```
 
-`update --dry-run` resolves each collection's ref again and prints a plan without changing the project: per entry, `unchanged`, `update` with the files added, changed and removed, `held`, `conflict`, `removed-upstream` or `error`. A dry run may fill the cache. `update` applies the plan. It never replaces a file you edited: an entry with an edited file is a `conflict` and stays at its locked version, and the command exits 1. A locked song or album is `held` until you name it, as in the last line. Files the new version drops are deleted only when unedited. An entry the catalog no longer lists keeps its files. Name a collection, and optionally entries, to update only those.
+`update --dry-run` resolves each collection's ref again and prints a plan without changing the project: per entry, `unchanged`, `update` with the files added, changed and removed, `held`, `conflict`, `removed-upstream` or `error`. A dry run may fill the cache. `update` applies the plan. It never replaces a file you edited: an entry with an edited file is a `conflict` and stays at its locked version, and the command exits 1. A locked song, album or composer is `held` until you name it, as in the last line. Files the new version drops are deleted only when unedited. An entry the catalog no longer lists keeps its files. Name a collection, and optionally entries, to update only those.
 
 ## Remove and search
 
@@ -190,7 +191,7 @@ A source may declare `sha256` and `bytes` together; an entry's `files` always ca
 
 The root object has `schema: "dawn.collection/v1"`, `id`, `version`, `title`, `curator`, optional `description`, and `entries`. Versions use numeric `major.minor.patch`. Each entry has `id`, `kind`, `title`, `credits`, `licenses`, `source`, and optional `description` and `files`. `files` lists every file of the entry as `{ "path", "sha256", "bytes" }`, relative to the folder of the source file, which it must include; without it, the entry is the source file alone.
 
-Kinds are `palette`, `patch-pack`, `sample-pack`, `loop`, `song`, `album` and `collection`. They describe the entry; they do not change what the checker reads or executes. A library is a collection containing entries, not a separate content format.
+Kinds are `palette`, `patch-pack`, `sample-pack`, `loop`, `song`, `album`, `composer` and `collection`. They describe the entry; they do not change what the checker reads or executes. An installed `composer` runs only when `dawn song --composer` names it, in the sealed song engine and from its locked files ([Write a composer plug-in](./composers.md)). A library is a collection containing entries, not a separate content format.
 
 IDs are lowercase slugs of up to 64 characters and must be unique within the catalog. Local paths and remote metadata have additional string and nesting bounds. Unknown fields are rejected, so misspelled fields cannot silently change the meaning of a source or license declaration.
 

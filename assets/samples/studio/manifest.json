@@ -3,46 +3,79 @@
   "license": "CC0-1.0",
   "sampleRate": 24000,
   "channels": 1,
+  "format": "flac",
   "samples": {
     "hold-on": {
       "sha256": "2ba6611084af627e05e375ef5d35e3947a004969d04202b4c0bf7814d85184d1",
       "seconds": 2,
-      "bytes": 96044
+      "bytes": 96044,
+      "flac": {
+        "sha256": "4e6b8c1b120a3ac2477fe95ff27ca8ed86f03e2ee006f62c633b7505ecf90bdc",
+        "bytes": 40491
+      }
     },
     "stay-up": {
       "sha256": "86e53719fdc7a28ab1f4062fd6160be51c067a64226f5ad3576f65ea08ec3d80",
       "seconds": 2,
-      "bytes": 96044
+      "bytes": 96044,
+      "flac": {
+        "sha256": "cb9f76f8d3c6ba2f5bce281d141f72071ad862b6b6e4ad0995456e02b21706e1",
+        "bytes": 37214
+      }
     },
     "vowel-ah": {
       "sha256": "fc2203d1b567348baee1aeafad74e0c980a5bb3a730ad21ced80572399c024eb",
       "seconds": 1,
-      "bytes": 48044
+      "bytes": 48044,
+      "flac": {
+        "sha256": "5a3d41e7259727f85557449524dea8e8fd1cc55f259c7f8bf438fa3b38c8741f",
+        "bytes": 18915
+      }
     },
     "vowel-oh": {
       "sha256": "c98b8f9b8683d8eab3f1420e88ee6e7aef01fa0bdf7564f5d09ddc9c724980e8",
       "seconds": 1,
-      "bytes": 48044
+      "bytes": 48044,
+      "flac": {
+        "sha256": "36f7b305da84cb2b965a5e20178ef5a8e5905a3ae743d86ad6cf889067690bc9",
+        "bytes": 16231
+      }
     },
     "glass-hit": {
       "sha256": "d9b0785e8172cba4e6fa5e57320a70392e6c1a9db8f3737d087704a86812086b",
       "seconds": 0.8,
-      "bytes": 38444
+      "bytes": 38444,
+      "flac": {
+        "sha256": "6f39691d56fd27c05c76494ce28fc383f3fb83656e53672a7c511d5c0562297f",
+        "bytes": 6505
+      }
     },
     "metal-hit": {
       "sha256": "d6a80299a60b764d538e041c4c7ff3c6d11237182336217d28cf27202145a454",
       "seconds": 0.8,
-      "bytes": 38444
+      "bytes": 38444,
+      "flac": {
+        "sha256": "74d63eb78d825a3b44289138d923a8562bb25a31e8445b751b7ae91637dbd657",
+        "bytes": 7824
+      }
     },
     "tape-hit": {
       "sha256": "7abfa46ffbd43ee40bba87a8bfe59db2eceb15b0e78e57c05600c1452399645f",
       "seconds": 0.45,
-      "bytes": 21644
+      "bytes": 21644,
+      "flac": {
+        "sha256": "25c5ae88a483ebac5fc6ea22380a15aaf90427519453d80da5aa260eb04085a7",
+        "bytes": 10794
+      }
     },
     "riser": {
       "sha256": "5a57894a109dc4fd117cee9acd9ea15c48a61fcfd27a9ba262e852ef9cff2108",
       "seconds": 2,
-      "bytes": 96044
+      "bytes": 96044,
+      "flac": {
+        "sha256": "a95e1e12e34d0f9efd6c5b65f1b3d1bfa47b4915f3b95d1bb4f8f0e34253e69e",
+        "bytes": 74369
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@hraness/dawn-sdk",
-  "version": "0.60.0",
+  "version": "0.61.0",
   "license": "MIT",
   "type": "module",
   "description": "Build sounds, sound packs and collections for DAWN, write song scores with its TypeScript SDK, and render them to audio",
@@ -23,12 +23,14 @@
   "bin": {
     "dawn-palette": "./src/palette/main.ts",
     "dawn-collection": "./src/collection/main.ts",
-    "dawn-render": "./src/renderer/main.ts"
+    "dawn-render": "./src/renderer/main.ts",
+    "dawn-compose": "./src/composer-plugin/main.ts"
   },
   "exports": {
     ".": "./core/sdk/v1.ts",
     "./palette": "./core/palette.ts",
     "./collection": "./core/collection.ts",
+    "./composer": "./core/composer-plugin.ts",
     "./render": "./src/renderer/cli.ts"
   },
   "dependencies": {

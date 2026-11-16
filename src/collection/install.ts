@@ -951,8 +951,12 @@ export async function update(
           });
           continue;
         }
+        // Songs, albums and composers are code or run it: a new version
+        // arrives only when named.
         if (
-          (old.kind === "song" || old.kind === "album") &&
+          (old.kind === "song" ||
+            old.kind === "album" ||
+            old.kind === "composer") &&
           !ids.includes(old.id)
         ) {
           entries.push(old);

@@ -3,9 +3,10 @@
  * resolved inside the project (lexically, then through `realpath`, never into
  * `.dawn/`), hashed, decoded and handed to the renderer as a `SampleBank`.
  *
- * - WAV (PCM 16/24/32-bit int, 32-bit float) and AIFF/AIFC (8/16/24/32-bit
- *   int, `sowt`, `fl32`) decode natively in TypeScript.
- * - Anything else (mp3, flac, ogg, m4a, …) decodes through `ffmpeg` when it is
+ * - WAV (PCM 16/24/32-bit int, 32-bit float), AIFF/AIFC (8/16/24/32-bit
+ *   int, `sowt`, `fl32`) and FLAC decode natively in TypeScript. A FLAC
+ *   gives exactly the floats of the PCM WAV it was made from (`flac.ts`).
+ * - Anything else (mp3, ogg, m4a, …) decodes through `ffmpeg` when it is
  *   on PATH; DAWN never installs it.
  * - Decoded PCM is cached content-addressed at `.dawn/assets/<sha256>.pcm`,
  *   least recently used first out, bounded by `DAWN_ASSETS_CACHE_MAX`
@@ -50,6 +51,13 @@ import {
 import { Wavetable, wavetableFromWav } from "./wavetable.ts";
 import { trackDirectories } from "../../core/sdk/print.ts";
 import { WavFormatError, parseWav } from "../media/vendor/wav.ts";
+import {
+  FlacFormatError,
+  decodeFlac,
+  flacStreamInfo,
+  flacToFloat,
+  isFlac,
+} from "./flac.ts";
 import { WorkspaceError, resolveReadPath } from "../fs/workspace.ts";
 import { FFMPEG_HINT } from "../install-hints.ts";
 import {
@@ -222,7 +230,10 @@ function ascii(bytes: Uint8Array, offset: number, count: number): string {
 }
 
 /** The container a file's first bytes announce, if DAWN decodes it natively. */
-export function nativeFormat(bytes: Uint8Array): "wav" | "aiff" | undefined {
+export function nativeFormat(
+  bytes: Uint8Array,
+): "wav" | "aiff" | "flac" | undefined {
+  if (isFlac(bytes)) return "flac";
   if (bytes.byteLength < 12) return undefined;
   if (ascii(bytes, 0, 4) === "RIFF" && ascii(bytes, 8, 4) === "WAVE")
     return "wav";
@@ -259,6 +270,34 @@ export function decodeWav(bytes: Uint8Array): PcmData {
 }
 
 /** IEEE 754 80-bit extended (AIFF sample rate). */
+/** FLAC through `flac.ts`: the same floats as the PCM WAV it holds. */
+export function decodeFlacSample(bytes: Uint8Array): PcmData {
+  let parsed;
+  try {
+    const info = flacStreamInfo(bytes);
+    checkShape(info.sampleRate, info.channels, info.frames);
+    parsed = decodeFlac(bytes, {
+      maximumFrames: Math.ceil(info.sampleRate * SCORE_LIMITS.maxSampleSeconds),
+      maximumChannels: MAX_CHANNELS,
+    });
+  } catch (error) {
+    if (error instanceof FlacFormatError && error.message.endsWith("too long"))
+      throw new SampleLimitError(
+        `longer than the ${SCORE_LIMITS.maxSampleSeconds / 60} minute sample limit`,
+      );
+    if (error instanceof FlacFormatError)
+      throw new SampleDecodeError(error.message);
+    throw error;
+  }
+  checkShape(parsed.sampleRate, parsed.channels, parsed.frames);
+  return {
+    sampleRate: parsed.sampleRate,
+    channels: parsed.channels,
+    frames: parsed.frames,
+    data: flacToFloat(parsed),
+  };
+}
+
 function extended80(view: DataView, offset: number): number {
   const exponent = view.getUint16(offset) & 0x7fff;
   const hi = view.getUint32(offset + 2);
@@ -1027,6 +1066,7 @@ export class SampleLibrary implements SampleSource {
     const format = nativeFormat(bytes);
     if (format === "wav") return decodeWav(bytes);
     if (format === "aiff") return decodeAiff(bytes);
+    if (format === "flac") return decodeFlacSample(bytes);
     if (!this.ffmpeg) throw new FfmpegMissingError();
     return decodeWithFfmpeg(this.ffmpeg, path, this.runFfmpeg);
   }
@@ -1116,7 +1156,7 @@ function describeFailure(
     return `${what} · ${error.message} · keep samples inside the project, e.g. tracks/<slug>/samples/`;
   }
   if (error instanceof FfmpegMissingError)
-    return `${what} · not WAV/AIFF and ffmpeg is not on PATH · convert it to WAV, or ${FFMPEG_HINT} and reload`;
+    return `${what} · not WAV/AIFF/FLAC and ffmpeg is not on PATH · convert it to WAV, or ${FFMPEG_HINT} and reload`;
   if (error instanceof SampleLimitError)
     return `${what} · ${error.message} · trim it or import a shorter section`;
   if (error instanceof SampleDecodeError)

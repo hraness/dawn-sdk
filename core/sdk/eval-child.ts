@@ -6,6 +6,12 @@
  * fresh sealed engine (`sandbox.ts`); then, here on the host, sample hashes
  * and Scala tuning files are filled in. Exits when standard input closes.
  * Never imported by DAWN itself.
+ *
+ * A composer request `{ composer: { sources, entry, brief, maxBytes },
+ * budget }` instead calls a composer plug-in (`core/composer-plugin.ts`)
+ * with its brief, from the in-memory sources the host read; nothing is read
+ * from disk and nothing is filled in. The answer is `{ ok, json }`: the
+ * composition as JSON text, at most `maxBytes` long.
  */
 
 import { createHash } from "node:crypto";
@@ -46,16 +52,38 @@ async function serve(): Promise<void> {
 }
 
 async function answer(request: Record<string, unknown>): Promise<unknown> {
+  const budget = Number(request.budget);
+  const time = Number.isFinite(budget) && budget > 0 ? { timeMs: budget } : {};
+  if (typeof request.composer === "object" && request.composer !== null) {
+    const call = request.composer as Record<string, unknown>;
+    const files = call.sources as Record<string, unknown>;
+    const sources = new Map<string, string>();
+    for (const [name, text] of Object.entries(files ?? {}))
+      if (typeof text === "string") sources.set(name, text);
+    const entry = String(call.entry);
+    const maxBytes = Number(call.maxBytes);
+    const result = await evaluateSandboxed("/", entry, {
+      ...time,
+      sources,
+      call: String(call.brief),
+      what: "composer",
+    });
+    if (!result.ok) return { ok: false, error: result.error };
+    if (!(result.json.length <= maxBytes))
+      return {
+        ok: false,
+        error: {
+          file: entry,
+          message: `the composer returned more than ${Math.floor(maxBytes / (1024 * 1024))} MiB of JSON`,
+        },
+      };
+    return { ok: true, json: result.json };
+  }
   const project = realpathSync(resolve(String(request.project)));
   // `entry` names another file of the project to evaluate as the song (a
   // candidate `song.ts` checked before it is written).
   const entry = typeof request.entry === "string" ? request.entry : "song.ts";
-  const budget = Number(request.budget);
-  const result = await evaluateSandboxed(
-    project,
-    entry,
-    Number.isFinite(budget) && budget > 0 ? { timeMs: budget } : {},
-  );
+  const result = await evaluateSandboxed(project, entry, time);
   if (!result.ok) return { ok: false, error: result.error };
   const song: unknown = JSON.parse(result.json);
   return {

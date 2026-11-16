@@ -13,8 +13,8 @@ Eight small original sounds from DAWN's studio library, version 1. `dawn-render`
 | tape-hit  | Saturated pitch-drop sine and seeded noise          | nominal C4 | 0.45 s |
 | riser     | Rising sine and seeded noise                        | nominal C4 | 2 s    |
 
-None of them is a recording of a person. Each is mono 16-bit PCM at 24 kHz. `manifest.json` records each file's SHA-256, byte length and duration, and `core/bundled-samples.ts` pins the same hashes; a sound whose bytes do not match is refused. The phrase syllables occupy exact quarters of their file, one bar at 120 BPM.
+None of them is a recording of a person. Each is a mono 16-bit PCM WAV at 24 kHz, stored as its lossless FLAC (`<id>.flac`), which `src/audio/flac.ts` decodes back to the same WAV, byte for byte. `manifest.json` records each sound's WAV SHA-256, byte length and duration and its FLAC's SHA-256 and length, and `core/bundled-samples.ts` pins the WAV hashes; a sound whose bytes do not match is refused. The phrase syllables occupy exact quarters of their file, one bar at 120 BPM.
 
 DAWN's full studio library also has sung hooks and vocal books. They are not part of this package, and a score that names one renders only in DAWN.
 
-The WAV files are dedicated to the public domain under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). To the extent possible under law, the DAWN contributors waive copyright and related rights in them. No attribution is required.
+The sound files are dedicated to the public domain under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). To the extent possible under law, the DAWN contributors waive copyright and related rights in them. No attribution is required.

@@ -94,21 +94,123 @@ async function evaluateNow(
 ): Promise<EvalResult> {
   const started = performance.now();
   const timeoutMs = options.timeoutMs ?? EVAL_TIMEOUT_MS;
+  const reply = await exchange(
+    {
+      project: resolve(project),
+      ...(options.entry === undefined ? {} : { entry: options.entry }),
+    },
+    timeoutMs,
+  );
+  const problem = replyProblem(
+    reply,
+    timeoutMs,
+    "song.ts",
+    "song.ts must be pure",
+  );
+  if (problem) return failure(started, [problem]);
+  return parseChildOutput((reply as { line: string }).line, started);
+}
+
+/** A composer plug-in call (`core/composer-plugin.ts`). */
+export type ComposerCall = Readonly<{
+  /** The plug-in's modules by `/`-separated name, read by the caller. */
+  sources: Readonly<Record<string, string>>;
+  /** The module whose default export is the composer function. */
+  entry: string;
+  /** The brief, as JSON text. */
+  brief: string;
+  /** The longest composition JSON accepted. */
+  maxBytes: number;
+  timeoutMs?: number;
+}>;
+
+export type ComposerCallResult =
+  | Readonly<{
+      ok: true;
+      /** The composition, as JSON text. */ json: string;
+      ms: number;
+    }>
+  | Readonly<{ ok: false; diagnostics: readonly Diagnostic[]; ms: number }>;
+
+/**
+ * Calls a composer plug-in in the sealed engine, in the same subprocess and
+ * queue as song evaluation. Reads no file: the sources are the caller's.
+ * Never throws for plug-in errors.
+ */
+export function callComposer(call: ComposerCall): Promise<ComposerCallResult> {
+  const run = queue.then(() => callNow(call));
+  queue = run.catch(() => undefined);
+  return run;
+}
+
+async function callNow(call: ComposerCall): Promise<ComposerCallResult> {
+  const started = performance.now();
+  const timeoutMs = call.timeoutMs ?? EVAL_TIMEOUT_MS;
+  const reply = await exchange(
+    {
+      composer: {
+        sources: call.sources,
+        entry: call.entry,
+        brief: call.brief,
+        maxBytes: call.maxBytes,
+      },
+    },
+    timeoutMs,
+  );
+  const fail = (diagnostics: readonly Diagnostic[]): ComposerCallResult => ({
+    ok: false,
+    diagnostics: Object.freeze(diagnostics.map((d) => Object.freeze({ ...d }))),
+    ms: elapsed(started),
+  });
+  const problem = replyProblem(
+    reply,
+    timeoutMs,
+    call.entry,
+    "a composer must be pure and finite",
+  );
+  if (problem) return fail([problem]);
+  let value: unknown;
+  try {
+    value = JSON.parse((reply as { line: string }).line);
+  } catch {
+    return fail([
+      { file: call.entry, message: "the composer engine printed invalid JSON" },
+    ]);
+  }
+  const record =
+    typeof value === "object" && value !== null
+      ? (value as Record<string, unknown>)
+      : {};
+  if (record.ok === true && typeof record.json === "string")
+    return { ok: true, json: record.json, ms: elapsed(started) };
+  const parsed = parseChildOutput(
+    JSON.stringify({ ok: false, error: record.error }),
+    started,
+  );
+  return fail(parsed.ok ? [] : parsed.diagnostics);
+}
+
+/** Sends one request to the subprocess and waits for its answer. */
+async function exchange(
+  request: Readonly<Record<string, unknown>>,
+  timeoutMs: number,
+): Promise<Reply> {
   let current: Server;
   try {
     current = server ?? start();
   } catch (error) {
-    return failure(started, [
-      { message: `could not start bun: ${text(error)}` },
-    ]);
+    return {
+      kind: "exit",
+      code: -1,
+      stderr: `could not start bun: ${text(error)}`,
+    };
   }
   if (current.idle) clearTimeout(current.idle);
-  const request = {
-    project: resolve(project),
+  const line = {
+    ...request,
     // The engine stops song code itself a little before the budget runs
     // out, so a runaway loop reports where it was.
     budget: timeoutMs - Math.min(ENGINE_MARGIN_MS, timeoutMs / 2),
-    ...(options.entry === undefined ? {} : { entry: options.entry }),
   };
   const reply = await new Promise<Reply>((settle) => {
     const timer = setTimeout(() => finish({ kind: "timeout" }), timeoutMs);
@@ -119,7 +221,7 @@ async function evaluateNow(
     }
     current.waiting = finish;
     try {
-      current.child.stdin.write(`${JSON.stringify(request)}\n`);
+      current.child.stdin.write(`${JSON.stringify(line)}\n`);
       current.child.stdin.flush();
     } catch {
       // A subprocess that died between requests reports through `exited`.
@@ -131,32 +233,37 @@ async function evaluateNow(
     idle.unref();
     current.idle = idle;
   }
+  return reply;
+}
+
+/** The diagnostic for a reply that is not an answer line. */
+function replyProblem(
+  reply: Reply,
+  timeoutMs: number,
+  file: string,
+  pure: string,
+): Diagnostic | undefined {
   if (reply.kind === "output")
-    return failure(started, [
-      {
-        file: "song.ts",
-        message: `evaluation printed more than ${EVAL_MAX_OUTPUT_BYTES / (1024 * 1024)} MiB`,
-      },
-    ]);
+    return {
+      file,
+      message: `evaluation printed more than ${EVAL_MAX_OUTPUT_BYTES / (1024 * 1024)} MiB`,
+    };
   if (reply.kind === "timeout")
-    return failure(started, [
-      {
-        file: "song.ts",
-        message: `evaluation timed out (${Math.round(timeoutMs / 1000)} s); song.ts must be pure`,
-      },
-    ]);
+    return {
+      file,
+      message: `evaluation timed out (${Math.round(timeoutMs / 1000)} s); ${pure}`,
+    };
   if (reply.kind === "exit") {
+    if (reply.code === -1) return { message: reply.stderr };
     const detail = reply.stderr.trim().split("\n").slice(0, 8).join("\n");
-    return failure(started, [
-      {
-        file: "song.ts",
-        message: detail
-          ? `evaluation exited with code ${reply.code}: ${detail}`
-          : `evaluation exited with code ${reply.code}`,
-      },
-    ]);
+    return {
+      file,
+      message: detail
+        ? `evaluation exited with code ${reply.code}: ${detail}`
+        : `evaluation exited with code ${reply.code}`,
+    };
   }
-  return parseChildOutput(reply.line, started);
+  return undefined;
 }
 
 /** Starts the evaluation subprocess with nothing of DAWN's environment. */
@@ -173,6 +280,7 @@ function start(): Server {
       "--no-addons",
       "--no-install",
       "--no-env-file",
+      "--config=/dev/null",
       "--smol",
       CHILD,
     ],

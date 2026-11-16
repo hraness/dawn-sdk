@@ -27,7 +27,7 @@
  */
 
 /** SDK release; DAWN refreshes the vendored copy when its own is newer. */
-export const SDK_VERSION = "1.49.0";
+export const SDK_VERSION = "1.51.0";
 /** Major of `SDK_VERSION`; `dawn.json` records it as `sdk`. */
 export const SDK_MAJOR = 1;
 
@@ -292,10 +292,20 @@ export type Expression = Readonly<{
    * `{ ph: "hh eh l", breath: 0.2 }`. `ph` takes phones as one string.
    */
   vox?: NoteVoxInput;
+  /**
+   * This note's id (SDK 1.50.0), 1..64 characters. It seeds the note's
+   * humanize, noise and phase, so the same id renders the same sound.
+   * Absent, `song()` derives one from the note's content; the printer writes
+   * it only where it differs from that, to keep a score's exact render.
+   * Copies made by `bars()`, `place()` and `reversed()` drop it, and `expr()`
+   * cannot share one.
+   */
+  id?: string;
 }>;
 
 /** The expression a built note carries; fields are present only when set. */
 export type NoteExpressionSpec = Readonly<{
+  id?: string;
   articulation?: Articulation;
   glide?: number;
   bend?: readonly BendPoint[];
@@ -308,6 +318,8 @@ export type NoteExpressionSpec = Readonly<{
 }>;
 
 const DEFAULT_VIBRATO_RATE = 5.5;
+/** Longest note id the score accepts. */
+const NOTE_ID_LIMIT = 64;
 const DEFAULT_VIBRATO_DEPTH = 20;
 
 function expression(
@@ -330,12 +342,14 @@ function expression(
         "lyric",
         "drift",
         "vox",
+        "id",
       ].includes(key)
     )
       throw new DawnSdkError(
-        `${label} expression has an unknown field "${key.slice(0, 32)}" (articulation glide bend vibrato humanize vowel lyric drift vox)`,
+        `${label} expression has an unknown field "${key.slice(0, 32)}" (articulation glide bend vibrato humanize vowel lyric drift vox id)`,
       );
   const out: {
+    id?: string;
     articulation?: Articulation;
     glide?: number;
     bend?: readonly BendPoint[];
@@ -350,6 +364,17 @@ function expression(
     drift?: number;
     vox?: NoteVoxSpec;
   } = {};
+  if (input.id !== undefined) {
+    if (
+      typeof input.id !== "string" ||
+      input.id.length === 0 ||
+      input.id.length > NOTE_ID_LIMIT
+    )
+      throw new DawnSdkError(
+        `${label} id must be a string of 1..${NOTE_ID_LIMIT} characters`,
+      );
+    out.id = input.id;
+  }
   const articulation = input.articulation ?? input.art;
   if (articulation !== undefined) {
     if (!ARTICULATIONS.includes(articulation))
@@ -464,6 +489,8 @@ export function expr<T extends NoteSpec | HitSpec>(
   if (!Array.isArray(notes))
     throw new DawnSdkError("expr needs an array of notes or hits");
   const shared = expression(expression_, "expr");
+  if (shared.id !== undefined)
+    throw new DawnSdkError("expr cannot share one id between notes");
   return Object.freeze(
     notes.map((item, index) => {
       if (!isRecord(item) || (item.kind !== "note" && item.kind !== "hit"))
@@ -5926,6 +5953,13 @@ function wholeBar(value: unknown, what: string): number {
   return value;
 }
 
+/** A copy of a note is a new note: it takes no `id` from the one copied. */
+function withoutId<T extends Timed>(item: T): T {
+  if (!isRecord(item) || !("id" in item)) return item;
+  const { id: _id, ...rest } = item as T & { id?: string };
+  return rest as T;
+}
+
 /**
  * The notes (or hits) that start in bars `from..to`, re-based to beat 0
  * and cut at the range's end: `bars(chorus, 5, 6)`.
@@ -5950,7 +5984,7 @@ export function bars<T extends Timed>(
       .filter((item) => item.start >= start && item.start < end)
       .map((item) =>
         Object.freeze({
-          ...item,
+          ...withoutId(item),
           start: item.start - start,
           length: Math.min(item.length, end - item.start),
         }),
@@ -5988,7 +6022,10 @@ export function place<T extends Timed>(
   for (let pass = 0; pass < times; pass += 1)
     for (const item of notes)
       out.push(
-        Object.freeze({ ...item, start: at + pass * span + item.start }),
+        Object.freeze({
+          ...withoutId(item),
+          start: at + pass * span + item.start,
+        }),
       );
   return Object.freeze(out);
 }
@@ -6013,7 +6050,7 @@ export function reversed<T extends Timed>(
       .map((item) => {
         const length = Math.min(item.length, span - item.start);
         return Object.freeze({
-          ...item,
+          ...withoutId(item),
           start: span - item.start - length,
           length,
         });
@@ -6200,6 +6237,7 @@ export function song(input: SongInput): Song {
   const seen = new Set<string>();
   const tracks: ScoreTrack[] = [];
   const notes: ScoreNote[] = [];
+  const noteIds = new Set<string>();
   const library = songPatches(input.patches);
   const ticksPerBar = Math.round(beatsPerBar * ticksPerBeat);
   input.tracks.forEach((spec, index) => {
@@ -6335,11 +6373,14 @@ export function song(input: SongInput): Song {
     for (const n of t.notes) {
       const startTick = ticks(n.start);
       const durationTicks = Math.max(1, ticks(n.length));
-      let id = "";
-      for (let occurrence = 0; ; occurrence += 1) {
-        id = `n-${hash64(`${t.id}|${n.pitch}|${startTick}|${durationTicks}|${n.velocity}|${occurrence}`)}`;
-        if (!ids.has(id)) break;
-      }
+      const id =
+        n.id ??
+        noteIdFor(t.id, n.pitch, startTick, durationTicks, n.velocity, ids);
+      if (noteIds.has(id))
+        throw new DawnSdkError(
+          `track ${t.name}: note id "${id}" is used twice; remove one id and song() derives it`,
+        );
+      noteIds.add(id);
       ids.add(id);
       notes.push(
         Object.freeze({
@@ -6444,6 +6485,28 @@ export function song(input: SongInput): Song {
       ? { patches: Object.freeze(library) }
       : {}),
   });
+}
+
+/**
+ * The id `song()` gives a note that has none (SDK 1.50.0): a hash of its
+ * track, pitch, start and length in ticks and velocity, skipping ids already
+ * `taken` on that track by the notes before it. The printer writes a note's
+ * `id` only when it is not this.
+ *
+ * @since 1.50.0
+ */
+export function noteIdFor(
+  trackId: string,
+  pitch: number,
+  startTick: number,
+  durationTicks: number,
+  velocity: number,
+  taken: ReadonlySet<string>,
+): string {
+  for (let occurrence = 0; ; occurrence += 1) {
+    const id = `n-${hash64(`${trackId}|${pitch}|${startTick}|${durationTicks}|${velocity}|${occurrence}`)}`;
+    if (!taken.has(id)) return id;
+  }
 }
 
 /** `song({ patches })` keyed by name. */
@@ -17303,4 +17366,168 @@ export function defineStyle(input: SongStyleInput): SongStyle {
   if (input.seconds !== undefined)
     checkRange("seconds", unwrapWant(input.seconds));
   return Object.freeze({ ...input, schema: "dawn.style/v1" as const });
+}
+
+// ------------------------------------------------------------ composer plug-ins
+
+/**
+ * The composer plug-in interface (SDK 1.51.0). A composer plug-in is a
+ * folder with a `dawn.composer.json` manifest and a TypeScript module whose
+ * default export is `composer((brief) => ...)`. `dawn song --composer` (and
+ * the SDK's `dawn-compose`) calls it in the sealed song engine, with no
+ * file, network, process, clock or ambient randomness, validates what it
+ * returns as a score and prints it as an ordinary project. The same brief
+ * always gives the same song.
+ *
+ * @since 1.51.0
+ */
+export const COMPOSER_PLUGIN_PROTOCOL = "dawn.composer-plugin/v1" as const;
+
+/**
+ * The palette roles a composer can voice a track with: the instrument
+ * roles of `dawn.palette/v1` (drum and effect sounds are not offered).
+ *
+ * @since 1.51.0
+ */
+export const COMPOSER_SOUND_ROLES = [
+  "bass",
+  "bed",
+  "lead",
+  "keys",
+  "texture",
+] as const;
+/** @since 1.51.0 */
+export type ComposerSoundRole = (typeof COMPOSER_SOUND_ROLES)[number];
+
+/**
+ * A palette sound the brief offers: name a track after it in
+ * `Composition.voices` and DAWN plays the track with that sound's patch.
+ * `range` is its playable MIDI range.
+ *
+ * @since 1.51.0
+ */
+export type ComposerSound = Readonly<{
+  id: string;
+  title: string;
+  role: ComposerSoundRole;
+  range?: Readonly<{ min: number; max: number }>;
+  tags?: readonly string[];
+}>;
+
+/** One section the user asked for, in order (`--form "intro:4 verse:8"`). @since 1.51.0 */
+export type ComposerSection = Readonly<{ name: string; bars: number }>;
+
+/**
+ * What the user asked for. Only `protocol`, `prompt`, `seed` and `sounds`
+ * are always present; every other field is the user's explicit choice and
+ * absent otherwise, so the composer picks its own default.
+ *
+ * @since 1.51.0
+ */
+export type ComposerBrief = Readonly<{
+  protocol: typeof COMPOSER_PLUGIN_PROTOCOL;
+  /** The words the user wrote, up to 4,000 characters; may be empty. */
+  prompt: string;
+  /** 0..4294967295. Derive every choice from it: `seededRandom(brief.seed)`. */
+  seed: number;
+  /** A key such as `"A minor"` or `"Eb major"`. */
+  key?: string;
+  /** Beats per minute, 20..300. */
+  tempo?: number;
+  /** Length in bars, 1..256. */
+  bars?: number;
+  /** Sections in order; their bars add up to `bars` when both are given. */
+  form?: readonly ComposerSection[];
+  /** One word or a short phrase, up to 64 characters. */
+  mood?: string;
+  /** 0 (still) .. 1 (full). */
+  energy?: number;
+  /** The palette's instrument sounds; empty without `--palette`. */
+  sounds: readonly ComposerSound[];
+  /** The song to vary (`--vary`), as `song()` returns it. */
+  score?: Song;
+}>;
+
+/**
+ * What a composer returns: the song, which DAWN validates exactly like a
+ * `song.ts` result, optional palette voices (track id → `ComposerSound.id`)
+ * and a one-line summary DAWN prints.
+ *
+ * @since 1.51.0
+ */
+export type Composition = Readonly<{
+  song: Song;
+  voices?: Readonly<Record<string, string>>;
+  /** Up to 500 characters. */
+  summary?: string;
+}>;
+
+/** @since 1.51.0 */
+export type ComposerFunction = (brief: ComposerBrief) => Composition | Song;
+
+/**
+ * Declares a composer plug-in: `export default composer((brief) => ...)`.
+ * The function runs synchronously and may return the `song()` alone or a
+ * `Composition`; the wrapper checks the brief's protocol and always hands
+ * DAWN a composition.
+ *
+ * ```ts
+ * import { composer, seededRandom, song, track, euclid } from "dawn";
+ * export default composer((brief) => {
+ *   const random = seededRandom(brief.seed);
+ *   return song({ tempo: brief.tempo ?? 120, bars: brief.bars ?? 4, tracks: [
+ *     track({ name: "Drums", instrument: "kit",
+ *       rhythm: [euclid("kick", 3 + Math.floor(random() * 3), 16)] }),
+ *   ] });
+ * });
+ * ```
+ *
+ * @since 1.51.0
+ */
+export function composer(
+  compose: ComposerFunction,
+): (brief: ComposerBrief) => Composition {
+  if (typeof compose !== "function")
+    throw new DawnSdkError("composer() takes a function of the brief");
+  return (brief: ComposerBrief): Composition => {
+    if (!isRecord(brief) || brief.protocol !== COMPOSER_PLUGIN_PROTOCOL)
+      throw new DawnSdkError(
+        `this composer speaks ${COMPOSER_PLUGIN_PROTOCOL}; the brief is another protocol`,
+      );
+    const out: unknown = compose(brief);
+    if (!isRecord(out))
+      throw new DawnSdkError("a composer must return song({...}) or { song }");
+    if (typeof (out as { then?: unknown }).then === "function")
+      throw new DawnSdkError(
+        "a composer returns its composition, not a promise: compose synchronously",
+      );
+    if ((out as { format?: unknown }).format === "track.loop/v1")
+      return Object.freeze({ song: out as Song });
+    return Object.freeze({ ...(out as Composition) });
+  };
+}
+
+/**
+ * A deterministic random source in [0, 1) from a 32-bit seed (mulberry32):
+ * the same seed gives the same sequence on every machine. Song and composer
+ * source have no `Math.random`; use this instead.
+ *
+ * ```ts
+ * const random = seededRandom(brief.seed);
+ * const pulses = 3 + Math.floor(random() * 4);
+ * ```
+ *
+ * @since 1.51.0
+ */
+export function seededRandom(seed: number): () => number {
+  if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff)
+    throw new DawnSdkError("seededRandom takes a whole number 0..4294967295");
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }

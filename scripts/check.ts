@@ -67,6 +67,8 @@ for (const path of walk("."))
 for (const path of listed)
   if (
     path.endsWith(".ts") &&
+    // Example composers import "dawn" and run only in the sealed engine.
+    !path.startsWith("examples/") &&
     !path.endsWith("/main.ts") &&
     !path.endsWith("/eval-child.ts") &&
     !path.endsWith("-worker.ts")
@@ -161,6 +163,21 @@ try {
   for (const stem of ["drums", "bass", "keys", "glass", "premaster"])
     if (!existsSync(join(scratch, "stems", `${stem}.wav`)))
       fail(`dawn-render wrote no ${stem} stem`);
+  // The example composer plug-in composes in the sealed engine, and what it
+  // writes renders.
+  const composed = run(
+    tool("composer-plugin"),
+    "composed",
+    "--composer",
+    join(root, "examples/composers/euclid-pulse"),
+    "--seed",
+    "7",
+  );
+  if (!composed.includes("composed with euclid-pulse"))
+    fail("dawn-compose did not compose with the example");
+  run(tool("renderer"), "composed/song.ts", "--out", "composed.wav");
+  if (readFileSync(join(scratch, "composed.wav")).length < 44_100)
+    fail("dawn-render wrote no audio for the composed song");
   // A score as song() returns it renders from JSON too.
   writeFileSync(join(scratch, "score.json"), JSON.stringify(score));
   run(tool("renderer"), "score.json", "--out", "score.wav");

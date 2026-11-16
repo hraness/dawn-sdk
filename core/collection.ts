@@ -19,6 +19,7 @@ export const COLLECTION_KINDS = [
   "loop",
   "song",
   "album",
+  "composer",
   "collection",
 ] as const;
 export type CollectionKind = (typeof COLLECTION_KINDS)[number];

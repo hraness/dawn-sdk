@@ -1,6 +1,6 @@
 # @hraness/dawn-sdk
 
-Build sounds, sound packs and community collections for
+Build sounds, sound packs, composers and community collections for
 [DAWN](https://dawnav.com), write song scores with the same TypeScript SDK
 that DAWN projects use, and render them to audio with DAWN's own renderer. The
 package is MIT licensed. Its one runtime dependency is the QuickJS engine
@@ -18,7 +18,7 @@ verifies them and runs none of them.
 Bun 1.3.14 or newer runs the tools. Install a tagged release from GitHub:
 
 ```sh
-bun add github:hraness/dawn-sdk#v0.60.0
+bun add github:hraness/dawn-sdk#v0.61.0
 ```
 
 The same bytes are mirrored to npm as `@hraness/dawn-sdk`. Each
@@ -63,8 +63,8 @@ bunx dawn-collection check my-library/dawn.collection.json
 ```
 
 A catalog lives at `dawn.collection.json` by convention. Entries name a kind
-(`palette`, `patch-pack`, `sample-pack`, `loop`, `song`, `album` or
-`collection`), credits, licenses and a source: a local file, an HTTPS URL or a
+(`palette`, `patch-pack`, `sample-pack`, `loop`, `song`, `album`, `composer`
+or `collection`), credits, licenses and a source: a local file, an HTTPS URL or a
 Git repository pinned to a commit. `add` proposes an entry from a manifest or a
 project folder, `check` verifies local files against their hashes, and `build`
 writes a portable copy with an integrity inventory and an optional static page.
@@ -139,12 +139,52 @@ Rendering takes the reference TypeScript DSP path. DAWN can also load a native
 reverb kernel, which produces the same samples faster; the SDK ships no native
 code.
 
+## Write a composer
+
+A composer plug-in turns a brief (a prompt, a seed, and the key, tempo, form,
+mood, energy and palette sounds the user asked for) into a song. It is a folder
+with a `dawn.composer.json` manifest and TypeScript that uses this SDK:
+
+```ts
+import { composer, euclid, seededRandom, song, track } from "dawn";
+
+export default composer((brief) => {
+  const random = seededRandom(brief.seed);
+  return song({
+    tempo: brief.tempo ?? 110,
+    bars: brief.bars ?? 4,
+    tracks: [
+      track({
+        name: "Drums",
+        instrument: "kit",
+        rhythm: [euclid("kick", 3 + Math.floor(random() * 3), 16)],
+      }),
+    ],
+  });
+});
+```
+
+A composer imports the SDK as `"dawn"`; the example's `tsconfig.json` maps it
+for your editor. `dawn-compose` runs one in the same sealed engine as song source, with no file,
+network, clock or randomness access, checks the song it returns and writes
+`song.ts` and `tracks/`:
+
+```sh
+bunx dawn-compose night --composer node_modules/@hraness/dawn-sdk/examples/composers/euclid-pulse --seed 7
+bunx dawn-render night/song.ts --out night.wav
+```
+
+DAWN runs the same composers with `dawn song --composer`, and installs them
+from collections. The [composer guide](docs/composers.md) describes the brief,
+what a composer may return and the limits.
+
 ## What this package does not include
 
-It has no song or album generator. DAWN's composer, which chooses melodies,
-harmony, arrangement and mix, stays part of the DAWN app. The SDK does include
-the musical building blocks an author selects by hand: chord parsing,
-progressions, voicing, strumming and Euclidean rhythms.
+It has no song or album generator of DAWN's. DAWN's composer, which chooses
+melodies, harmony, arrangement and mix, stays part of the DAWN app. The SDK
+does include the musical building blocks an author selects by hand: chord
+parsing, progressions, voicing, strumming and Euclidean rhythms, and the
+composer plug-in interface for writing your own.
 
 ## Check a release
 

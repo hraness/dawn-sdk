@@ -1,0 +1,10 @@
+{
+  "schema": "dawn.composer-plugin/v1",
+  "id": "euclid-pulse",
+  "version": "1.0.0",
+  "title": "Euclid Pulse",
+  "author": "XTE Industries LLC",
+  "license": "MIT",
+  "entry": "composer.ts",
+  "description": "A small example composer: Euclidean drums, a seeded four-chord loop, a root bass and a pentatonic top line, shaped by the brief's key, tempo, form, mood and energy."
+}

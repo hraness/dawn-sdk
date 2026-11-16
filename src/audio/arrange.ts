@@ -64,6 +64,8 @@ import {
   StemAccumulator,
   replayWindowStems,
   type ArrangedStems,
+  type StemSink,
+  type StemStream,
   type TappedWindow,
 } from "./stems.ts";
 import type { RenderDiskCache } from "./render-cache.ts";
@@ -73,7 +75,7 @@ export type ArrangedRenderOptions = RenderOptions &
     /** Owned by a long-lived renderer; omitted by one-off exports. */
     windowCache?: Pick<WindowCache, "get" | "set">;
     /** Internal: collects pre-master stems across windows. */
-    stemSink?: StemAccumulator;
+    stemSink?: StemSink;
     /**
      * Internal: plan only. Each window an arranged render would run is
      * pushed here instead of rendered (the returned audio is empty).
@@ -408,6 +410,49 @@ export function renderArrangedStems(
     },
   });
   return { audio, stems: sink.result(audio.frames) };
+}
+
+/**
+ * Frames before the end of a window that the next one may still change: its
+ * seam fade (`StemStream`'s `hold`).
+ */
+export function seamFrames(sampleRate?: number): number {
+  return Math.round(SEAM_FADE_SECONDS * clampSampleRate(sampleRate)) + 1;
+}
+
+/**
+ * `renderArrangedStems` into a `StemStream`: the same audio, and the same
+ * stems written out as the windows join instead of returned. A full
+ * collection runs after each window, so what a window leaves is gone before
+ * the next one allocates: the render holds about one window at a time.
+ * Ends the stream at the song's length.
+ */
+export function renderArrangedStemsTo(
+  score: TrackScore,
+  sink: StemStream,
+  options: Omit<RenderOptions, "loop" | "taps"> &
+    Readonly<{ cache?: RenderDiskCache; breathe?: () => void }> = {},
+): RenderedAudio {
+  const { cache, breathe, ...rest } = options;
+  const audio = renderArranged(
+    new StemRenderer({
+      maxCacheBytes: 0,
+      ...(cache ? { store: cache } : {}),
+      ...(breathe ? { breathe } : {}),
+    }),
+    score,
+    {
+      ...rest,
+      loop: false,
+      stemSink: sink,
+      taps: {
+        stem: (id, left, right) => sink.add(id, 0, left, right),
+        mix: (left, right) => sink.setPreMaster(left, right),
+      },
+    },
+  );
+  sink.finish(audio.frames);
+  return audio;
 }
 
 /** `renderScoreWav` for arranged songs: what `dawn render` writes. */
