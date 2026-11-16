@@ -1,17 +1,19 @@
 {
   "schema": "dawn.extension-source-candidate/v1",
-  "version": "0.60.0",
+  "version": "0.61.0",
   "entrypoints": [
     "core/collection.ts",
     "src/collection/main.ts",
     "core/palette.ts",
     "core/sdk/v1.ts",
     "src/palette/main.ts",
+    "core/composer-plugin.ts",
+    "src/composer-plugin/main.ts",
     "src/renderer/main.ts",
     "core/sdk/eval-child.ts"
   ],
   "publication": "public: github.com/hraness/dawn-sdk, npm @hraness/dawn-sdk",
-  "scope": "palette and collection authoring, score SDK and offline renderer; no composer",
+  "scope": "palette, collection and composer plug-in authoring, score SDK and offline renderer; not DAWN's composer",
   "admission": {
     "publicationApproved": true,
     "approval": "owner, 2026-11-15: publish as MIT; sound presets confirmed original; publish the renderer",
@@ -19,110 +21,110 @@
   },
   "files": [
     {
-      "path": "assets/samples/studio/glass-hit.wav",
-      "bytes": 38444,
-      "sha256": "d9b0785e8172cba4e6fa5e57320a70392e6c1a9db8f3737d087704a86812086b",
+      "path": "assets/samples/studio/glass-hit.flac",
+      "bytes": 6505,
+      "sha256": "6f39691d56fd27c05c76494ce28fc383f3fb83656e53672a7c511d5c0562297f",
       "license": "CC0-1.0",
       "provenance": {
-        "sourcePath": "assets/samples/studio/glass-hit.wav",
-        "sourceSha256": "d9b0785e8172cba4e6fa5e57320a70392e6c1a9db8f3737d087704a86812086b",
+        "sourcePath": "assets/samples/studio/glass-hit.flac",
+        "sourceSha256": "6f39691d56fd27c05c76494ce28fc383f3fb83656e53672a7c511d5c0562297f",
         "adaptation": null
       }
     },
     {
-      "path": "assets/samples/studio/hold-on.wav",
-      "bytes": 96044,
-      "sha256": "2ba6611084af627e05e375ef5d35e3947a004969d04202b4c0bf7814d85184d1",
+      "path": "assets/samples/studio/hold-on.flac",
+      "bytes": 40491,
+      "sha256": "4e6b8c1b120a3ac2477fe95ff27ca8ed86f03e2ee006f62c633b7505ecf90bdc",
       "license": "CC0-1.0",
       "provenance": {
-        "sourcePath": "assets/samples/studio/hold-on.wav",
-        "sourceSha256": "2ba6611084af627e05e375ef5d35e3947a004969d04202b4c0bf7814d85184d1",
+        "sourcePath": "assets/samples/studio/hold-on.flac",
+        "sourceSha256": "4e6b8c1b120a3ac2477fe95ff27ca8ed86f03e2ee006f62c633b7505ecf90bdc",
         "adaptation": null
       }
     },
     {
       "path": "assets/samples/studio/manifest.json",
-      "bytes": 1306,
-      "sha256": "d3627be200e3108fef658e37083cfec8ba1f80d8afbc084635ef28ba22a79137",
+      "bytes": 2396,
+      "sha256": "dfdf419afcb25975b1e6da878f6b4b0115d0c5b3efba6f8f68c000065fcf503b",
       "license": "CC0-1.0",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
       }
     },
     {
-      "path": "assets/samples/studio/metal-hit.wav",
-      "bytes": 38444,
-      "sha256": "d6a80299a60b764d538e041c4c7ff3c6d11237182336217d28cf27202145a454",
+      "path": "assets/samples/studio/metal-hit.flac",
+      "bytes": 7824,
+      "sha256": "74d63eb78d825a3b44289138d923a8562bb25a31e8445b751b7ae91637dbd657",
       "license": "CC0-1.0",
       "provenance": {
-        "sourcePath": "assets/samples/studio/metal-hit.wav",
-        "sourceSha256": "d6a80299a60b764d538e041c4c7ff3c6d11237182336217d28cf27202145a454",
+        "sourcePath": "assets/samples/studio/metal-hit.flac",
+        "sourceSha256": "74d63eb78d825a3b44289138d923a8562bb25a31e8445b751b7ae91637dbd657",
         "adaptation": null
       }
     },
     {
       "path": "assets/samples/studio/README.md",
-      "bytes": 1801,
-      "sha256": "54c3909d1de38eab7f72900c30d00ebaa911cb30e38c7deefc7cf7857b679003",
+      "bytes": 1961,
+      "sha256": "413ea9519e0f38256e081215f2bfa5d28ade44152128934ca595bca2156d25ea",
       "license": "MIT",
       "provenance": {
         "sourcePath": "sdk-public/editions/assets/samples/studio/README.md",
-        "sourceSha256": "54c3909d1de38eab7f72900c30d00ebaa911cb30e38c7deefc7cf7857b679003",
+        "sourceSha256": "413ea9519e0f38256e081215f2bfa5d28ade44152128934ca595bca2156d25ea",
         "adaptation": "SDK edition: the generated sounds only"
       }
     },
     {
-      "path": "assets/samples/studio/riser.wav",
-      "bytes": 96044,
-      "sha256": "5a57894a109dc4fd117cee9acd9ea15c48a61fcfd27a9ba262e852ef9cff2108",
+      "path": "assets/samples/studio/riser.flac",
+      "bytes": 74369,
+      "sha256": "a95e1e12e34d0f9efd6c5b65f1b3d1bfa47b4915f3b95d1bb4f8f0e34253e69e",
       "license": "CC0-1.0",
       "provenance": {
-        "sourcePath": "assets/samples/studio/riser.wav",
-        "sourceSha256": "5a57894a109dc4fd117cee9acd9ea15c48a61fcfd27a9ba262e852ef9cff2108",
+        "sourcePath": "assets/samples/studio/riser.flac",
+        "sourceSha256": "a95e1e12e34d0f9efd6c5b65f1b3d1bfa47b4915f3b95d1bb4f8f0e34253e69e",
         "adaptation": null
       }
     },
     {
-      "path": "assets/samples/studio/stay-up.wav",
-      "bytes": 96044,
-      "sha256": "86e53719fdc7a28ab1f4062fd6160be51c067a64226f5ad3576f65ea08ec3d80",
+      "path": "assets/samples/studio/stay-up.flac",
+      "bytes": 37214,
+      "sha256": "cb9f76f8d3c6ba2f5bce281d141f72071ad862b6b6e4ad0995456e02b21706e1",
       "license": "CC0-1.0",
       "provenance": {
-        "sourcePath": "assets/samples/studio/stay-up.wav",
-        "sourceSha256": "86e53719fdc7a28ab1f4062fd6160be51c067a64226f5ad3576f65ea08ec3d80",
+        "sourcePath": "assets/samples/studio/stay-up.flac",
+        "sourceSha256": "cb9f76f8d3c6ba2f5bce281d141f72071ad862b6b6e4ad0995456e02b21706e1",
         "adaptation": null
       }
     },
     {
-      "path": "assets/samples/studio/tape-hit.wav",
-      "bytes": 21644,
-      "sha256": "7abfa46ffbd43ee40bba87a8bfe59db2eceb15b0e78e57c05600c1452399645f",
+      "path": "assets/samples/studio/tape-hit.flac",
+      "bytes": 10794,
+      "sha256": "25c5ae88a483ebac5fc6ea22380a15aaf90427519453d80da5aa260eb04085a7",
       "license": "CC0-1.0",
       "provenance": {
-        "sourcePath": "assets/samples/studio/tape-hit.wav",
-        "sourceSha256": "7abfa46ffbd43ee40bba87a8bfe59db2eceb15b0e78e57c05600c1452399645f",
+        "sourcePath": "assets/samples/studio/tape-hit.flac",
+        "sourceSha256": "25c5ae88a483ebac5fc6ea22380a15aaf90427519453d80da5aa260eb04085a7",
         "adaptation": null
       }
     },
     {
-      "path": "assets/samples/studio/vowel-ah.wav",
-      "bytes": 48044,
-      "sha256": "fc2203d1b567348baee1aeafad74e0c980a5bb3a730ad21ced80572399c024eb",
+      "path": "assets/samples/studio/vowel-ah.flac",
+      "bytes": 18915,
+      "sha256": "5a3d41e7259727f85557449524dea8e8fd1cc55f259c7f8bf438fa3b38c8741f",
       "license": "CC0-1.0",
       "provenance": {
-        "sourcePath": "assets/samples/studio/vowel-ah.wav",
-        "sourceSha256": "fc2203d1b567348baee1aeafad74e0c980a5bb3a730ad21ced80572399c024eb",
+        "sourcePath": "assets/samples/studio/vowel-ah.flac",
+        "sourceSha256": "5a3d41e7259727f85557449524dea8e8fd1cc55f259c7f8bf438fa3b38c8741f",
         "adaptation": null
       }
     },
     {
-      "path": "assets/samples/studio/vowel-oh.wav",
-      "bytes": 48044,
-      "sha256": "c98b8f9b8683d8eab3f1420e88ee6e7aef01fa0bdf7564f5d09ddc9c724980e8",
+      "path": "assets/samples/studio/vowel-oh.flac",
+      "bytes": 16231,
+      "sha256": "36f7b305da84cb2b965a5e20178ef5a8e5905a3ae743d86ad6cf889067690bc9",
       "license": "CC0-1.0",
       "provenance": {
-        "sourcePath": "assets/samples/studio/vowel-oh.wav",
-        "sourceSha256": "c98b8f9b8683d8eab3f1420e88ee6e7aef01fa0bdf7564f5d09ddc9c724980e8",
+        "sourcePath": "assets/samples/studio/vowel-oh.flac",
+        "sourceSha256": "36f7b305da84cb2b965a5e20178ef5a8e5905a3ae743d86ad6cf889067690bc9",
         "adaptation": null
       }
     },
@@ -192,12 +194,23 @@
     },
     {
       "path": "core/collection.ts",
-      "bytes": 14743,
-      "sha256": "4a8577a32167f943f337ca89d0481662fec4eaee05dd137a18cecf2e4cec57f7",
+      "bytes": 14757,
+      "sha256": "ed2acf56a68e405ca8d941dd7a0e8b58f96f810d251a1df98de35e6d64aed300",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/collection.ts",
-        "sourceSha256": "4a8577a32167f943f337ca89d0481662fec4eaee05dd137a18cecf2e4cec57f7",
+        "sourceSha256": "ed2acf56a68e405ca8d941dd7a0e8b58f96f810d251a1df98de35e6d64aed300",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/composer-plugin.ts",
+      "bytes": 17611,
+      "sha256": "242bee7a9c2a2280d0c85f250e3cecb661a1a00c729f22a7be14383a8920d66c",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/composer-plugin.ts",
+        "sourceSha256": "242bee7a9c2a2280d0c85f250e3cecb661a1a00c729f22a7be14383a8920d66c",
         "adaptation": null
       }
     },
@@ -478,34 +491,34 @@
     },
     {
       "path": "core/sdk/eval-child.ts",
-      "bytes": 5531,
-      "sha256": "46b4b8dd98e1c1640e818e044a3108664720c2a5a86c600722533642cbe2e281",
+      "bytes": 6839,
+      "sha256": "635d0191bfc820c674f98565574fb54ce8c1d57897d6f18de9b68937db00dcd8",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/sdk/eval-child.ts",
-        "sourceSha256": "46b4b8dd98e1c1640e818e044a3108664720c2a5a86c600722533642cbe2e281",
+        "sourceSha256": "635d0191bfc820c674f98565574fb54ce8c1d57897d6f18de9b68937db00dcd8",
         "adaptation": null
       }
     },
     {
       "path": "core/sdk/eval.ts",
-      "bytes": 10916,
-      "sha256": "82a7ef904995aba3d2da8434318a032f94591df17b382409c4c8c629b43c93d1",
+      "bytes": 13927,
+      "sha256": "ce7ec5cda14e317a29daaf81ceb329182e0ba8fe58f2b121d19eb7afa74bb4c2",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/sdk/eval.ts",
-        "sourceSha256": "82a7ef904995aba3d2da8434318a032f94591df17b382409c4c8c629b43c93d1",
+        "sourceSha256": "ce7ec5cda14e317a29daaf81ceb329182e0ba8fe58f2b121d19eb7afa74bb4c2",
         "adaptation": null
       }
     },
     {
       "path": "core/sdk/print.ts",
-      "bytes": 63819,
-      "sha256": "8322e7bd7650410bfe6c94b835d6d6b406b0c4f362ebc2361efc7466e2b3d10b",
+      "bytes": 66354,
+      "sha256": "f2905b1c99c2f58b0dac6f7ab261b4862e9a2d18eb3fc36ebdf4609048756c49",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/sdk/print.ts",
-        "sourceSha256": "8322e7bd7650410bfe6c94b835d6d6b406b0c4f362ebc2361efc7466e2b3d10b",
+        "sourceSha256": "f2905b1c99c2f58b0dac6f7ab261b4862e9a2d18eb3fc36ebdf4609048756c49",
         "adaptation": null
       }
     },
@@ -522,23 +535,23 @@
     },
     {
       "path": "core/sdk/sandbox.ts",
-      "bytes": 23529,
-      "sha256": "f834eb5f24c895b96a590a04eaebd16d466a830fc082bffb2a2df480e16b853d",
+      "bytes": 27977,
+      "sha256": "5fc439d0cabb837fe15b299c50f97f06d0341c1bd447484bd366b6ad575d56e3",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/sdk/sandbox.ts",
-        "sourceSha256": "f834eb5f24c895b96a590a04eaebd16d466a830fc082bffb2a2df480e16b853d",
+        "sourceSha256": "5fc439d0cabb837fe15b299c50f97f06d0341c1bd447484bd366b6ad575d56e3",
         "adaptation": null
       }
     },
     {
       "path": "core/sdk/v1.ts",
-      "bytes": 568740,
-      "sha256": "509e5421658bf227e55c31565b4e0182654db56d7b877042d538428ccafac9ac",
+      "bytes": 576377,
+      "sha256": "2d1438a845aca88ccd803ab5d63ba8b483da69b391dcc5f5904ef65f7df862d6",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/sdk/v1.ts",
-        "sourceSha256": "509e5421658bf227e55c31565b4e0182654db56d7b877042d538428ccafac9ac",
+        "sourceSha256": "2d1438a845aca88ccd803ab5d63ba8b483da69b391dcc5f5904ef65f7df862d6",
         "adaptation": null
       }
     },
@@ -687,12 +700,23 @@
     },
     {
       "path": "docs/collections.md",
-      "bytes": 19509,
-      "sha256": "0dc7e5cf405e75575a2b81cf5cb9cda69c0b62f66b5fb2eb5b9a6b7ea16efb71",
+      "bytes": 19801,
+      "sha256": "ac592e1f673e4343980286cebf107f55d1f5f4ed653d666e3458a650afc04c53",
       "license": "MIT",
       "provenance": {
         "sourcePath": "docs/collections.md",
-        "sourceSha256": "eb46379cbd04b025bd5485f2a1996c8b1ec0256b09bcf73447fad82993d7369c",
+        "sourceSha256": "a22e993968f3bd8d742ec4378d5a20a4db2f896a62b52def4c34833682c33727",
+        "adaptation": "SDK command names"
+      }
+    },
+    {
+      "path": "docs/composers.md",
+      "bytes": 12300,
+      "sha256": "b13e240f306aacb3d1ecadae2410639f3a0d04bf4db484837fba3315122e9bfd",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "docs/composers.md",
+        "sourceSha256": "a102226b19e93ade5a651ece3e3320fc5001a53210eaacf1a7f0ad963a66f5d2",
         "adaptation": "SDK command names"
       }
     },
@@ -716,6 +740,50 @@
         "sourcePath": "docs/palettes.md",
         "sourceSha256": "edb0c1e0d7753dbddd236989abef713b0ffb0daeedcb829f97044be27faa90c1",
         "adaptation": "reference link targets included SDK source; SDK command names"
+      }
+    },
+    {
+      "path": "examples/composers/euclid-pulse/composer.ts",
+      "bytes": 5713,
+      "sha256": "c39f907d6276262c070dbb7e0c62c1ed526958fdec96583cd88bc84a2f37a005",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "examples/composers/euclid-pulse/composer.ts",
+        "sourceSha256": "c39f907d6276262c070dbb7e0c62c1ed526958fdec96583cd88bc84a2f37a005",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "examples/composers/euclid-pulse/dawn.composer.json",
+      "bytes": 380,
+      "sha256": "accc06819e0f58fef0a77a0facac8f32e2d8915407b62b7ed6e563965292b01f",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "examples/composers/euclid-pulse/dawn.composer.json",
+        "sourceSha256": "accc06819e0f58fef0a77a0facac8f32e2d8915407b62b7ed6e563965292b01f",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "examples/composers/euclid-pulse/loops.ts",
+      "bytes": 446,
+      "sha256": "73e1608f831e857f821d6dd89190eace81cbf88f372c0cc1c937dece4c1ae433",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "examples/composers/euclid-pulse/loops.ts",
+        "sourceSha256": "73e1608f831e857f821d6dd89190eace81cbf88f372c0cc1c937dece4c1ae433",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "examples/composers/euclid-pulse/tsconfig.json",
+      "bytes": 325,
+      "sha256": "a7b8fe0a31cf98649499866f715f294b70322a2692fd244cf134cc7d58ceea24",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "examples/composers/euclid-pulse/tsconfig.json",
+        "sourceSha256": "a7b8fe0a31cf98649499866f715f294b70322a2692fd244cf134cc7d58ceea24",
+        "adaptation": null
       }
     },
     {
@@ -753,19 +821,19 @@
     },
     {
       "path": "LICENSE",
-      "bytes": 1064,
-      "sha256": "74b69bf37c8f340c9c2a54d431a15218738d9c463d0e014fa6a8bb8edce4e539",
+      "bytes": 1075,
+      "sha256": "233186cc7cdaaac5bd0033cf838d179a262d30075f21ee4d56742d8a507c9986",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/sdk/LICENSE",
-        "sourceSha256": "74b69bf37c8f340c9c2a54d431a15218738d9c463d0e014fa6a8bb8edce4e539",
+        "sourceSha256": "233186cc7cdaaac5bd0033cf838d179a262d30075f21ee4d56742d8a507c9986",
         "adaptation": null
       }
     },
     {
       "path": "package.json",
-      "bytes": 1052,
-      "sha256": "076bf6f0b3b8cf39976c0836e56fad2fb261e432140ab899f942fd02205713f4",
+      "bytes": 1152,
+      "sha256": "26336833b93c19df0b328cdaad1b579415f1283e7a2054469a3bde146c615783",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
@@ -773,8 +841,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 6752,
-      "sha256": "fac53cfc049d6d21a968ac1efac3724da8e7b48ac556857dd0681fe8b7bc8b5f",
+      "bytes": 8141,
+      "sha256": "1e96ee681a1509b2a2a8588890cceb645255c90eb16394249070cc758534f876",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
@@ -793,12 +861,12 @@
     },
     {
       "path": "src/audio/arrange.ts",
-      "bytes": 35202,
-      "sha256": "0ba736cc521e0fbd24ce5ede194be21a306341e11b937fdd4b000d24d32be60a",
+      "bytes": 36548,
+      "sha256": "f12e9434df1c762c247c4c6491ab2fa4bd852ed2b6bb4f8aecf73f097091dea3",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/audio/arrange.ts",
-        "sourceSha256": "0ba736cc521e0fbd24ce5ede194be21a306341e11b937fdd4b000d24d32be60a",
+        "sourceSha256": "f12e9434df1c762c247c4c6491ab2fa4bd852ed2b6bb4f8aecf73f097091dea3",
         "adaptation": null
       }
     },
@@ -826,12 +894,12 @@
     },
     {
       "path": "src/audio/bundled-samples.ts",
-      "bytes": 1145,
-      "sha256": "26300b961403c087b0c97e471d3adafe7a85ce2d5e0172870eb710dfe57f033b",
+      "bytes": 3645,
+      "sha256": "a011a26e3374899cb2880d5d09ead60397ef28b88ebe59986d6249bf8af1ee8f",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/audio/bundled-samples.ts",
-        "sourceSha256": "26300b961403c087b0c97e471d3adafe7a85ce2d5e0172870eb710dfe57f033b",
+        "sourceSha256": "a011a26e3374899cb2880d5d09ead60397ef28b88ebe59986d6249bf8af1ee8f",
         "adaptation": null
       }
     },
@@ -1331,6 +1399,17 @@
       }
     },
     {
+      "path": "src/audio/flac.ts",
+      "bytes": 19487,
+      "sha256": "b08ac85570987f7423cd04288eaf7fc96956337746a9fb3eed515e64f86c2a67",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/audio/flac.ts",
+        "sourceSha256": "b08ac85570987f7423cd04288eaf7fc96956337746a9fb3eed515e64f86c2a67",
+        "adaptation": null
+      }
+    },
+    {
       "path": "src/audio/granular.ts",
       "bytes": 34915,
       "sha256": "874d8b445236b40f1efa49ad375f50683cebad9d67084f196f5577cd2fbc1fbf",
@@ -1706,12 +1785,12 @@
     },
     {
       "path": "src/audio/samples.ts",
-      "bytes": 40575,
-      "sha256": "adeec8c31934b748a6c585d81fa6e8c3ab0af2eb0797a8f2fbb7cfda8948506f",
+      "bytes": 41842,
+      "sha256": "e6fa613f2621b58f6104431d38a18c9618b7a686641d68705533576ebe777c24",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/audio/samples.ts",
-        "sourceSha256": "adeec8c31934b748a6c585d81fa6e8c3ab0af2eb0797a8f2fbb7cfda8948506f",
+        "sourceSha256": "e6fa613f2621b58f6104431d38a18c9618b7a686641d68705533576ebe777c24",
         "adaptation": null
       }
     },
@@ -1739,12 +1818,12 @@
     },
     {
       "path": "src/audio/stems.ts",
-      "bytes": 7864,
-      "sha256": "567749c709b06810860a6afca8e66117205dbb12013b56f3f3e478b711741dc3",
+      "bytes": 14332,
+      "sha256": "39d6fe28115b19b3c787c99813a4b7c3b47afe5657f750335ea080f3d2f8829b",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/audio/stems.ts",
-        "sourceSha256": "567749c709b06810860a6afca8e66117205dbb12013b56f3f3e478b711741dc3",
+        "sourceSha256": "39d6fe28115b19b3c787c99813a4b7c3b47afe5657f750335ea080f3d2f8829b",
         "adaptation": null
       }
     },
@@ -2047,12 +2126,12 @@
     },
     {
       "path": "src/collection/author.ts",
-      "bytes": 21536,
-      "sha256": "401419faca644ef90d4a31e9bbad7cf8b60d3dd31fbf26b77f8050c7821c616f",
+      "bytes": 21867,
+      "sha256": "ffc1227fa2bd2a97595992d4d717b78cb11f159934ba4217aca13b794207876a",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/collection/author.ts",
-        "sourceSha256": "401419faca644ef90d4a31e9bbad7cf8b60d3dd31fbf26b77f8050c7821c616f",
+        "sourceSha256": "ffc1227fa2bd2a97595992d4d717b78cb11f159934ba4217aca13b794207876a",
         "adaptation": null
       }
     },
@@ -2080,12 +2159,12 @@
     },
     {
       "path": "src/collection/install.ts",
-      "bytes": 41866,
-      "sha256": "6804c98794e5335e28a5d6d982d439685e484da763ef57fdc526e67ea26acad6",
+      "bytes": 42026,
+      "sha256": "173e1ff92df7975da7bb0837e3cad1d9eb63732bf12967fc2c4bc07ad6dfc959",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/collection/install.ts",
-        "sourceSha256": "5d101c0b872d9ec0d944077eeffa81f455a6c75c9ec5df1f73825f7dac6da9b3",
+        "sourceSha256": "f10f69453cba745d6f1e7488527a7a0437beadf3f5c640d86b95cf9bf725c0f0",
         "adaptation": "SDK command names"
       }
     },
@@ -2113,12 +2192,12 @@
     },
     {
       "path": "src/collection/main.ts",
-      "bytes": 288,
-      "sha256": "5e2f4b3b5a602d59995efe05580f19891f204de046903da6d2c22e3658a45c95",
+      "bytes": 337,
+      "sha256": "e8fbe165b4cb4cc795131c5b957f1b0f5a84a328b49697828d3951f4b4b5bb52",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/collection/main.ts",
-        "sourceSha256": "5e2f4b3b5a602d59995efe05580f19891f204de046903da6d2c22e3658a45c95",
+        "sourceSha256": "e8fbe165b4cb4cc795131c5b957f1b0f5a84a328b49697828d3951f4b4b5bb52",
         "adaptation": null
       }
     },
@@ -2164,6 +2243,39 @@
         "sourcePath": "src/collection/templates.ts",
         "sourceSha256": "5d695fa98c0c0ec459c79c9928f18dcb8e6ed5429b9fd2309388672c411b7c12",
         "adaptation": "SDK command names"
+      }
+    },
+    {
+      "path": "src/composer-plugin/cli.ts",
+      "bytes": 11921,
+      "sha256": "e5083d562831c2b9deebff0ac65fcc12a8e7e45852251fd0f227ffcf090eefd1",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/composer-plugin/cli.ts",
+        "sourceSha256": "e5083d562831c2b9deebff0ac65fcc12a8e7e45852251fd0f227ffcf090eefd1",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/composer-plugin/load.ts",
+      "bytes": 8825,
+      "sha256": "2192672a6e93fd940124b2b56d6c16f56553ab204672381c9b154d1859952dcc",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/composer-plugin/load.ts",
+        "sourceSha256": "2192672a6e93fd940124b2b56d6c16f56553ab204672381c9b154d1859952dcc",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/composer-plugin/main.ts",
+      "bytes": 439,
+      "sha256": "3c89a33d98a520f967fdc8386d7eaaf62172c16c2e879d24dc018af9980ca5a5",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/composer-plugin/main.ts",
+        "sourceSha256": "3c89a33d98a520f967fdc8386d7eaaf62172c16c2e879d24dc018af9980ca5a5",
+        "adaptation": null
       }
     },
     {
@@ -2245,12 +2357,23 @@
     },
     {
       "path": "src/palette/main.ts",
-      "bytes": 288,
-      "sha256": "8b4d69f2154467c3a0735e5ccd783f48e00a2c027ccc70b60027a27bc34ce241",
+      "bytes": 337,
+      "sha256": "bfb5e6d50becab4a3ee9c25394f70cebd0f7a9bf0b8d6bcd7f4286e81a97aabd",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/palette/main.ts",
-        "sourceSha256": "8b4d69f2154467c3a0735e5ccd783f48e00a2c027ccc70b60027a27bc34ce241",
+        "sourceSha256": "bfb5e6d50becab4a3ee9c25394f70cebd0f7a9bf0b8d6bcd7f4286e81a97aabd",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/palette/source.ts",
+      "bytes": 4600,
+      "sha256": "db84d7ef77ffa8c5eabfd406108b4b372c5097446ee9632d8035d3cdf7d9c4ce",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/palette/source.ts",
+        "sourceSha256": "db84d7ef77ffa8c5eabfd406108b4b372c5097446ee9632d8035d3cdf7d9c4ce",
         "adaptation": null
       }
     },
@@ -2267,12 +2390,12 @@
     },
     {
       "path": "src/renderer/main.ts",
-      "bytes": 265,
-      "sha256": "a08b3e2812f993a430bd18653f63c58024c29e68c61c88145c2636c2bd78bdb5",
+      "bytes": 314,
+      "sha256": "97d7bdb43065227c71a6fb8eb19607d16a0613ce5f5474aab35d4f78d349cb6d",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/renderer/main.ts",
-        "sourceSha256": "a08b3e2812f993a430bd18653f63c58024c29e68c61c88145c2636c2bd78bdb5",
+        "sourceSha256": "97d7bdb43065227c71a6fb8eb19607d16a0613ce5f5474aab35d4f78d349cb6d",
         "adaptation": null
       }
     }

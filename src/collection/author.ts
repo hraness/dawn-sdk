@@ -294,6 +294,11 @@ async function inspect(root: string, path: string) {
       source = join(path, "album.json");
       folder = path;
       meta = await jsonOf(root, source);
+    } else if (await exists(join(path, "dawn.composer.json"))) {
+      kind = "composer";
+      source = join(path, "dawn.composer.json");
+      folder = path;
+      meta = await jsonOf(root, source);
     } else if (await exists(join(path, "dawn.collection.json"))) {
       kind = "collection";
       source = join(path, "dawn.collection.json");
@@ -304,7 +309,7 @@ async function inspect(root: string, path: string) {
       meta = await jsonOf(root, source);
     } else
       throw new Error(
-        "the folder has no dawn.json, album.json, dawn.collection.json or patches.json; name the manifest file",
+        "the folder has no dawn.json, album.json, dawn.composer.json, dawn.collection.json or patches.json; name the manifest file",
       );
   } else if (basename(path) === "song.ts") {
     kind = "song";
@@ -317,7 +322,10 @@ async function inspect(root: string, path: string) {
     const schema = meta?.schema;
     if (schema === "dawn.palette/v1") kind = "palette";
     else if (schema === "dawn.collection/v1") kind = "collection";
-    else if (schema === "dawn.album/v1") {
+    else if (schema === "dawn.composer-plugin/v1") {
+      kind = "composer";
+      folder = dirname(path);
+    } else if (schema === "dawn.album/v1") {
       kind = "album";
       folder = dirname(path);
     } else if (

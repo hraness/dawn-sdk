@@ -4,7 +4,8 @@
  * Output is already in prettier's shape (80 columns, double quotes, trailing
  * commas, two-space indent, objects kept expanded) so formatting it again is
  * a no-op, and printing the evaluation of a printed project reproduces the
- * same bytes. Note ids are never printed: `song()` derives them from content.
+ * same bytes. A note's id is printed only when it is not the one `song()`
+ * derives from its content (`noteIdFor`), so a score keeps its exact render.
  */
 
 import { DRUM_VOICES, isDrumInstrument } from "../drums.ts";
@@ -73,7 +74,12 @@ import { trackSlug } from "../slug.ts";
 import { barStartTick, timeWithinSong } from "../tempo.ts";
 import type { Tuning } from "../tuning.ts";
 import { DEFAULT_STRING_PRESET, type TrackString } from "../strings.ts";
-import { DEFAULT_HIT_LENGTH, DEFAULT_VELOCITY, defaultClipId } from "./v1.ts";
+import {
+  DEFAULT_HIT_LENGTH,
+  DEFAULT_VELOCITY,
+  defaultClipId,
+  noteIdFor,
+} from "./v1.ts";
 
 const WIDTH = 80;
 const INDENT = "  ";
@@ -104,8 +110,22 @@ export function trackDirectories(
   return out;
 }
 
+/** How a score prints. */
+export type PrintOptions = Readonly<{
+  /**
+   * Write a note's id where it is not the one `song()` derives (default
+   * true), so the project renders exactly as the score does. False leaves
+   * every id to `song()`, for a score whose ids mean nothing, such as one
+   * read from a link, which carries none.
+   */
+  noteIds?: boolean;
+}>;
+
 /** Prints the whole project. Pure; returns frozen data. */
-export function printProject(score: TrackScore): PrintedProject {
+export function printProject(
+  score: TrackScore,
+  options: PrintOptions = {},
+): PrintedProject {
   const dirs = trackDirectories(score);
   const trackFiles = new Map<string, string>();
   const files: PrintedFile[] = [
@@ -114,7 +134,9 @@ export function printProject(score: TrackScore): PrintedProject {
   for (const track of score.tracks) {
     const path = `tracks/${dirs.get(track.id)!}/track.ts`;
     trackFiles.set(track.id, path);
-    files.push(Object.freeze({ path, text: printTrack(score, track) }));
+    files.push(
+      Object.freeze({ path, text: printTrack(score, track, options) }),
+    );
   }
   return Object.freeze({ files: Object.freeze(files), trackFiles });
 }
@@ -436,7 +458,11 @@ function printForm(form: readonly FormEntry[], indent: string): string {
 }
 
 /** `tracks/<slug>/track.ts` for one track of a score. */
-export function printTrack(score: TrackScore, track: Track): string {
+export function printTrack(
+  score: TrackScore,
+  track: Track,
+  options: PrintOptions = {},
+): string {
   // Rows whose lane still matches their expansion print as generators and
   // own their notes; a hand-edited lane prints as plain notes instead.
   const rows = (track.rhythm ?? []).filter((row) =>
@@ -457,14 +483,28 @@ export function printTrack(score: TrackScore, track: Track): string {
   if (kit) for (const info of DRUM_VOICES) voiceFor.set(info.pitch, info.voice);
   if (slots) for (const [voice, slot] of slots) voiceFor.set(slot, voice);
   const used = new Set<string>(["track"]);
-  const printed = notes.map((note) => {
+  // song() derives an id for each note in this order; a note whose id is
+  // not that one carries it.
+  const taken = new Set<string>();
+  const printed = inDerivationOrder(track.id, notes).map((note) => {
+    const derived = noteIdFor(
+      track.id,
+      note.pitch,
+      note.startTick,
+      note.durationTicks,
+      note.velocity,
+      taken,
+    );
+    taken.add(note.id);
+    const id =
+      options.noteIds === false || note.id === derived ? undefined : note.id;
     const voice = note.cents ? undefined : voiceFor.get(note.pitch);
     if (voice !== undefined) {
       used.add("hit");
-      return printHit(score, note, voice, INDENT + INDENT);
+      return printHit(score, note, voice, id, INDENT + INDENT);
     }
     used.add("note");
-    return printNote(score, note, !kit && !slots, INDENT + INDENT);
+    return printNote(score, note, !kit && !slots, id, INDENT + INDENT);
   });
   const grained =
     track.instrument === "granular" && track.granular !== undefined;
@@ -852,10 +892,54 @@ export function printTrack(score: TrackScore, track: Track): string {
   return lines.join("\n");
 }
 
+/**
+ * `notes` with each run of notes `song()` cannot tell apart (same pitch,
+ * start, length and velocity) put in the order of their derived ids, so a
+ * derived id is never printed just because a score sorts its ids the other
+ * way. Every other note keeps its place.
+ */
+function inDerivationOrder(
+  trackId: string,
+  notes: readonly Note[],
+): readonly Note[] {
+  const groups = new Map<string, number[]>();
+  notes.forEach((note, index) => {
+    const key = `${note.pitch}|${note.startTick}|${note.durationTicks}|${note.velocity}`;
+    const group = groups.get(key);
+    if (group) group.push(index);
+    else groups.set(key, [index]);
+  });
+  const out = [...notes];
+  for (const places of groups.values()) {
+    if (places.length < 2) continue;
+    const first = notes[places[0]!]!;
+    const derived: string[] = [];
+    for (let k = 0; k < places.length; k += 1)
+      derived.push(
+        noteIdFor(
+          trackId,
+          first.pitch,
+          first.startTick,
+          first.durationTicks,
+          first.velocity,
+          new Set(derived),
+        ),
+      );
+    const rank = (index: number) => {
+      const at = derived.indexOf(notes[index]!.id);
+      return at < 0 ? places.length + index : at;
+    };
+    const sorted = [...places].sort((a, b) => rank(a) - rank(b));
+    places.forEach((place, k) => (out[place] = notes[sorted[k]!]!));
+  }
+  return out;
+}
+
 function printNote(
   score: TrackScore,
   note: Note,
   named: boolean,
+  id: string | undefined,
   indent: string,
 ): string {
   // A detuned note always prints by name: `"E4-14c"`.
@@ -868,7 +952,7 @@ function printNote(
       : num(note.pitch);
   const args = [pitch, num(note.startTick / score.ticksPerBeat)];
   const length = note.durationTicks / score.ticksPerBeat;
-  const how = expressionEntries(note, indent + INDENT);
+  const how = expressionEntries(note, id, indent + INDENT);
   if (length !== 1 || note.velocity !== DEFAULT_VELOCITY || how)
     args.push(num(length));
   if (note.velocity !== DEFAULT_VELOCITY || how) args.push(num(note.velocity));
@@ -879,11 +963,12 @@ function printHit(
   score: TrackScore,
   note: Note,
   voice: string,
+  id: string | undefined,
   indent: string,
 ): string {
   const args = [str(voice), num(note.startTick / score.ticksPerBeat)];
   const length = note.durationTicks / score.ticksPerBeat;
-  const how = expressionEntries(note, indent + INDENT);
+  const how = expressionEntries(note, id, indent + INDENT);
   if (
     note.velocity !== DEFAULT_VELOCITY ||
     length !== DEFAULT_HIT_LENGTH ||
@@ -900,6 +985,7 @@ function printHit(
  */
 function expressionEntries(
   note: Note,
+  id: string | undefined,
   indent: string,
 ): (readonly [string, string])[] | undefined {
   const entries: (readonly [string, string])[] = [];
@@ -951,6 +1037,7 @@ function expressionEntries(
   if (note.lyric !== undefined) entries.push(["lyric", str(note.lyric)]);
   if (note.drift !== undefined) entries.push(["drift", num(note.drift)]);
   if (note.vox) entries.push(["vox", printNoteVox(note.vox, indent)]);
+  if (id !== undefined) entries.push(["id", str(id)]);
   return entries.length === 0 ? undefined : entries;
 }
 

@@ -31,7 +31,15 @@ import {
   type QuickJSWASMModule,
 } from "quickjs-emscripten-core";
 import { readFileSync, realpathSync, statSync } from "node:fs";
-import { dirname, extname, isAbsolute, join, relative, sep } from "node:path";
+import {
+  dirname,
+  extname,
+  isAbsolute,
+  join,
+  posix,
+  relative,
+  sep,
+} from "node:path";
 import { fileURLToPath } from "node:url";
 import { mapPosition } from "./sandbox-positions.ts";
 
@@ -86,6 +94,21 @@ export type SandboxOptions = {
   /** Wall-time budget in milliseconds (default `SANDBOX_TIME_MS`). */
   timeMs?: number;
   memoryBytes?: number;
+  /**
+   * The modules by root-relative `/`-separated name, read by the host
+   * beforehand (a composer plug-in, `core/composer-plugin.ts`). With it the
+   * evaluation reads no file at all: imports resolve against these names
+   * only, and `dawn` is always the SDK this runtime ships.
+   */
+  sources?: ReadonlyMap<string, string>;
+  /**
+   * JSON text of one argument: the default export must then be a function,
+   * which is called with the parsed value (inside the engine, by the
+   * intrinsic `JSON.parse`), and its return value is the result.
+   */
+  call?: string;
+  /** What the entry is, for messages: `song` (default) or `composer`. */
+  what?: "song" | "composer";
 };
 
 /**
@@ -175,8 +198,9 @@ const ALLOWED_GLOBALS = new Set([
 /**
  * Runs before any project code: removes non-standard globals, replaces the
  * clock and ambient randomness with functions that explain themselves, and
- * returns the intrinsic `JSON.stringify` so a song that reassigns it cannot
- * change how its own result is read.
+ * returns the intrinsic `JSON.stringify` and `JSON.parse` so a song or a
+ * composer that reassigns them cannot change how its argument is made or
+ * its result is read.
  */
 const PRELUDE = `(() => {
   const allowed = new Set(${JSON.stringify([...ALLOWED_GLOBALS])});
@@ -196,8 +220,12 @@ const PRELUDE = `(() => {
     configurable: true,
   });
   const stringify = JSON.stringify;
-  return (value) =>
-    typeof value === "object" && value !== null ? stringify(value) : undefined;
+  const parse = JSON.parse;
+  return [
+    (value) =>
+      typeof value === "object" && value !== null ? stringify(value) : undefined,
+    (text) => parse(text),
+  ];
 })()`;
 
 let compiled: WebAssembly.Module | undefined;
@@ -256,9 +284,12 @@ export async function evaluateSandboxed(
   entry = "song.ts",
   options: SandboxOptions = {},
 ): Promise<SandboxResult> {
+  const sources = options.sources;
+  const what = options.what ?? "song";
   let root: string;
   try {
-    root = realpathSync(project);
+    // In-memory sources name no folder: nothing below reads the disk.
+    root = sources ? "/" : realpathSync(project);
   } catch (error) {
     return failure({ message: `cannot read project: ${text(error)}` });
   }
@@ -271,7 +302,7 @@ export async function evaluateSandboxed(
     throw new Refusal(diagnostic);
   };
 
-  const vendored = vendoredSdk(root);
+  const vendored = sources ? undefined : vendoredSdk(root);
   /** Names `resolveImport` produced: the only ones `load` will read. */
   const resolved = new Set<string>(["dawn"]);
   const load = (name: string): LoadedModule => {
@@ -284,19 +315,21 @@ export async function evaluateSandboxed(
     if (modules.size >= SANDBOX_MAX_MODULES)
       refuse({
         file: name,
-        message: `song source loads more than ${SANDBOX_MAX_MODULES} modules`,
+        message: `${what} source loads more than ${SANDBOX_MAX_MODULES} modules`,
       });
     let module: LoadedModule;
     if (name === "dawn" && vendored === undefined) module = sdkModule();
     else {
       const path = name === "dawn" ? vendored! : join(root, name);
       const display = name === "dawn" ? VENDORED_SDK : name;
-      const source = readModule(root, path, display, refuse);
+      const source = sources
+        ? memoryModule(sources, name, refuse)
+        : readModule(root, path, display, refuse);
       sourceBytes += source.length;
       if (sourceBytes > SANDBOX_MAX_SOURCE_BYTES)
         refuse({
           file: display,
-          message: `song source is larger than ${SANDBOX_MAX_SOURCE_BYTES / (1024 * 1024)} MiB`,
+          message: `${what} source is larger than ${SANDBOX_MAX_SOURCE_BYTES / (1024 * 1024)} MiB`,
         });
       // The vendored SDK is the same 17,000 lines evaluation after
       // evaluation; its transpiled text is kept per source text.
@@ -330,8 +363,24 @@ export async function evaluateSandboxed(
     if (base === "dawn") refused("is not allowed: the SDK imports nothing");
     if (!specifier.startsWith("./") && !specifier.startsWith("../"))
       refused(
-        'is not allowed: song source may import only "dawn" and relative paths inside the project',
+        `is not allowed: ${what} source may import only "dawn" and relative paths inside the ${sources ? "composer" : "project"}`,
       );
+    if (sources) {
+      // Names only: the map is the whole file system this evaluation has.
+      const target = posix.normalize(
+        posix.join(posix.dirname(base), specifier),
+      );
+      if (target === ".." || target.startsWith("../") || target.startsWith("/"))
+        refused("resolves outside the composer");
+      const name = [...candidates(target, posix.join)].find((c) =>
+        sources.has(c),
+      );
+      if (name === undefined) return refused("does not resolve to a file");
+      if (!(extname(name) in LOADERS))
+        refused("is not a .ts, .js or .json module");
+      resolved.add(name);
+      return name;
+    }
     const target = join(root, dirname(base), specifier);
     let real: string | undefined;
     for (const candidate of candidates(target)) {
@@ -374,7 +423,10 @@ export async function evaluateSandboxed(
     );
   }
   if (entryName === "dawn")
-    return failure({ file: entry, message: `${entry} is the SDK, not a song` });
+    return failure({
+      file: entry,
+      message: `${entry} is the SDK, not a ${what}`,
+    });
   const budget = options.timeMs ?? SANDBOX_TIME_MS;
   const memory = options.memoryBytes ?? SANDBOX_MEMORY_BYTES;
   const runtime = QuickJS.newRuntime();
@@ -409,7 +461,15 @@ export async function evaluateSandboxed(
   );
   const context = runtime.newContext();
   try {
-    const result = run(context, entryName, load, memory, () => interrupted);
+    const result = run(
+      context,
+      entryName,
+      load,
+      memory,
+      () => interrupted,
+      options.call,
+      what,
+    );
     if (result.ok) return result;
     // An import the host refused surfaces in the engine as an error with
     // the refusal's message; the refusal knows the file and line.
@@ -420,7 +480,7 @@ export async function evaluateSandboxed(
     if (interrupted)
       return failure({
         ...locate(result.error, modules, entryName),
-        message: `evaluation timed out (${budget < 1000 ? `${budget} ms` : `${Math.round(budget / 1000)} s`}); song source must be pure and finite`,
+        message: `evaluation timed out (${budget < 1000 ? `${budget} ms` : `${Math.round(budget / 1000)} s`}); ${what} source must be pure and finite`,
       });
     return failure(locate(result.error, modules, entryName));
   } catch (error) {
@@ -438,22 +498,30 @@ export async function evaluateSandboxed(
 
 type RunFailure = { ok: false; error: SandboxDiagnostic & { stack?: string } };
 
-/** Evaluates the entry module and reads its default export as JSON text. */
+/**
+ * Evaluates the entry module and reads its default export as JSON text; with
+ * `call`, calls the default export with that JSON argument and reads what it
+ * returns.
+ */
 function run(
   context: QuickJSContext,
   entry: string,
   load: (name: string) => LoadedModule,
   memory: number,
   stopped: () => boolean,
+  call: string | undefined,
+  what: "song" | "composer",
 ): SandboxResult | RunFailure {
   const runtime = context.runtime;
   const fail = (handle: QuickJSHandle): RunFailure =>
-    thrown(context, handle, memory);
+    thrown(context, handle, memory, what);
   const prelude = context.evalCode(PRELUDE, "dawn:prelude", {
     type: "global",
   });
   if (prelude.error) return fail(prelude.error);
-  using stringify = prelude.value;
+  using intrinsics = prelude.value;
+  using stringify = context.getProp(intrinsics, 0);
+  using parse = context.getProp(intrinsics, 1);
   let entryModule: LoadedModule;
   try {
     entryModule = load(entry);
@@ -461,38 +529,86 @@ function run(
     if (error instanceof Refusal) return { ok: false, error: error.diagnostic };
     throw error;
   }
+  /**
+   * The value a promise settles to after the engine's pending jobs run (a
+   * top-level await, or a composer that returns a promise); a value that is
+   * not a promise is itself. Takes ownership of `handle`.
+   */
+  const settle = (
+    handle: QuickJSHandle,
+    waiting: string,
+  ): { value: QuickJSHandle } | { failure: RunFailure } => {
+    const first = context.getPromiseState(handle);
+    if (first.type === "fulfilled" && first.notAPromise === true)
+      return { value: handle };
+    if (first.type === "fulfilled") first.value.dispose();
+    else if (first.type === "rejected") first.error.dispose();
+    for (;;) {
+      const jobs = runtime.executePendingJobs();
+      if (jobs.error) {
+        handle.dispose();
+        return { failure: fail(jobs.error) };
+      }
+      if (jobs.value === 0 || stopped()) break;
+    }
+    const settled = context.getPromiseState(handle);
+    handle.dispose();
+    if (settled.type === "rejected") return { failure: fail(settled.error) };
+    if (settled.type === "pending")
+      return {
+        failure: {
+          ok: false,
+          error: {
+            file: entry,
+            message: `${entry} never finished: ${waiting}`,
+          },
+        },
+      };
+    return { value: settled.value };
+  };
   const evaluated = context.evalCode(entryModule.js, entry, { type: "module" });
   if (evaluated.error) return fail(evaluated.error);
   // A module evaluates to its namespace, or to a promise of it when it (or
   // a module it imports) awaits at the top level.
-  let namespace = evaluated.value;
-  const first = context.getPromiseState(namespace);
-  if (first.type !== "fulfilled" || first.notAPromise !== true) {
-    for (;;) {
-      const jobs = runtime.executePendingJobs();
-      if (jobs.error) {
-        namespace.dispose();
-        return fail(jobs.error);
-      }
-      if (jobs.value === 0 || stopped()) break;
-    }
-    const settled = context.getPromiseState(namespace);
-    namespace.dispose();
-    if (settled.type === "rejected") return fail(settled.error);
-    if (settled.type === "pending")
+  const module = settle(evaluated.value, "a top-level await is still waiting");
+  if ("failure" in module) return module.failure;
+  let result = context.getProp(module.value, "default");
+  module.value.dispose();
+  if (call !== undefined) {
+    if (context.typeof(result) !== "function") {
+      result.dispose();
       return {
         ok: false,
         error: {
           file: entry,
-          message: `${entry} never finished: a top-level await is still waiting`,
+          message: `${entry} must \`export default composer((brief) => ...)\``,
         },
       };
-    namespace = settled.value;
+    }
+    const argument = context.newString(call);
+    const parsed = context.callFunction(parse, context.undefined, argument);
+    argument.dispose();
+    if (parsed.error) {
+      result.dispose();
+      return fail(parsed.error);
+    }
+    const called = context.callFunction(
+      result,
+      context.undefined,
+      parsed.value,
+    );
+    parsed.value.dispose();
+    result.dispose();
+    if (called.error) return fail(called.error);
+    const returned = settle(
+      called.value,
+      "the promise it returned never settled",
+    );
+    if ("failure" in returned) return returned.failure;
+    result = returned.value;
   }
-  const song = context.getProp(namespace, "default");
-  namespace.dispose();
-  const json = context.callFunction(stringify, context.undefined, song);
-  song.dispose();
+  const json = context.callFunction(stringify, context.undefined, result);
+  result.dispose();
   if (json.error) return fail(json.error);
   using text = json.value;
   if (context.typeof(text) !== "string")
@@ -500,7 +616,10 @@ function run(
       ok: false,
       error: {
         file: entry,
-        message: `${entry} must \`export default song({...})\``,
+        message:
+          what === "composer"
+            ? `${entry}: the composer must return a composition object`
+            : `${entry} must \`export default song({...})\``,
       },
     };
   return { ok: true, json: context.getString(text) };
@@ -511,6 +630,7 @@ function thrown(
   context: QuickJSContext,
   handle: QuickJSHandle,
   memory: number,
+  what: "song" | "composer",
 ): RunFailure {
   let value: unknown;
   try {
@@ -529,7 +649,7 @@ function thrown(
   const out: RunFailure["error"] = {
     message:
       record.name === "InternalError" && /out of memory/i.test(message)
-        ? `evaluation ran out of memory (limit ${memory / (1024 * 1024)} MiB); song source must be finite`
+        ? `evaluation ran out of memory (limit ${memory / (1024 * 1024)} MiB); ${what} source must be finite`
         : message,
   };
   if (typeof record.stack === "string") out.stack = record.stack;
@@ -594,10 +714,31 @@ function vendoredSdk(root: string): string | undefined {
   }
 }
 
-function* candidates(target: string): Generator<string> {
+function* candidates(
+  target: string,
+  joinPath: (a: string, b: string) => string = join,
+): Generator<string> {
   yield target;
   for (const extension of EXTENSIONS) yield `${target}${extension}`;
-  for (const extension of EXTENSIONS) yield join(target, `index${extension}`);
+  for (const extension of EXTENSIONS)
+    yield joinPath(target, `index${extension}`);
+}
+
+/** A module of in-memory sources, held to the same size bound as a file. */
+function memoryModule(
+  sources: ReadonlyMap<string, string>,
+  name: string,
+  refuse: (diagnostic: SandboxDiagnostic) => never,
+): string {
+  const source = sources.get(name);
+  if (source === undefined)
+    return refuse({ file: name, message: `${name} is not a composer file` });
+  if (source.length > SANDBOX_MAX_MODULE_BYTES)
+    refuse({
+      file: name,
+      message: `${name} is not a file under ${SANDBOX_MAX_MODULE_BYTES / (1024 * 1024)} MiB`,
+    });
+  return source;
 }
 
 /**
