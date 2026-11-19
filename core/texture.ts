@@ -31,6 +31,12 @@ export const TEXTURE_TYPES = Object.freeze([
   "crowd",
   "data",
   "air",
+  "ocean",
+  "stream",
+  "waterfall",
+  "crickets",
+  "birds",
+  "country-road",
 ] as const);
 export type TextureType = (typeof TEXTURE_TYPES)[number];
 
@@ -56,6 +62,13 @@ export const TEXTURE_DOCS: Readonly<Record<TextureType, string>> =
     crowd: "murmur: seeded formant bursts (syllables) from many talkers",
     data: "glitches: bit-flips, buffer stutters, sample-rate sweeps, clicks, modem bursts",
     air: "high shimmering band noise",
+    ocean: "grouped ocean swell, asymmetric breaks and foamy wash",
+    stream: "running water with bright gurgling bubbles",
+    waterfall: "a broad sheet of falling water with deep turbulence",
+    crickets: "stereo night insects in pulsed chirp trains",
+    birds: "scattered birdsong with bent whistle calls",
+    "country-road":
+      "distant tires and a low engine drifting across a quiet road",
   });
 
 const num = (
@@ -192,6 +205,12 @@ export const TEXTURE_TYPE_DEFAULTS: Readonly<
   crowd: { density: 0.5, distance: 0.5, wear: 0.2, width: 0.8 },
   data: { density: 0.5, distance: 0.1, wear: 0.4, width: 0.6 },
   air: { density: 0.5, distance: 0.2, wear: 0.2, width: 0.8 },
+  ocean: { density: 0.5, distance: 0.25, wear: 0.32, width: 0.78 },
+  stream: { density: 0.5, distance: 0.25, wear: 0.32, width: 0.78 },
+  waterfall: { density: 0.5, distance: 0.25, wear: 0.32, width: 0.78 },
+  crickets: { density: 0.5, distance: 0.25, wear: 0.32, width: 0.78 },
+  birds: { density: 0.5, distance: 0.25, wear: 0.32, width: 0.78 },
+  "country-road": { density: 0.5, distance: 0.25, wear: 0.32, width: 0.78 },
 });
 
 export const TEXTURE_DEFAULTS: TextureSettings = Object.freeze({
