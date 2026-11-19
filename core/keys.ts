@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Modelled pianos (0.6 "Instruments", keys lane): the piano families, the one
  * `KEYS_PARAMS` table that drives validation, printing, the menu, the

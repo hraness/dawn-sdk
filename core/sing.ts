@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The built-in singing voice (0.7 "Voice", lane f07-sing): an LF glottal
  * source through a five-formant Klatt cascade with SATB singer tables,

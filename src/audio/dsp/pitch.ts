@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Monophonic f0 tracker for 0.7 Voice: pYIN-lite (Mauch and Dixon, ICASSP
  * 2014) over YIN's cumulative mean normalised difference (de Cheveigne and

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Off-thread measurement for `master measure` and the measure_mix agent
  * tool: a full render (master chain and target search included) plus the

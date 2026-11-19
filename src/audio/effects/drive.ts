@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Saturation stages on the mono track signal: bitcrush/coarse (sample-rate
  * and bit-depth reduction) and the distortion waveshaper.

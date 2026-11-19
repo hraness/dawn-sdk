@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Shared orbit buses (Strudel orbits): tracks whose `fx.orbit` sets
  * `shared` send into one delay and one reverb per orbit instead of running

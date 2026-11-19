@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The vocoder's detectors (0.7): the unvoiced curve (fricatives and
  * breaths get a noise carrier). A sample counts as unvoiced when its share

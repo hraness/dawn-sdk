@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * What an installed or built collection file may be. Installed entries are
  * data: names that other tools would load as configuration or code (dot

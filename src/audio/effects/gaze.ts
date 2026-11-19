@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Shoegaze stages (0.6.1): wobble, bloom, swell (mono, after the cab) and
  * double (stereo, right after pan). Ported from the guitar design lane's

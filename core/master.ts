@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The song master: optional mastering units applied to the whole mix after
  * the track and orbit-bus sum (DSP in src/audio/master.ts), and a loudness

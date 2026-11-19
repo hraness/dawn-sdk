@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Disk cache budgets and LRU pruning for pack downloads and decoded assets.
  *

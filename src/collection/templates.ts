@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** Starting files for a collection repository: a guide and an optional CI workflow. */
 
 export const TEMPLATES = ["pack", "artist", "community"] as const;

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Pitch correction (0.7 `Track.autotune`): from gentle to hard-tuned.
  *

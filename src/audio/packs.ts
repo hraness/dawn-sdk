@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Sample packs: Strudel-style sample manifests used from DAWN.
  *

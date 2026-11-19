@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Arranged rendering: what playback and export hear when the song has
  * section mutes or variations, a form, or a looped section. A song with

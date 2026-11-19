@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The score's schema version and the way an older score becomes the current
  * one (docs/design/score-versions.md).

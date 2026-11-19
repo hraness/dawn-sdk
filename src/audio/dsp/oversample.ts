@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Polyphase half-band oversampling for nonlinear stages (guitar rig, high
  * bowed notes). Kaiser-windowed half-band FIRs: 47 taps, beta 8 for 2x and

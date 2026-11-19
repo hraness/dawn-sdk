@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Deterministic printer: score → `song.ts` + `tracks/<slug>/track.ts`.
  *
@@ -252,6 +253,7 @@ export function printSong(
     "song",
     ...TIME_HELPERS.filter((name) => time.used.has(name)),
     ...(score.style ? ["style"] : []),
+    ...(score.video ? ["video"] : []),
     ...libraryHelpers(score),
   ];
   const lines: string[] = [`import { ${helpers.join(", ")} } from "dawn";`];
@@ -284,6 +286,12 @@ export function printSong(
   );
   if (score.master) entries.push(printMaster(score.master));
   if (score.style) entries.push(`style: ${printStyle(score.style)}`);
+  if (score.video) {
+    const { schema: _schema, ...video } = score.video;
+    entries.push(
+      `video: video(${literal(video, INDENT, "video: video(".length, 2)})`,
+    );
+  }
   // Song sections and form (0.5): printed only when the song has them.
   if (score.sections.length > 0)
     entries.push(

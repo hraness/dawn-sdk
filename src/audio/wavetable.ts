@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Wavetable oscillator: tables, band-limited mipmaps and the per-note voice.
  *

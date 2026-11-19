@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Composer plug-ins (`dawn.composer-plugin/v1`, docs/composers.md): other
  * people's composers, run as data rather than as programs with the user's

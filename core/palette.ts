@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** Declarative sound palettes: reusable patches and metadata, never composition code. */
 import { DEVICE_KINDS, type DeviceKind } from "./device.ts";
 import { validatePatch, type Patch } from "./patch.ts";

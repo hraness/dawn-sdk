@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The song master (core/master.ts) as DSP: trim (gain staging), EQ, glue
  * compressor, tape, width, a soft clipper, a DC blocker and a true-peak

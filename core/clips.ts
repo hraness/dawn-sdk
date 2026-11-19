@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Audio clips and lyrics (0.7 clips lane): the pure, render-free half.
  * Placement on the tempo map, the section cuts (`mapClips`, `sliceClips`)

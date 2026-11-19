@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The one line that installs each outside tool a feature may need. DAWN never
  * installs them itself: a message that says a tool is missing ends with one of

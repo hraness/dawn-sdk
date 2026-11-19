@@ -1,0 +1,15 @@
+{
+  "extends": "./.dawg/sdk/tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "dawg": [
+        "./.dawg/sdk/v1.ts"
+      ]
+    }
+  },
+  "include": [
+    "song.ts",
+    "tracks/**/*.ts",
+    ".dawg/sdk/*.ts"
+  ]
+}

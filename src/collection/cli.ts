@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * `dawn collection`: author, check and build catalogs, and install selected
  * entries pinned by commit and digest. Checking, building and installing

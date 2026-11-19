@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Level stages: tremolo, step gate, compressor and post gain.
  */

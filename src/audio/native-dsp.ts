@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The SDK renders with the reference TypeScript DSP only. DAWN can load an
  * optional native reverb kernel (its own prebuilt library) that produces the

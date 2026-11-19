@@ -18,7 +18,7 @@ verifies them and runs none of them.
 Bun 1.3.14 or newer runs the tools. Install a tagged release from GitHub:
 
 ```sh
-bun add github:hraness/dawn-sdk#v0.61.0
+bun add github:hraness/dawn-sdk#v0.62.0
 ```
 
 The same bytes are mirrored to npm as `@hraness/dawn-sdk`. Each
@@ -45,6 +45,38 @@ packed glass-weather · 4 sounds · /path/to/my-sounds/pack
 metadata and `SHA256SUMS`. A DAWN project loads that folder as a patch pack.
 `dawn-palette export <palette> <sound-id> <out.patch.json>` writes a single
 sound instead. Neither command overwrites an existing path.
+
+## Render a passage in the browser
+
+Bundle this module for a browser or a dedicated Web Worker. It renders the
+same stereo samples as the CLI for the supported instruments and effects.
+
+```ts
+import { note, song, track } from "@hraness/dawn-sdk";
+import { renderBrowserPcm } from "@hraness/dawn-sdk/browser";
+
+const score = song({
+  tempo: 72,
+  bars: 1,
+  tracks: [
+    track({ name: "Keys", instrument: "felt", notes: [note("D4", 0, 2, 0.5)] }),
+  ],
+});
+const { pcm, sampleRate, channels, musicalSeconds, tailSeconds } =
+  renderBrowserPcm(score, { sampleRate: 22050 });
+```
+
+The PCM is interleaved signed 16-bit stereo. Divide each channel’s samples
+by 32768 for Web Audio. Schedule the following passage at `musicalSeconds`
+and let this buffer continue for `tailSeconds`. A worker can transfer
+`pcm.buffer` back to its page.
+
+Use fixed-tempo scores with the legacy tones, oscillator synths, modeled
+pianos and electric keys, pan, tempo-synced delay and algorithmic reverb.
+The score can span up to 45 seconds of music, with up to 60 seconds in
+the complete buffer including release tails. Sample rates range from
+8,000 to 48,000 Hz. Unsupported instruments, routing, assets, master chains
+and arranged forms raise a score validation error. [Play the open-source browser example](https://sleepy.land/).
 
 ## Write your own palette
 
@@ -178,10 +210,82 @@ DAWN runs the same composers with `dawn song --composer`, and installs them
 from collections. The [composer guide](docs/composers.md) describes the brief,
 what a composer may return and the limits.
 
+## Make, check, lint, upgrade and share a project
+
+A DAWN project is a folder: `dawn.json`, `song.ts`, one `tracks/<name>/track.ts`
+per track, and a copy of this SDK in `.dawn/sdk/`. `dawn-project` holds the
+commands DAWN itself uses on that folder:
+
+```sh
+bunx dawn-project init night
+cd night
+bunx dawn-project check
+bunx dawn-project lint
+bunx dawn-project link
+bunx dawn-project open "https://dawnav.com/open#d1…" copy
+bunx dawn-project migrate
+bunx dawn-project comments add "tighten the hats" --agent my-tool
+```
+
+```text
+ok · 0 tracks, 0 notes · types 110 ms · eval 83 ms · score version 1
+```
+
+- `init` writes a new project.
+- `check` brings the SDK copy up to date, typechecks and evaluates the song in
+  the sealed engine. It runs the TypeScript compiler you have: install
+  `typescript` beside the SDK or have `tsc` on your PATH.
+- `lint` reads the score without rendering it and reports what is wrong
+  with the music, each finding with a rule, a place and a fix: a note
+  outside the key or against the bar's chord, a clash held over the bass, a
+  semitone between parts on a strong beat, a sung line outside its register
+  or too fast to say, a stressed syllable on a weak position, a chorus
+  thinner than its verse and, with `--album <dir>`, two songs that are too
+  alike. It exits 1 on an error; `--json` prints the report. A project's
+  `lint.json` declares its chords, its vocal books and what it allows.
+- `link` writes the score as a link and `open` turns a link back into a
+  project. The link is the whole score: nothing is uploaded.
+- `migrate` shows what an older project needs as a diff and exits 3 when
+  steps are pending; `--apply` makes the changes with a backup, `--undo`
+  restores it.
+- `comments` reads and appends `comments.jsonl`, the project's review notes.
+
+Each command prints its messages as DAWN does, so `dawn check` in a message
+is `dawn-project check` here. The score class, the link codec, the score
+diff, the lint, the comment events, MIDI export and the trace envelope are
+also importable: `@hraness/dawn-sdk/score`, `/link`, `/diff`, `/lint`,
+`/comments`, `/midi` and `/trace`.
+
+```ts
+import { diffScores } from "@hraness/dawn-sdk/diff";
+import { lintSong } from "@hraness/dawn-sdk/lint";
+import { TrackScore } from "@hraness/dawn-sdk/score";
+
+// `before` and `after` are scores as song() returns them. The diff is the
+// list of operations that turns one into the other; the lint reads a score
+// against its key and the chords you declare, one per bar.
+const operations = diffScores(new TrackScore(before), new TrackScore(after));
+const { ok, findings } = lintSong(after, { config: { harmony: ["Am", "F"] } });
+```
+
+The lint's thresholds come from a calibration. This package's is a wide
+baseline that no song was tuned on: the rules that judge taste (register,
+prosody, density, repetition, sameness) rarely fire, and the sung-line ones
+report warnings. A note outside the key, a clash held over the bass and a
+semitone between parts on a strong beat are found under any calibration. To
+hold songs to the numbers of the music you like, pass your own
+`LintCalibration` to `lintSong`, or override single numbers in `lint.json`
+under `style`.
+
+Before version 1.0 a newer DAWN may render an older project differently:
+`migrate` keeps a project readable, not its exact sound.
+
 ## What this package does not include
 
 It has no song or album generator of DAWN's. DAWN's composer, which chooses
-melodies, harmony, arrangement and mix, stays part of the DAWN app. The SDK
+melodies, harmony, arrangement and mix, stays part of the DAWN app, as do
+the lint thresholds it fits to its own songs and the recorder that writes a
+project's `trace/`. The SDK
 does include the musical building blocks an author selects by hand: chord
 parsing, progressions, voicing, strumming and Euclidean rhythms, and the
 composer plug-in interface for writing your own.

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Convolution reverb for `reverb.ir` (Strudel `iresponse`/`ir`): the track's
  * stereo pair, summed to mono, is convolved with a stereo impulse response

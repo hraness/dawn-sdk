@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Loop filters for the string waveguides (ported from the 0.6 strings
  * prototype, proto/strings/dsp.ts): the two-decay loss filter and the

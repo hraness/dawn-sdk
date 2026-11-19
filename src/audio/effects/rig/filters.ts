@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Filters for the guitar rig: the full RBJ cookbook biquad (peaks and
  * shelves, which the effects chain's `Biquad` does not offer) and a

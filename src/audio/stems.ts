@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Stem taps joined over a whole song: per-track (or per-group) pre-master
  * stems and the pre-master mix from one render (`renderArrangedStems`).

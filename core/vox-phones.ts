@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The machine-vox phone table (lane V1): every ARPAbet phone the built-in
  * formant voice can say, with its class, voicing, formant targets (F1-F3

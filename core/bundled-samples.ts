@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** Small, original, offline sample library. Assets are versioned and immutable. */
 import type { PinnedSampleRef } from "./score.ts";
 import { BUNDLED_VOCALS } from "./bundled-vocals.ts";

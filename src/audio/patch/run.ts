@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The patch runner (design §8.2): interprets a `PatchProgram` in 32-sample
  * blocks over flat Float64Arrays. The global nodes ahead of the voices run

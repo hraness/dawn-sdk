@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Cepstral spectral envelope (0.6 B2): the smooth outline of a magnitude
  * spectrum, used by `shift.ts` to hold formants still while the pitch moves.

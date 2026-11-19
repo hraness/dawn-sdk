@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * DAWN's studio library also holds sung hooks and vocal books. The SDK ships
  * only the library's generated sounds (`assets/samples/studio/`), so this

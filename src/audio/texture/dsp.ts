@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Small building blocks for the texture engine: a sequential seeded
  * generator, pink and brown noise, filters whose coefficients can move every

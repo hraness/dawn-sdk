@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Chords: vocabulary, key-mode harmony, voice leading, bass, performance
  * (block, strum, arpeggio, harp) and explicit progression presets. Pure and

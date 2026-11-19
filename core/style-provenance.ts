@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Which style and seed made a song. Stored as the optional
  * `style` field of the score so `/style`, the agent and `song.ts` agree on

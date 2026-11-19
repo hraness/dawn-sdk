@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Rhythm rows on a score: the glue between `core/euclid.ts` generators and
  * the stored notes.

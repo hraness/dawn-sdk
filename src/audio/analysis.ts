@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The pitch-analysis cache (0.7). `pitchCurve` tracks a decoded sample once
  * and keeps the canonical curve in a small in-memory LRU and on disk at

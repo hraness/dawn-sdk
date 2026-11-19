@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Seeded randomness for 0.6 instruments. `seededRandom` is the existing
  * sequential generator (src/audio/random.ts, unchanged); `unit` is a

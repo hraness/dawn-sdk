@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The project-local lock of installed collection entries,
  * `collections.lock.json`. It records what was installed from where, by

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Synthesized drum kits: parameter sets for the built-in drum synth
  * (`src/audio/kits.ts`). A kit is chosen per track (`kit: "syn808"` on an

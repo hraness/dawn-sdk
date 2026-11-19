@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Sample loading for sampler tracks (score v2). Every voice's `src` is
  * resolved inside the project (lexically, then through `realpath`, never into

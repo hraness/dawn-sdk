@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The modelled acoustic piano (0.6 keys lane, families grand, upright, felt,
  * honkytonk, prepared), ported from the reviewed prototype

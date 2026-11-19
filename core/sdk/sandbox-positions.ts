@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Maps a position in transpiled JavaScript back to the TypeScript it came
  * from. `Bun.Transpiler` reprints a module without a source map, but the

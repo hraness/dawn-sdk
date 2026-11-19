@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Typed parameter specs shared by the effects chain (core/fx.ts) and the
  * synth voice (core/synth.ts): one table per unit drives validation,

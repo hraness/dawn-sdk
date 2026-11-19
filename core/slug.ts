@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** Longest directory name a track slug may take. */
 export const MAX_TRACK_SLUG_LENGTH = 64;
 

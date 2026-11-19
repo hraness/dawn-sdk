@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Interpolation and fractional delay for 0.6 instruments: 4-point Hermite
  * reads (grains, modulated delays) and a first-order Thiran allpass

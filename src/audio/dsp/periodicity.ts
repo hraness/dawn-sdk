@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Periodicity (0.7 vocoder): 0..1 per sample, the best normalised
  * autocorrelation over 2..20 ms lags (a YIN-style aperiodicity cue), on a

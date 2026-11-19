@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The modal percussion engine (0.6, lane f06-modal): renders a track whose
  * instrument is `"modal"` and that carries a `modal` field. Registered in

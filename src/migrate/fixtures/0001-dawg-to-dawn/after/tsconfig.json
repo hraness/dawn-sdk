@@ -1,0 +1,15 @@
+{
+  "extends": "./.dawn/sdk/tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "dawn": [
+        "./.dawn/sdk/v1.ts"
+      ]
+    }
+  },
+  "include": [
+    "song.ts",
+    "tracks/**/*.ts",
+    ".dawn/sdk/*.ts"
+  ]
+}

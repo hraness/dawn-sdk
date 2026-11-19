@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Modal synthesis primitives (0.6, lane f06-modal): a bank of decaying
  * complex phasors (exact-frequency two-pole resonators) struck by a

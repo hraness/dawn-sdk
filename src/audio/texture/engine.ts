@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The texture engine: renders a track whose instrument is `"texture"` and
  * that carries a `texture` field. Each note is one event (a bed, a whoosh,

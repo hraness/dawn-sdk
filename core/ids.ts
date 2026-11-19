@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Collision-free ids for things two writers can create at once (notes from
  * agent tools, resamples, guide tracks). A readable prefix keeps receipts

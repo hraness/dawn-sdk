@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The shared radix-2 FFT: a re-export of the convolution reverb's
  * `fftInPlace` (cached tables; `inverse` uses e^{+i} and no scaling).

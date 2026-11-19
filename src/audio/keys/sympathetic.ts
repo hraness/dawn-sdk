@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Sympathetic resonance for the modelled pianos (0.6.1, keys-electric
  * lane): a per-track bank of 36 tuned feedback combs (C2..B4), fed by the

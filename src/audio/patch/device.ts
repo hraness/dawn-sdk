@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * WebAssembly devices in the render (core/device.ts, docs/devices.md): the
  * `device.fx` and `device.synth` buffer nodes, the `device.notes` rewrite

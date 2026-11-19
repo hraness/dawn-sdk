@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Inlined kernels for the fused voice block (fuse.ts): a node's kernel
  * written into the block with its port offsets, state cells and mode as

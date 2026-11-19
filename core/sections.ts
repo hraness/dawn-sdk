@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Song structure (0.5). Sections are named bar ranges of the score and the
  * form is the order they play in, with repeats (`A A B A`). Everything here

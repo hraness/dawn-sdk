@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Mix patches: the moves `mixqa --fix` solves, as data the SDK applies to a
  * score at render time (a project's `mix.patch.json`). A patch never

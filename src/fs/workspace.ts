@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Workspace file access for the agent. The project root is the directory
  * `dawn` runs in. Every path the model supplies is resolved lexically, then

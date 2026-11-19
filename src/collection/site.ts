@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * One static page for a built catalog, in the DAWN instrument language: one
  * paper and one ink, structure from alignment and space, quiet labels and

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * One oversampler per nonlinear rig section (stomp, head): 4x at 22.05 kHz
  * and below, 2x at 44.1/48 kHz, from the shared half-band primitives in

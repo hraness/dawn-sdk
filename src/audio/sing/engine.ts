@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The sing engine (0.7): a built-in singing voice for a `sing` track.
  *

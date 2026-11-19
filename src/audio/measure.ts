@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Render a score and measure the result: the shared path behind
  * `master measure`, `dawn render`'s loudness line and the measure_mix agent

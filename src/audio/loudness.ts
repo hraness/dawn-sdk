@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Loudness and mix measurement after ITU-R BS.1770-4 and EBU R 128:
  * K-weighted mean square, momentary (400 ms) and short-term (3 s) loudness

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Linear prediction (0.7 talkbox): autocorrelation with a deterministic
  * white-noise floor and a 60 Hz Gaussian lag window, and Levinson-Durbin.

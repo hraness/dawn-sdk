@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Speaker cabinets (`fx.cab`): a parametric speaker, box and microphone
  * model from cheap biquads (no impulse response, no setup cost). Ported

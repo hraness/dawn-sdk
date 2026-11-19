@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Filters the wind voice needs beyond DAWN's `Biquad` (lpf, hpf, bpf):
  * the RBJ cookbook peak and high shelf for mutes and the dynamics shelf

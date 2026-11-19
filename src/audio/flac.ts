@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * FLAC decoding in TypeScript, with no dependencies, so a lossless sample
  * renders exactly as the WAV it replaces: the integers decoded here are the

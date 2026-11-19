@@ -1,0 +1,94 @@
+{
+  "schema": "dawn.comments/v1",
+  "song": "Paper Boats",
+  "comments": [
+    {
+      "id": "c1",
+      "status": "open",
+      "created": "2026-11-10T09:00:00Z",
+      "text": "The whole song could breathe more.",
+      "anchor": {
+        "t0": 0.0,
+        "t1": 32.0,
+        "bars": { "from": { "bar": 1, "beat": 1.0 }, "to": { "bar": 17, "beat": 1.0 } },
+        "sections": [],
+        "all_tracks": true,
+        "tracks": [],
+        "note_count": 0,
+        "notes": []
+      }
+    },
+    {
+      "id": "c2",
+      "status": "addressed",
+      "created": "2026-11-10T09:05:00Z",
+      "addressed": "2026-11-11T18:30:00Z",
+      "text": "Too busy under the vocal.\nHalve it?",
+      "anchor": {
+        "t0": 16.0,
+        "t1": 24.0,
+        "bars": { "from": { "bar": 9, "beat": 1.0 }, "to": { "bar": 13, "beat": 1.0 } },
+        "sections": ["B"],
+        "all_tracks": false,
+        "tracks": [{ "id": "hats", "name": "Hats" }],
+        "note_count": 0,
+        "notes": []
+      }
+    },
+    {
+      "id": "c3",
+      "status": "open",
+      "created": "2026-11-10T09:10:00Z",
+      "text": "Call this one Sub.",
+      "anchor": {
+        "t0": 0.0,
+        "t1": 32.0,
+        "bars": { "from": { "bar": 1, "beat": 1.0 }, "to": { "bar": 17, "beat": 1.0 } },
+        "sections": [],
+        "all_tracks": false,
+        "tracks": [{ "id": "bass", "name": "Bass" }],
+        "note_count": 0,
+        "notes": []
+      },
+      "rename": { "track": "bass", "to": "Sub" }
+    },
+    {
+      "id": "c4",
+      "status": "open",
+      "created": "2026-11-10T09:15:00Z",
+      "text": "この二つの音は長すぎる。",
+      "anchor": {
+        "t0": 16.0,
+        "t1": 17.25,
+        "bars": { "from": { "bar": 9, "beat": 1.0 }, "to": { "bar": 9, "beat": 3.5 } },
+        "sections": ["B"],
+        "all_tracks": false,
+        "tracks": [{ "id": "bass", "name": "Bass" }],
+        "note_count": 2,
+        "notes": [
+          { "track": "bass", "t": 16.0, "dur": 0.5, "pitch": 43.0 },
+          { "track": "bass", "t": 16.75, "dur": 0.5, "pitch": 46.0 }
+        ]
+      }
+    },
+    {
+      "id": "c5",
+      "status": "open",
+      "created": "2026-11-10T09:20:00Z",
+      "text": "Kick and bass fight here.",
+      "anchor": {
+        "t0": 8.0,
+        "t1": 16.0,
+        "bars": { "from": { "bar": 5, "beat": 1.0 }, "to": { "bar": 9, "beat": 1.0 } },
+        "sections": ["A", "B"],
+        "all_tracks": false,
+        "tracks": [
+          { "id": "kick", "name": "Kick" },
+          { "id": "bass", "name": "Bass" }
+        ],
+        "note_count": 0,
+        "notes": []
+      }
+    }
+  ]
+}

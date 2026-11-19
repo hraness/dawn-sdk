@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** Mix kernels: vca, mix, xfade, pan, plus the compiler's pass and macro nodes. */
 import { at, BLOCK, type Frame, put } from "./frame.ts";
 

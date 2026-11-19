@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Stomp boxes (`fx.stomp`): fuzz (Big Muff family), face (Fuzz Face), od
  * (Tube Screamer), rat (RAT) and octave (Octavia). Circuit-inspired

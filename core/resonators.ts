@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Modal percussion settings (0.6 "Instruments", lane f06-modal): mallets,
  * bars, tines, bells, pans, bowls, gongs and drums played by one engine,

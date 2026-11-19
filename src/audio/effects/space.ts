@@ -1,10 +1,11 @@
+// SPDX-License-Identifier: MIT
 /**
  * Send effects on the stereo pair: delay and reverb. Without their
  * optional parameters both render exactly as the original renderer did.
  */
 import type { Track } from "../../../core/score.ts";
 import type { DecodedSample } from "../samples.ts";
-import { nativeReverbKernel, type ReverbKernel } from "../native-dsp.ts";
+import type { ReverbKernel } from "../native-dsp.ts";
 import {
   addConvolved,
   builtinImpulse,
@@ -329,7 +330,13 @@ export function reverbWet(
   const { sampleRate } = context;
   const impulse = reverbImpulse(track, sampleRate, context.irs);
   if (impulse) return convolutionWet(left, right, track, context, impulse);
-  return algorithmicReverbWet(left, right, reverb, sampleRate);
+  return algorithmicReverbWet(
+    left,
+    right,
+    reverb,
+    sampleRate,
+    context.reverbKernel?.(),
+  );
 }
 
 /** Exported for exact reference/native qualification; mix and convolution
@@ -339,7 +346,7 @@ export function algorithmicReverbWet(
   right: Float64Array,
   reverb: NonNullable<Track["reverb"]>,
   sampleRate: number,
-  kernel: ReverbKernel | null | undefined = nativeReverbKernel(),
+  kernel?: ReverbKernel | null,
 ): ReverbWet {
   if (kernel && left.length === right.length) {
     const wet = nativeAlgorithmicReverb(

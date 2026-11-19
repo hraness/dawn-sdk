@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** Bounded collection catalogs. Parsing metadata never reads or executes its sources. */
 export const COLLECTION_SCHEMA = "dawn.collection/v1";
 export const COLLECTION_LIMITS = Object.freeze({

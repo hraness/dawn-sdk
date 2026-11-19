@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Glottal source: the Liljencrants-Fant (LF) flow-derivative pulse shaped by
  * one voice-quality knob Rd (Fant 1995, "The LF-model revisited"): 0.3 is

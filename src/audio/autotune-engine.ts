@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The built-in pitch engine for autotune (0.7): the pitch lane's tracker
  * (src/audio/dsp/pitch.ts) and PSOLA (src/audio/dsp/psola.ts) behind the

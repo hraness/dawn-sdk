@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { createHash } from "node:crypto";
 import {
   SCORE_LIMITS,
@@ -58,7 +59,22 @@ import {
   usesSynthVoice,
   type VoiceContext,
 } from "./synth/voice.ts";
-import { legacyWaveFor } from "./synth/oscillators.ts";
+import { nativeReverbKernel } from "./native-dsp.ts";
+import {
+  applyPan,
+  clampSampleRate,
+  noteSpan,
+  oneShotSeconds,
+  renderToneNote,
+  toPcm,
+  trackGainAt,
+  RENDER_CHANNELS,
+} from "./voice-mix.ts";
+export {
+  RENDER_CHANNELS,
+  DEFAULT_SAMPLE_RATE,
+  clampSampleRate,
+} from "./voice-mix.ts";
 import {
   EMPTY_SAMPLE_BANK,
   sampleKey,
@@ -110,7 +126,7 @@ import {
   performedNotes,
   slowestBpmOf,
 } from "../../core/tempo.ts";
-import { sampleWarpFor, warpedSpan, type SampleWarp } from "./warp.ts";
+import { sampleWarpFor, type SampleWarp } from "./warp.ts";
 import { clipsDigest, hasClips, renderClips } from "./clips.ts";
 import { isGuideInstrument } from "../../core/clips.ts";
 import {
@@ -297,10 +313,6 @@ export function scrubNonFinite(buffer: Float64Array): number {
   return count;
 }
 
-/** Output channel count for every render and export. */
-export const RENDER_CHANNELS = 2 as const;
-export const DEFAULT_SAMPLE_RATE = 22_050;
-
 /** Names understood by the deterministic local voice bank and the agent. */
 export const AVAILABLE_INSTRUMENTS = Object.freeze([
   "sine",
@@ -359,25 +371,6 @@ export const AVAILABLE_FX_PRESETS: Readonly<Record<string, string>> =
 
 /** Longest drum one-shot, in seconds; hits ring past their note length. */
 const MAX_DRUM_SECONDS = 0.6;
-/** Effect parameters are refreshed at this sample interval when automated. */
-const CONTROL_SAMPLES = 32;
-/** One-shot renders keep this much ring-out after the last bar. */
-const ONE_SHOT_TAIL_SECONDS = 0.35;
-
-function oneShotSeconds(
-  loopSeconds: number,
-  samplerTail: number,
-  reverbTail: number,
-  delayTail = 0,
-): number {
-  return (
-    loopSeconds +
-    Math.max(ONE_SHOT_TAIL_SECONDS, samplerTail) +
-    reverbTail +
-    delayTail
-  );
-}
-
 /**
  * Seconds the longest delay keeps echoing after the song, at the slowest
  * tempo, so a throw on the last bar fades out instead of being cut.
@@ -426,6 +419,7 @@ export type RenderContext = Readonly<{
   samplesPerTick: number;
   tempoBpm: number;
   irs?: ReadonlyMap<string, DecodedSample>;
+  reverbKernel?: typeof nativeReverbKernel;
   /** Tempo map in samples (core/tempo.ts); absent: constant tempo. */
   warp?: SampleWarp;
   seedTick?: number;
@@ -438,13 +432,6 @@ export type RenderContext = Readonly<{
 export function loopFrames(score: TrackScore, sampleRate: number): number {
   if (score.time) return loopSecondsOf(score) * sampleRate;
   return (score.bars * score.beatsPerBar * 60 * sampleRate) / score.tempoBpm;
-}
-
-export function clampSampleRate(sampleRate?: number): number {
-  return Math.max(
-    8_000,
-    Math.min(48_000, Math.floor(sampleRate ?? DEFAULT_SAMPLE_RATE)),
-  );
 }
 
 /** Render the bounded score to a stereo 16-bit PCM WAV. */
@@ -688,6 +675,7 @@ export class StemRenderer {
       samples = frames;
     }
     const context: RenderContext = {
+      reverbKernel: nativeReverbKernel,
       score,
       sampleRate,
       samples,
@@ -1475,40 +1463,6 @@ export const masteredPcm = (
   frames: number,
 ): Int16Array => toPcm(left, right, frames, true);
 
-function toPcm(
-  mixL: Float64Array,
-  mixR: Float64Array,
-  frames: number,
-  dither = false,
-): Int16Array {
-  const pcm = new Int16Array(frames * RENDER_CHANNELS);
-  if (dither) {
-    // Triangular dither of +-1 LSB: the sum of two uniform values, from a
-    // fixed-seed xorshift so every render of a score dithers the same way.
-    let state = 0x9e3779b9;
-    const uniform = () => {
-      state ^= state << 13;
-      state ^= state >>> 17;
-      state ^= state << 5;
-      return (state >>> 0) / 4_294_967_296;
-    };
-    for (let index = 0; index < frames; index += 1) {
-      pcm[index * 2] = clamp16(
-        Math.round(mixL[index]! * 32767 + uniform() - uniform()),
-      );
-      pcm[index * 2 + 1] = clamp16(
-        Math.round(mixR[index]! * 32767 + uniform() - uniform()),
-      );
-    }
-    return pcm;
-  }
-  for (let index = 0; index < frames; index += 1) {
-    pcm[index * 2] = clamp16(mixL[index]! * 32767);
-    pcm[index * 2 + 1] = clamp16(mixR[index]! * 32767);
-  }
-  return pcm;
-}
-
 /** Everything a track's stem depends on, except mute and solo. */
 /**
  * The track as its reverb tail sees it: everything but the reverb's mix
@@ -1989,17 +1943,6 @@ function applyTrackGain(
   }
 }
 
-/** Track volume and volume automation at a score tick (pan is applied in stereo). */
-function trackGainAt(track: Track | undefined, tick: number): number {
-  const trackGain = Math.max(0, Math.min(1, track?.volume ?? 1));
-  const automatedGain = interpolateAutomation(
-    track?.volumeAutomation ?? [],
-    tick,
-    1,
-  );
-  return trackGain * automatedGain;
-}
-
 /** The notes as note-aware effects see them (EffectContext.notes). */
 function effectNotes(
   notes: readonly Note[],
@@ -2016,77 +1959,6 @@ function effectNotes(
       velocity: note.velocity,
     };
   });
-}
-
-function noteSpan(
-  note: Note,
-  context: RenderContext,
-): { start: number; length: number } {
-  const { score, sampleRate, warp } = context;
-  if (warp) return warpedSpan(warp, note.startTick, note.durationTicks);
-  const start = Math.max(
-    0,
-    Math.floor(
-      (((note.startTick / score.ticksPerBeat) * 60) / score.tempoBpm) *
-        sampleRate,
-    ),
-  );
-  const length = Math.max(
-    1,
-    Math.floor(
-      (((note.durationTicks / score.ticksPerBeat) * 60) / score.tempoBpm) *
-        sampleRate,
-    ),
-  );
-  return { start, length };
-}
-
-function renderToneNote(
-  target: Float64Array,
-  note: Note,
-  track: Track | undefined,
-  context: RenderContext,
-  tuning?: TuningTable,
-): void {
-  const { sampleRate, samples, samplesPerTick } = context;
-  const instrument = track?.instrument ?? "sine";
-  const { start, length } = noteSpan(note, context);
-  const end = Math.min(samples, start + length);
-  const frequency = noteHz(note.pitch, note.cents, tuning);
-  if (!(frequency > 0)) return;
-  const velocity = Math.max(0, Math.min(1, note.velocity));
-  const performance = (note as PerformedNote).performance;
-  const cents = performance?.cents;
-  let bent = 0;
-  const wave = legacyWaveFor(instrument);
-  for (let index = start; index < end; index += 1) {
-    const elapsed = index - start;
-    const remaining = end - index;
-    const attack = Math.min(1, elapsed / Math.max(1, sampleRate * 0.012));
-    const release = Math.min(1, remaining / Math.max(1, sampleRate * 0.09));
-    const envelope =
-      Math.min(attack, release) *
-      velocity *
-      0.28 *
-      trackGainAt(
-        track,
-        context.warp
-          ? context.warp.tick(index)
-          : note.startTick + elapsed / samplesPerTick,
-      );
-    // Plain notes keep the closed-form phase (byte-identical output).
-    let phase = (frequency * elapsed) / sampleRate;
-    if (cents) {
-      phase = bent;
-      bent +=
-        (frequency * 2 ** (cents(elapsed / sampleRate) / 1200)) / sampleRate;
-    }
-    const damp = performance?.damp;
-    const t = elapsed / sampleRate;
-    const held =
-      damp && t > damp.from ? Math.exp(-(t - damp.from) / damp.tau) : 1;
-    target[index]! += wave(phase) * envelope * held;
-  }
 }
 
 /**
@@ -2241,44 +2113,6 @@ function renderDrumNote(
   }
 }
 
-/**
- * Equal-power pan of the mono track into the stereo pair: left = cos(θ),
- * right = sin(θ) with θ = (pan + 1)·π/4, so the summed power is constant
- * and a centred track sits 3 dB down in each channel.
- */
-function applyPan(
-  dry: Float64Array,
-  left: Float64Array,
-  right: Float64Array,
-  track: Track | undefined,
-  context: RenderContext,
-  dryRight?: Float64Array,
-): void {
-  const lane = track?.panAutomation ?? [];
-  const staticPan = track?.pan ?? 0;
-  const gains = (pan: number): [number, number] => {
-    const theta = ((Math.max(-1, Math.min(1, pan)) + 1) * Math.PI) / 4;
-    return [Math.cos(theta), Math.sin(theta)];
-  };
-  let [gainL, gainR] = gains(staticPan);
-  for (let index = 0; index < dry.length; index += 1) {
-    if (lane.length > 0 && index % CONTROL_SAMPLES === 0)
-      [gainL, gainR] = gains(
-        interpolateAutomation(
-          lane,
-          context.warp
-            ? context.warp.tick(index)
-            : index / context.samplesPerTick,
-          staticPan,
-        ),
-      );
-    const sample = dry[index]!;
-    left[index] = sample * gainL;
-    // A stereo voice pans its own right channel the same way.
-    right[index] = (dryRight ? dryRight[index]! : sample) * gainR;
-  }
-}
-
 type WavetableHook = Readonly<{
   /** Joins the stem key: a different or missing table re-renders. */
   id: string;
@@ -2361,10 +2195,6 @@ export function encodeWav(
 function writeAscii(target: Uint8Array, offset: number, value: string): void {
   for (let index = 0; index < value.length; index += 1)
     target[offset + index] = value.charCodeAt(index);
-}
-
-function clamp16(value: number): number {
-  return Math.max(-32_768, Math.min(32_767, Math.round(value)));
 }
 
 /** A named point in a WAV export: a sample frame and its label. */

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Built-in carriers for instrument `vocoder` (0.7): saw, supersaw, pulse or
  * noise, pitched by the track's performed notes, the song's chord timeline

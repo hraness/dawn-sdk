@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Pitch shift at constant duration (0.6 B2 `shift`, `formant`), ported from
  * the granular prototype (`proto/granular/stretch.ts` `pitchShift`):

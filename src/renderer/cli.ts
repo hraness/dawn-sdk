@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * `dawn-render`, the SDK's standalone renderer: a score (`song.ts` source or
  * score JSON) plus the patches, samples and devices it names, to a WAV.

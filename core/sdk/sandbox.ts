@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The sealed evaluator for song source. `song.ts`, its track files and any
  * other project module are transpiled from TypeScript to JavaScript on the

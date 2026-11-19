@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Electric keys (0.6.1 keys-electric lane): the Rhodes-style tine piano
  * (`epiano`), the Wurlitzer-style reed piano (`wurli`) and the clavinet

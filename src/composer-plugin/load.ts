@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Where a `--composer` argument points, read into memory
  * (`core/composer-plugin.ts`): a plug-in folder or its `dawn.composer.json`,

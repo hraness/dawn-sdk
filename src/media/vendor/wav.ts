@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // Vendored from soundfish `lib/audio-media/wav.ts` (same owner): RIFF/WAVE parser for PCM 16/24/32 and float32.
 
 export type WavFailureCode = "unsupported_media" | "decode_failed" | "too_long";
