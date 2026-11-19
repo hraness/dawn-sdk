@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 /**
- * The ten texture sources. Each renders a block of two decorrelated raw
+ * The texture sources. Each renders a block of two decorrelated raw
  * channels (`a`, `b`) from its own seeded generator; the voice
  * (`voice.ts`) adds the envelope, distance (darkening and the FDN), width
  * and the DC blocker. Rates are per second and every random draw comes from
@@ -12,6 +12,8 @@ import { Brown, Drift, Hp1, Lp1, Pink, polyBlep, Rng, Svf } from "./dsp.ts";
 
 /** What a source reads each control block. */
 export type Controls = {
+  /** Frames in this block before note-off. Materials may ring after this. */
+  heldSamples: number;
   density: number;
   wear: number;
   distance: number;
@@ -1142,6 +1144,127 @@ class Air implements Source {
   }
 }
 
+/** Individual bristles or paper creases excite a moving surface and its body. */
+class Friction implements Source {
+  private readonly surface = new Svf();
+  private readonly body = new Svf();
+  private nextStroke = 0;
+  private nextGrain = 0;
+  private age = 0;
+  private duration = 1;
+  private pan = 0;
+  private grain = 0;
+  private readonly grainDecay: number;
+
+  constructor(
+    private readonly paper: boolean,
+    private readonly rng: Rng,
+    private readonly sr: number,
+  ) {
+    this.grainDecay = Math.exp(-1 / (sr * (paper ? 0.0012 : 0.0032)));
+  }
+
+  render(a: Float64Array, b: Float64Array, n: number, c: Controls) {
+    const paper = this.paper;
+    this.surface.set(
+      (paper ? 3100 : 1850) * (0.7 + c.wear) * c.sweep,
+      0.85,
+      this.sr,
+    );
+    this.body.set((paper ? 840 : 270) * c.sweep, paper ? 3.8 : 1.65, this.sr);
+    for (let i = 0; i < n; i++) {
+      if (--this.nextStroke <= 0 && i < c.heldSamples) {
+        this.duration =
+          this.rng.range(paper ? 0.12 : 0.19, paper ? 0.38 : 0.46) * this.sr;
+        this.nextStroke =
+          this.duration + this.rng.wait(1.6 + 7 * c.density) * this.sr;
+        this.age = 0;
+        this.nextGrain = 0;
+        this.pan = this.rng.bi() * 0.48;
+      }
+      const phase = Math.min(1, this.age++ / this.duration);
+      const pressure = Math.sin(Math.PI * phase);
+      let buckle = 0;
+      if (phase < 1 && --this.nextGrain <= 0) {
+        const rate =
+          (paper ? 28 : 145) * (0.25 + pressure * (0.55 + c.density));
+        this.nextGrain = Math.max(1, this.rng.wait(rate) * this.sr);
+        this.grain += this.rng.range(0.18, 0.75) * pressure;
+        buckle = this.rng.bi() * pressure * (paper ? 2.4 : 0.5);
+      }
+      this.grain *= this.grainDecay;
+      const noise = this.rng.noise();
+      const scrape = this.surface.process(
+        noise * (this.grain + pressure * (paper ? 0.07 : 0.28)),
+      );
+      const body = this.body.process(
+        buckle + noise * pressure * (paper ? 0.11 : 0.35),
+      );
+      const movement = this.pan + (phase - 0.5) * 0.22;
+      a[i] = body + scrape * (1 - movement);
+      b[i] = body + scrape * (1 + movement);
+    }
+  }
+}
+
+/** A contact impulse excites a cup's paired rim modes and shorter body modes. */
+class Porcelain implements Source {
+  private readonly modes = [1, 1.006, 2.51, 3.87, 5.43];
+  private readonly weights = [0.31, 0.21, 0.18, 0.09, 0.045];
+  private readonly loss: number[];
+  private readonly y1 = new Float64Array(5);
+  private readonly y2 = new Float64Array(5);
+  private readonly coeff = new Float64Array(5);
+  private readonly excitation = new Float64Array(5);
+  private readonly fundamental: number;
+  private next = 0;
+  private rebound = -1;
+  private pan = 0;
+
+  constructor(
+    private readonly rng: Rng,
+    private readonly sr: number,
+  ) {
+    this.fundamental = rng.range(510, 870);
+    this.loss = [0.29, 0.34, 0.16, 0.094, 0.048].map((seconds) =>
+      Math.exp(-1 / (sr * seconds)),
+    );
+  }
+
+  render(a: Float64Array, b: Float64Array, n: number, c: Controls) {
+    for (let k = 0; k < this.modes.length; k++) {
+      const hz = this.fundamental * this.modes[k]! * c.sweep;
+      const angle = TAU * Math.min(0.45, hz / this.sr);
+      this.coeff[k] = 2 * this.loss[k]! * Math.cos(angle);
+      const fade = Math.min(1, Math.max(0, (0.48 - hz / this.sr) / 0.08));
+      this.excitation[k] =
+        Math.sin(angle) * this.weights[k]! * fade * (k < 2 ? 1 : 0.4 + c.wear);
+    }
+    for (let i = 0; i < n; i++) {
+      let impulse = 0;
+      if (--this.next <= 0 && i < c.heldSamples) {
+        impulse = this.rng.range(0.55, 1);
+        this.next = (0.25 + this.rng.wait(0.7 + 3 * c.density)) * this.sr;
+        this.rebound = Math.floor(this.rng.range(0.009, 0.023) * this.sr);
+        this.pan = this.rng.bi() * 0.42;
+      } else if (--this.rebound === 0) impulse = 0.15 + 0.16 * c.wear;
+      let sum = 0;
+      for (let k = 0; k < this.modes.length; k++) {
+        const loss = this.loss[k]!;
+        const y =
+          this.coeff[k]! * this.y1[k]! -
+          loss * loss * this.y2[k]! +
+          impulse * this.excitation[k]!;
+        this.y2[k] = this.y1[k]!;
+        this.y1[k] = y;
+        sum += y;
+      }
+      a[i] = sum * (1 - this.pan);
+      b[i] = sum * (1 + this.pan) - this.y1[1]! * 0.16;
+    }
+  }
+}
+
 /** A fresh source of `type`, drawing from `rng`. */
 export function makeSource(
   type: TextureType,
@@ -1150,6 +1273,11 @@ export function makeSource(
   mains: number,
 ): Source {
   switch (type) {
+    case "brush":
+    case "paper":
+      return new Friction(type === "paper", rng, sampleRate);
+    case "porcelain":
+      return new Porcelain(rng, sampleRate);
     case "room":
       return new Room(rng, sampleRate);
     case "rain":
