@@ -29,6 +29,17 @@ export type SdkChange = Readonly<{
 
 export const SDK_CHANGES: readonly SdkChange[] = Object.freeze([
   {
+    sdk: "1.56.0",
+    dawn: "0.64.0",
+    changed: [
+      {
+        symbol: "TextureType",
+        note: "Adds brush, paper and porcelain. Ocean surf has a separate backwash and crickets have a distant answering voice.",
+      },
+    ],
+    render: "changed",
+  },
+  {
     sdk: "1.55.0",
     dawn: "0.63.0",
     changed: [

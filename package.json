@@ -1,6 +1,6 @@
 {
   "name": "@hraness/dawn-sdk",
-  "version": "0.63.0",
+  "version": "0.64.0",
   "license": "MIT",
   "type": "module",
   "description": "Build sounds, sound packs and collections for DAWN, write song scores with its TypeScript SDK, and render them to audio",

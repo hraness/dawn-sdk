@@ -8,12 +8,14 @@ export class Water implements Source {
   private readonly pink = [new Pink(), new Pink()] as const;
   private readonly rumble: Brown;
   private readonly foam = [new Svf(), new Svf()] as const;
+  private readonly sand = [new Svf(), new Svf()] as const;
   private readonly bubble = new Svf();
   private age = 1.8;
   private period = 8;
   private height = 0.7;
   private count = 0;
   private group = 0.9;
+  private shoreDelay = 0.05;
   private nextBubble = 0;
 
   constructor(
@@ -25,6 +27,7 @@ export class Water implements Source {
     if (kind === "ocean") {
       this.age = random.range(1.2, 3.9);
       this.height = random.range(0.5, 0.9);
+      this.shoreDelay = random.range(-0.087, 0.087);
     }
   }
 
@@ -36,10 +39,17 @@ export class Water implements Source {
   ) {
     const ocean = this.kind === "ocean";
     const stream = this.kind === "stream";
+    const arrival = Math.min(1, this.age / this.period);
+    const crest = Math.exp(-28 * (arrival - 0.36) ** 2);
     const center =
-      (ocean ? 760 + this.height * 700 : stream ? 2100 : 950) * controls.sweep;
+      (ocean ? 550 + this.height * (420 + 1160 * crest) : stream ? 2100 : 950) *
+      controls.sweep;
     this.foam[0].set(center, 0.65, this.rate);
     this.foam[1].set(center * 1.12, 0.72, this.rate);
+    if (ocean) {
+      this.sand[0].set((420 + 360 * arrival) * controls.sweep, 1.15, this.rate);
+      this.sand[1].set((490 + 380 * arrival) * controls.sweep, 1.05, this.rate);
+    }
     const channels = [left, right] as const;
     for (let i = 0; i < n; i++) {
       this.age += 1 / this.rate;
@@ -51,6 +61,7 @@ export class Water implements Source {
           0.52 * this.height + 0.48 * Math.min(1.5, rayleigh * this.group);
         this.period =
           (15 - 9.8 * controls.density) * this.random.range(0.85, 1.17);
+        this.shoreDelay = this.random.range(-0.087, 0.087);
       }
       const phase = this.age / this.period;
       const swell = Math.sin(Math.PI * Math.min(1, phase)) ** 2;
@@ -86,9 +97,30 @@ export class Water implements Source {
       for (let channel = 0; channel < 2; channel++) {
         const output = channels[channel]!;
         const pink = this.pink[channel]!.process(this.random.noise());
+        let wash = foamLevel,
+          backwash = 0;
+        if (ocean) {
+          const breakAt = 0.36 + (channel ? this.shoreDelay : 0);
+          const shore =
+            phase < breakAt
+              ? (phase / breakAt) ** 3
+              : Math.exp(-5 * (phase - breakAt));
+          const retreat =
+            Math.sin(
+              Math.PI *
+                Math.min(1, Math.max(0, (phase - breakAt - 0.09) / 0.49)),
+            ) ** 2;
+          wash = 0.18 + shore * this.height;
+          backwash =
+            this.sand[channel]!.process(pink) *
+            retreat *
+            (0.35 + controls.wear) *
+            this.height;
+        }
         output[i] =
           pink * bed +
-          this.foam[channel]!.process(pink) * foamLevel +
+          this.foam[channel]!.process(pink) * wash +
+          backwash +
           low +
           bubbles * (channel ? 0.67 : 1);
       }
@@ -106,12 +138,21 @@ export class FieldCalls implements Source {
   private pan = 0;
   private accents = 3;
   private length = 0.38;
+  private distantPhase = 0;
+  private distantClock = 0;
+  private readonly distantPitch: number;
+  private readonly distantPeriod: number;
 
   constructor(
     private readonly kind: "birds" | "crickets",
     private readonly random: Rng,
     private readonly rate: number,
-  ) {}
+  ) {
+    this.distantPitch = kind === "crickets" ? random.range(2870, 3590) : 0;
+    this.distantPeriod = kind === "crickets" ? random.range(0.74, 1.13) : 1;
+    if (kind === "crickets")
+      this.distantClock = random.range(0, this.distantPeriod);
+  }
 
   render(
     left: Float64Array,
@@ -159,8 +200,30 @@ export class FieldCalls implements Source {
       this.age += 1 / this.rate;
       const background =
         this.bed.process(this.random.noise()) * (birds ? 0.15 : 0.08);
-      left[i] = background + call * (1 - this.pan);
-      right[i] = background + call * (1 + this.pan);
+      let distant = 0;
+      if (!birds) {
+        this.distantClock += (0.78 + controls.density * 0.43) / this.rate;
+        if (this.distantClock >= this.distantPeriod)
+          this.distantClock -= this.distantPeriod;
+        const phrase = this.distantClock / this.distantPeriod;
+        if (phrase < 0.38) {
+          const pulse = Math.sin((Math.PI * phrase * 12) / 0.38) ** 6;
+          this.distantPhase =
+            (this.distantPhase +
+              Math.min(
+                0.43,
+                (this.distantPitch * controls.sweep) / this.rate,
+              )) %
+            1;
+          distant =
+            Math.sin(TAU * this.distantPhase) *
+            Math.sin((Math.PI * phrase) / 0.38) *
+            pulse *
+            0.16;
+        }
+      }
+      left[i] = background + call * (1 - this.pan) + distant * 0.6;
+      right[i] = background + call * (1 + this.pan) + distant;
     }
   }
 }

@@ -64,6 +64,9 @@ export const TEXTURE_TRIM: Readonly<Record<TextureType, number>> =
     crickets: 0.672,
     birds: 0.401,
     "country-road": 1.322,
+    brush: 0.839,
+    paper: 3.37,
+    porcelain: 0.731,
   });
 
 /** Types that always sit in their FDN (the space is the sound). */
@@ -170,6 +173,7 @@ class Voice {
   private readonly b = new Float64Array(TEXTURE_BLOCK);
   private readonly wet = new Float64Array(2);
   private readonly controls: Controls = {
+    heldSamples: 0,
     density: 0.5,
     wear: 0.3,
     distance: 0.3,
@@ -230,6 +234,7 @@ class Voice {
   ): void {
     const s = this.settings;
     const c = this.controls;
+    c.heldSamples = Math.max(0, Math.min(n, this.plan.length - at));
     const p = clamp01(at / this.plan.length);
     const shape = motionShape(s.motion, p);
     const moving = s.motion !== "steady";

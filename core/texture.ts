@@ -37,6 +37,9 @@ export const TEXTURE_TYPES = Object.freeze([
   "crickets",
   "birds",
   "country-road",
+  "brush",
+  "paper",
+  "porcelain",
 ] as const);
 export type TextureType = (typeof TEXTURE_TYPES)[number];
 
@@ -69,6 +72,9 @@ export const TEXTURE_DOCS: Readonly<Record<TextureType, string>> =
     birds: "scattered birdsong with bent whistle calls",
     "country-road":
       "distant tires and a low engine drifting across a quiet road",
+    brush: "bristles brushing a drum skin in soft, uneven strokes",
+    paper: "flexing paper, with clusters of creases and a dry rustle",
+    porcelain: "tapped ceramic with a hollow body and beating partials",
   });
 
 const num = (
@@ -211,6 +217,30 @@ export const TEXTURE_TYPE_DEFAULTS: Readonly<
   crickets: { density: 0.5, distance: 0.25, wear: 0.32, width: 0.78 },
   birds: { density: 0.5, distance: 0.25, wear: 0.32, width: 0.78 },
   "country-road": { density: 0.5, distance: 0.25, wear: 0.32, width: 0.78 },
+  brush: {
+    density: 0.46,
+    distance: 0.22,
+    wear: 0.23,
+    width: 0.58,
+    attack: 0.005,
+    release: 0.07,
+  },
+  paper: {
+    density: 0.43,
+    distance: 0.16,
+    wear: 0.51,
+    width: 0.78,
+    attack: 0.004,
+    release: 0.12,
+  },
+  porcelain: {
+    density: 0.35,
+    distance: 0.22,
+    wear: 0.26,
+    width: 0.72,
+    attack: 0.001,
+    release: 0.65,
+  },
 });
 
 export const TEXTURE_DEFAULTS: TextureSettings = Object.freeze({
@@ -309,7 +339,7 @@ export const TEXTURE_LANE_PARAMS: readonly Readonly<{
 export const MAX_TEXTURE_VOICES = 8;
 
 /** Joins the stem cache key so a DSP change re-renders texture stems. */
-export const TEXTURE_ENGINE_VERSION = 1;
+export const TEXTURE_ENGINE_VERSION = 2;
 
 /**
  * A texture track's ring-out after its last note-off, in seconds: the

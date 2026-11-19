@@ -28,7 +28,7 @@
  */
 
 /** SDK release; DAWN refreshes the vendored copy when its own is newer. */
-export const SDK_VERSION = "1.55.0";
+export const SDK_VERSION = "1.56.0";
 /** Major of `SDK_VERSION`; `dawn.json` records it as `sdk`. */
 export const SDK_MAJOR = 1;
 
@@ -2611,7 +2611,8 @@ function trackVocoder(
 export const TEXTURE_INSTRUMENT = "texture";
 
 /**
- * Texture types (core/texture.ts TEXTURE_TYPES).
+ * Seeded environments and materials, including brushed skin, folding paper
+ * and tapped porcelain (core/texture.ts TEXTURE_TYPES).
  *
  * @since 1.45.0
  */
@@ -2631,7 +2632,10 @@ export type TextureType =
   | "waterfall"
   | "crickets"
   | "birds"
-  | "country-road";
+  | "country-road"
+  | "brush"
+  | "paper"
+  | "porcelain";
 
 const TEXTURE_TYPE_WORDS: readonly string[] = Object.freeze([
   "room",
@@ -2650,6 +2654,9 @@ const TEXTURE_TYPE_WORDS: readonly string[] = Object.freeze([
   "crickets",
   "birds",
   "country-road",
+  "brush",
+  "paper",
+  "porcelain",
 ]);
 const TEXTURE_MOTION_WORDS: readonly string[] = Object.freeze([
   "steady",
