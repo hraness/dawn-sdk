@@ -18,7 +18,7 @@ verifies them and runs none of them.
 Bun 1.3.14 or newer runs the tools. Install a tagged release from GitHub:
 
 ```sh
-bun add github:hraness/dawn-sdk#v0.64.0
+bun add github:hraness/dawn-sdk#v0.65.0
 ```
 
 The same bytes are mirrored to npm as `@hraness/dawn-sdk`. Each
@@ -48,14 +48,17 @@ sound instead. Neither command overwrites an existing path.
 
 ## Render a passage in the browser
 
+Use `ambientVoicing(name, warmth)` from `@hraness/dawn-sdk` to play an intimate ensemble. For example, spread `...ambientVoicing("felt-piano", 0.7)` into a track and add notes and a sustain pedal. Set `calibration: SONG_CALIBRATION_LATEST` in `song()` to use the piano and wind response of a new local DAWN project. The 23 sounds include piano, electric keys, glass and wooden mallets, bowed and plucked strings, bamboo flute, vowel voices and synthesizers. `ambientVoicingNames` lists the choices. The warmth control runs from 0 to 1 and each sound expands to editable DAWN instrument parameters.
+
 Bundle this module for a browser or a dedicated Web Worker. It renders the
 same stereo samples as the CLI for the supported instruments and effects.
 
 ```ts
-import { note, song, track } from "@hraness/dawn-sdk";
+import { note, song, track, SONG_CALIBRATION_LATEST } from "@hraness/dawn-sdk";
 import { renderBrowserPcm } from "@hraness/dawn-sdk/browser";
 
 const score = song({
+  calibration: SONG_CALIBRATION_LATEST,
   tempo: 72,
   bars: 1,
   tracks: [

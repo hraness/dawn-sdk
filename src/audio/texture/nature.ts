@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-import { Brown, Pink, Rng, Svf } from "./dsp.ts";
+import { Brown, Drift, Pink, Rng, Svf } from "./dsp.ts";
 import type { Controls, Source } from "./sources.ts";
 
 const TAU = Math.PI * 2;
@@ -10,6 +10,10 @@ export class Water implements Source {
   private readonly foam = [new Svf(), new Svf()] as const;
   private readonly sand = [new Svf(), new Svf()] as const;
   private readonly bubble = new Svf();
+  private readonly farBubble = new Svf();
+  private readonly flow: Drift;
+  private nextFarBubble = 0;
+  private farPan = 0.65;
   private age = 1.8;
   private period = 8;
   private height = 0.7;
@@ -24,6 +28,7 @@ export class Water implements Source {
     private readonly rate: number,
   ) {
     this.rumble = new Brown(rate);
+    this.flow = new Drift(random);
     if (kind === "ocean") {
       this.age = random.range(1.2, 3.9);
       this.height = random.range(0.5, 0.9);
@@ -39,16 +44,26 @@ export class Water implements Source {
   ) {
     const ocean = this.kind === "ocean";
     const stream = this.kind === "stream";
+    const flow = ocean
+      ? 0.5
+      : this.flow.step(n / this.rate, stream ? 1.7 : 3.4);
     const arrival = Math.min(1, this.age / this.period);
     const crest = Math.exp(-28 * (arrival - 0.36) ** 2);
     const center =
-      (ocean ? 550 + this.height * (420 + 1160 * crest) : stream ? 2100 : 950) *
-      controls.sweep;
+      (ocean
+        ? 550 + this.height * (420 + 1160 * crest)
+        : stream
+          ? 1460 + 820 * flow
+          : 740 + 520 * flow) * controls.sweep;
     this.foam[0].set(center, 0.65, this.rate);
     this.foam[1].set(center * 1.12, 0.72, this.rate);
     if (ocean) {
       this.sand[0].set((420 + 360 * arrival) * controls.sweep, 1.15, this.rate);
       this.sand[1].set((490 + 380 * arrival) * controls.sweep, 1.05, this.rate);
+    }
+    if (this.kind === "waterfall") {
+      this.sand[0].set((1720 + 690 * flow) * controls.sweep, 0.73, this.rate);
+      this.sand[1].set((2450 - 430 * flow) * controls.sweep, 0.81, this.rate);
     }
     const channels = [left, right] as const;
     for (let i = 0; i < n; i++) {
@@ -70,15 +85,19 @@ export class Water implements Source {
       const bed = ocean
         ? 0.12 + 0.69 * this.height * swell
         : stream
-          ? 0.56
-          : 0.94;
+          ? 0.4 + 0.2 * flow
+          : 0.72 + 0.23 * flow;
       const low =
         this.rumble.process(this.random.noise()) *
-        (ocean ? (0.28 + swell) * this.height : stream ? 0.11 : 0.76);
+        (ocean
+          ? (0.28 + swell) * this.height
+          : stream
+            ? 0.11
+            : 0.62 + 0.36 * flow);
       let impulse = 0;
       if ((stream || ocean) && --this.nextBubble <= 0) {
         const events = stream
-          ? 14 + 34 * controls.density
+          ? (11 + 27 * controls.density) * (0.76 + flow * 0.48)
           : 5 + 34 * collapse * this.height;
         this.nextBubble = this.random.wait(events) * this.rate;
         this.bubble.set(
@@ -89,6 +108,23 @@ export class Water implements Source {
         impulse = this.random.bi() * (stream ? 4.2 : 2.6 * collapse);
       }
       const bubbles = this.bubble.process(impulse) * (0.5 + controls.wear);
+      let far = 0;
+      if (stream) {
+        // A second cluster behind the stones has its own size, timing and position.
+        let hit = 0;
+        if (--this.nextFarBubble <= 0) {
+          this.nextFarBubble =
+            this.random.wait(5 + 14 * controls.density) * this.rate;
+          this.farBubble.set(
+            this.random.range(710, 1880) * controls.sweep,
+            13,
+            this.rate,
+          );
+          this.farPan = this.random.range(0.54, 0.91);
+          hit = this.random.bi() * (2.2 + 1.7 * controls.wear);
+        }
+        far = this.farBubble.process(hit);
+      }
       const foamLevel = ocean
         ? 0.27 + collapse * this.height
         : stream
@@ -116,13 +152,17 @@ export class Water implements Source {
             retreat *
             (0.35 + controls.wear) *
             this.height;
+        } else if (!stream) {
+          // The fine spray and the heavier plunge change independently.
+          backwash = this.sand[channel]!.process(pink) * (0.37 + flow * 0.42);
         }
         output[i] =
           pink * bed +
           this.foam[channel]!.process(pink) * wash +
           backwash +
           low +
-          bubbles * (channel ? 0.67 : 1);
+          bubbles * (channel ? (stream ? 0.37 : 0.67) : 1) +
+          far * (channel ? this.farPan : 1 - this.farPan);
       }
     }
   }
@@ -138,6 +178,8 @@ export class FieldCalls implements Source {
   private pan = 0;
   private accents = 3;
   private length = 0.38;
+  private lastBirdPitch = 0;
+  private birdAnswer = false;
   private distantPhase = 0;
   private distantClock = 0;
   private readonly distantPitch: number;
@@ -169,6 +211,13 @@ export class FieldCalls implements Source {
           ? this.random.range(1150, 2750)
           : this.random.range(3150, 4880);
         this.sweep = this.random.bi() * (birds ? 1050 : 140);
+        if (birds) {
+          // An answering phrase stays near the first singer's register.
+          this.birdAnswer = !this.birdAnswer;
+          if (!this.birdAnswer && this.lastBirdPitch)
+            this.pitch = this.lastBirdPitch * this.random.range(0.87, 1.16);
+          this.lastBirdPitch = this.pitch;
+        }
         this.accents = Math.floor(this.random.range(2, birds ? 5 : 7));
         this.length = birds
           ? this.random.range(0.37, 0.83)
@@ -182,9 +231,16 @@ export class FieldCalls implements Source {
       const position = this.age / this.length;
       let call = 0;
       if (position < 1) {
+        const syllable = Math.floor(position * this.accents);
         const within = (position * this.accents) % 1;
-        const pulse = Math.sin(Math.PI * within) ** (birds ? 2.2 : 7);
-        const bend = birds ? Math.sin(TAU * within * 0.82) : within - 0.5;
+        const sung = birds
+          ? Math.min(1, within / (syllable % 2 ? 0.86 : 0.73))
+          : within;
+        const pulse = Math.sin(Math.PI * sung) ** (birds ? 1.65 : 7);
+        const bend = birds
+          ? (syllable % 2 ? -1 : 1) * Math.sin(Math.PI * (sung - 0.18)) +
+            (this.birdAnswer ? -0.18 : 0.19) * syllable
+          : within - 0.5;
         const hz = Math.min(
           this.rate * 0.42,
           (this.pitch + bend * this.sweep) * controls.sweep,
@@ -192,7 +248,11 @@ export class FieldCalls implements Source {
         this.phase = (this.phase + hz / this.rate) % 1;
         const carrier = Math.sin(TAU * this.phase);
         const harmonics = birds
-          ? Math.sin(TAU * 2 * this.phase) * 0.19 * controls.wear
+          ? 2 * hz < 0.45 * this.rate
+            ? Math.sin(TAU * 2 * this.phase) *
+              (0.08 + 0.15 * controls.wear) *
+              (1 - sung)
+            : 0
           : this.random.noise() * (0.04 + controls.wear * 0.13);
         call =
           (carrier + harmonics) * pulse * Math.sin(Math.PI * position) * 0.55;
@@ -232,17 +292,20 @@ export class CountryRoad implements Source {
   private readonly earth: Brown;
   private readonly air = new Pink();
   private readonly gravel = new Svf();
+  private readonly tires = [new Svf(), new Svf()] as const;
   private age = 0;
   private duration = 3.8;
   private gap = 6;
   private heading = 1;
   private motor = 0;
+  private motorHz: number;
 
   constructor(
     private readonly random: Rng,
     private readonly rate: number,
   ) {
     this.earth = new Brown(rate);
+    this.motorHz = random.range(55, 76);
   }
 
   render(
@@ -252,6 +315,9 @@ export class CountryRoad implements Source {
     controls: Controls,
   ) {
     this.gravel.set(720 * controls.sweep, 0.8, this.rate);
+    const near = Math.sin(Math.PI * Math.min(1, this.age / this.duration));
+    this.tires[0].set((380 + 920 * near) * controls.sweep, 0.8, this.rate);
+    this.tires[1].set((510 + 1020 * near) * controls.sweep, 0.75, this.rate);
     for (let i = 0; i < n; i++) {
       this.age += 1 / this.rate;
       if (this.age >= this.duration + this.gap) {
@@ -259,20 +325,29 @@ export class CountryRoad implements Source {
         this.duration = this.random.range(3.2, 6.2);
         this.gap = (12 - 10 * controls.density) * this.random.range(0.45, 1.4);
         this.heading = this.random.next() < 0.5 ? -1 : 1;
+        this.motorHz = this.random.range(51, 83);
       }
       const position = Math.min(1, this.age / this.duration);
       const proximity = Math.sin(Math.PI * position) ** 3;
       const pan = (position * 2 - 1) * this.heading * 0.65;
-      this.motor = (this.motor + (81 - 28 * position) / this.rate) % 1;
+      const offset = 2 * position - 1;
+      const doppler = 1 - (0.12 * offset) / Math.sqrt(offset * offset + 0.06);
+      this.motor = (this.motor + (this.motorHz * doppler) / this.rate) % 1;
       const wind = this.air.process(this.random.noise());
       const dust = this.gravel.process(this.random.noise());
       const car =
         (this.earth.process(this.random.noise()) * 0.62 +
-          Math.sin(TAU * this.motor) * 0.17 +
+          (Math.sin(TAU * this.motor) + 0.38 * Math.sin(2 * TAU * this.motor)) *
+            0.145 +
           dust * (0.15 + controls.wear * 0.42)) *
         proximity;
-      left[i] = wind * 0.12 + car * (1 - pan);
-      right[i] = wind * 0.12 + car * (1 + pan);
+      const tread = proximity * (0.19 + controls.wear * 0.23);
+      left[i] =
+        wind * 0.12 +
+        (car + tread * this.tires[0].process(this.random.noise())) * (1 - pan);
+      right[i] =
+        wind * 0.12 +
+        (car + tread * this.tires[1].process(this.random.noise())) * (1 + pan);
     }
   }
 }

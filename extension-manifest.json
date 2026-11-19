@@ -1,6 +1,6 @@
 {
   "schema": "dawn.extension-source-candidate/v1",
-  "version": "0.64.0",
+  "version": "0.65.0",
   "entrypoints": [
     "core/collection.ts",
     "src/collection/main.ts",
@@ -812,12 +812,12 @@
     },
     {
       "path": "core/sdk/changes.ts",
-      "bytes": 7946,
-      "sha256": "af6b5517b51b9020196b42c159d5945d9cae5d65549dcebfb66046021ca8c5f1",
+      "bytes": 8089,
+      "sha256": "56ef1ff36adfe3e887c8d10e11811e4b8ca96724966bc9e0d0f56309ba688c2d",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/sdk/changes.ts",
-        "sourceSha256": "af6b5517b51b9020196b42c159d5945d9cae5d65549dcebfb66046021ca8c5f1",
+        "sourceSha256": "56ef1ff36adfe3e887c8d10e11811e4b8ca96724966bc9e0d0f56309ba688c2d",
         "adaptation": null
       }
     },
@@ -878,12 +878,12 @@
     },
     {
       "path": "core/sdk/v1.ts",
-      "bytes": 601272,
-      "sha256": "94ef450d8b774ee188d5ae8db11a440e85016875d908036c564410f5e7e51c07",
+      "bytes": 609565,
+      "sha256": "1231b1a6c638427265b13e9e8f9de9ba7a666c96d12c4bb3f108133e2dfa62db",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/sdk/v1.ts",
-        "sourceSha256": "94ef450d8b774ee188d5ae8db11a440e85016875d908036c564410f5e7e51c07",
+        "sourceSha256": "1231b1a6c638427265b13e9e8f9de9ba7a666c96d12c4bb3f108133e2dfa62db",
         "adaptation": null
       }
     },
@@ -1198,7 +1198,7 @@
     {
       "path": "package.json",
       "bytes": 1528,
-      "sha256": "510669b0659ee47f7696665781364c3a5e70a1accbfeb9e9b894c47a2c7399fe",
+      "sha256": "659506686ccf69362a712a9aa86db97399a10e4f5f94702d73708a1a0b96b61c",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
@@ -1206,8 +1206,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 13123,
-      "sha256": "1491df3339887475ac8905306aa062e153c1e55ee0c379753758f8a86b1c7348",
+      "bytes": 13787,
+      "sha256": "9cb9aa782c2d093d7a86327935155e1017aa3390b0d32f8bd57490de42e3781a",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
@@ -2315,23 +2315,23 @@
     },
     {
       "path": "src/audio/texture/nature.ts",
-      "bytes": 9445,
-      "sha256": "6f1b3444bd206a11e6158d6ea1b519505b66469961d3441c74853aa8c0fb83ad",
+      "bytes": 12500,
+      "sha256": "a090bcfc400aa8ba21a032b3a3b47a70f37cad3fd24af6df3dc06377b17a0781",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/audio/texture/nature.ts",
-        "sourceSha256": "6f1b3444bd206a11e6158d6ea1b519505b66469961d3441c74853aa8c0fb83ad",
+        "sourceSha256": "a090bcfc400aa8ba21a032b3a3b47a70f37cad3fd24af6df3dc06377b17a0781",
         "adaptation": null
       }
     },
     {
       "path": "src/audio/texture/sources.ts",
-      "bytes": 46389,
-      "sha256": "bfdbf4dd207047213906b8d29d7ef1358ecf64ca26812c801674f900e5b25b3d",
+      "bytes": 47254,
+      "sha256": "9ad18710538f0e279688475d4422e8cbf1fd8daea324ed3825d3bf370722f089",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/audio/texture/sources.ts",
-        "sourceSha256": "bfdbf4dd207047213906b8d29d7ef1358ecf64ca26812c801674f900e5b25b3d",
+        "sourceSha256": "9ad18710538f0e279688475d4422e8cbf1fd8daea324ed3825d3bf370722f089",
         "adaptation": null
       }
     },
