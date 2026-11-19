@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** Modulator kernels: lfo, sh (sample and hold), random and clock. */
 import { at, BLOCK, draw, type Frame, put } from "./frame.ts";
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Where a `--palette` argument points: a `dawn.palette/v1` file, or an
  * installed collection entry (`<collection>/<entry>`) that

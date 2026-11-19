@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** Bounded local file access shared by the collection tools. */
 import { createHash, randomUUID } from "node:crypto";
 import { constants } from "node:fs";

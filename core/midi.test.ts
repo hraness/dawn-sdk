@@ -1,0 +1,449 @@
+// SPDX-License-Identifier: MIT
+import { describe, expect, test } from "bun:test";
+import { midiTempoEvents, mtsKeys, scoreToMidi } from "./midi.ts";
+import { resolveTuning } from "./tuning.ts";
+import { createScore } from "./score.ts";
+import { secondsAtTick } from "./tempo.ts";
+
+type Event = { tick: number; status: number; data: number[] };
+
+/** A minimal SMF reader: header fields and absolute-tick events per track. */
+function readMidi(bytes: Uint8Array) {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const text = (at: number) => String.fromCharCode(...bytes.slice(at, at + 4));
+  expect(text(0)).toBe("MThd");
+  const format = view.getUint16(8);
+  const count = view.getUint16(10);
+  const division = view.getUint16(12);
+  let offset = 14;
+  const tracks: Event[][] = [];
+  for (let index = 0; index < count; index += 1) {
+    expect(text(offset)).toBe("MTrk");
+    const length = view.getUint32(offset + 4);
+    let at = offset + 8;
+    const end = at + length;
+    let tick = 0;
+    const events: Event[] = [];
+    const varLen = () => {
+      let value = 0;
+      for (;;) {
+        const byte = bytes[at++]!;
+        value = (value << 7) | (byte & 0x7f);
+        if (!(byte & 0x80)) return value;
+      }
+    };
+    while (at < end) {
+      tick += varLen();
+      const status = bytes[at++]!;
+      if (status === 0xff) {
+        const type = bytes[at++]!;
+        const size = varLen();
+        events.push({
+          tick,
+          status: 0xff00 | type,
+          data: [...bytes.slice(at, at + size)],
+        });
+        at += size;
+      } else {
+        events.push({ tick, status, data: [bytes[at]!, bytes[at + 1]!] });
+        at += 2;
+      }
+    }
+    tracks.push(events);
+    offset = end;
+  }
+  return { format, division, tracks };
+}
+
+const usOf = (data: number[]) => (data[0]! << 16) | (data[1]! << 8) | data[2]!;
+
+describe("MIDI export", () => {
+  const piano = {
+    id: "p",
+    name: "piano",
+    instrument: "piano",
+  };
+
+  test("a constant score writes one tempo, one meter and its notes", () => {
+    const score = createScore({
+      tempoBpm: 120,
+      bars: 1,
+      tracks: [piano, { id: "d", name: "drums", instrument: "drums" }],
+      notes: [
+        {
+          id: "a",
+          trackId: "p",
+          startTick: 0,
+          durationTicks: 480,
+          pitch: 60,
+          velocity: 1,
+        },
+        {
+          id: "b",
+          trackId: "d",
+          startTick: 960,
+          durationTicks: 120,
+          pitch: 36,
+          velocity: 0.5,
+        },
+      ],
+    });
+    const midi = readMidi(scoreToMidi(score));
+    expect(midi.format).toBe(1);
+    expect(midi.division).toBe(score.ticksPerBeat);
+    expect(midi.tracks.length).toBe(3);
+    const conductor = midi.tracks[0]!;
+    const tempos = conductor.filter((e) => e.status === 0xff51);
+    expect(tempos.map((e) => usOf(e.data))).toEqual([500_000]);
+    const meters = conductor.filter((e) => e.status === 0xff58);
+    expect(meters).toEqual([{ tick: 0, status: 0xff58, data: [4, 2, 24, 8] }]);
+    const end = conductor.at(-1)!;
+    expect(end.status).toBe(0xff2f);
+    expect(end.tick).toBe(4 * 480);
+    const pianoNotes = midi.tracks[1]!.filter((e) => e.status < 0xff00);
+    expect(pianoNotes).toEqual([
+      { tick: 0, status: 0x90, data: [60, 127] },
+      { tick: 480, status: 0x80, data: [60, 0] },
+    ]);
+    const drumOn = midi.tracks[2]!.find((e) => (e.status & 0xf0) === 0x90)!;
+    expect(drumOn.status & 0x0f).toBe(9);
+    expect(drumOn.data).toEqual([36, 64]);
+  });
+
+  test("meter changes, ramps and fermatas reach the conductor track", () => {
+    const score = createScore({
+      tempoBpm: 120,
+      bars: 4,
+      time: {
+        tempo: [{ tick: 1920, bpm: 60, ramp: "linear" }],
+        meter: [{ bar: 2, beatsPerBar: 6, beatUnit: 8 }],
+        fermatas: [{ tick: 3840, beats: 1 }],
+      },
+    });
+    const conductor = readMidi(scoreToMidi(score)).tracks[0]!;
+    const meters = conductor.filter((e) => e.status === 0xff58);
+    expect(meters.map((e) => [e.tick, ...e.data])).toEqual([
+      [0, 4, 2, 24, 8],
+      [3840, 6, 3, 36, 8],
+    ]);
+    const tempos = midiTempoEvents(score);
+    // Ramp steps slow down monotonically.
+    const ramp = tempos.filter((e) => e.tick < 1920);
+    expect(ramp.length).toBe(16);
+    for (let i = 1; i < ramp.length; i += 1)
+      expect(ramp[i]!.usPerQuarter).toBeGreaterThan(ramp[i - 1]!.usPerQuarter);
+    // Every boundary keeps the rendered timeline: summed MIDI time matches.
+    let seconds = 0;
+    for (let i = 0; i < tempos.length; i += 1) {
+      const next = tempos[i + 1]?.tick ?? 4800;
+      seconds +=
+        ((next - tempos[i]!.tick) / 480) * (tempos[i]!.usPerQuarter / 1e6);
+      expect(seconds).toBeCloseTo(secondsAtTick(score, next), 4);
+    }
+    // The fermata's beat in 6/8 is the dotted quarter: it plays twice as
+    // long, then the tempo returns.
+    const at = (tick: number) =>
+      [...tempos].reverse().find((e) => e.tick <= tick)!.usPerQuarter;
+    expect(at(3840)).toBe(2_000_000);
+    expect(at(4320)).toBe(2_000_000);
+    expect(at(4560)).toBe(1_000_000);
+  });
+
+  test("a fermata beat lands subdivisions at the same seconds as the WAV", () => {
+    const score = createScore({
+      tempoBpm: 120,
+      bars: 1,
+      time: { fermatas: [{ tick: 0, beats: 2 }] },
+    });
+    const tempos = midiTempoEvents(score);
+    const midiSeconds = (tick: number) => {
+      let seconds = 0;
+      for (let i = 0; i < tempos.length; i += 1) {
+        const from = tempos[i]!.tick;
+        const to = Math.min(tick, tempos[i + 1]?.tick ?? Infinity);
+        if (to <= from) break;
+        seconds += ((to - from) / 480) * (tempos[i]!.usPerQuarter / 1e6);
+      }
+      return seconds;
+    };
+    for (const tick of [60, 120, 240, 360, 480, 720, 1920])
+      expect(midiSeconds(tick)).toBeCloseTo(secondsAtTick(score, tick), 6);
+    expect(secondsAtTick(score, 120)).toBeCloseTo(0.375, 9);
+  });
+
+  test("track rate places repeats on the song timeline", () => {
+    const score = createScore({
+      bars: 1,
+      tracks: [{ ...piano, time: { rate: 2, cycle: 960 } }],
+      notes: [
+        {
+          id: "a",
+          trackId: "p",
+          startTick: 0,
+          durationTicks: 480,
+          pitch: 64,
+          velocity: 0.8,
+        },
+      ],
+    });
+    const ons = readMidi(scoreToMidi(score))
+      .tracks[1]!.filter((e) => e.status === 0x90)
+      .map((e) => e.tick);
+    expect(ons).toEqual([0, 480, 960, 1440]);
+  });
+});
+
+describe("MIDI export of performance", () => {
+  test("pedal writes CC64 and articulation shortens the note-off", () => {
+    const score = createScore({
+      tempoBpm: 120,
+      bars: 1,
+      tracks: [
+        {
+          id: "p",
+          name: "piano",
+          instrument: "piano",
+          pedal: [
+            { tick: 0, state: "down" },
+            { tick: 960, state: "half" },
+            { tick: 1440, state: "up" },
+          ],
+        },
+      ],
+      notes: [
+        {
+          id: "a",
+          trackId: "p",
+          startTick: 0,
+          durationTicks: 480,
+          pitch: 60,
+          velocity: 0.5,
+          articulation: "staccato",
+        },
+        {
+          id: "b",
+          trackId: "p",
+          startTick: 480,
+          durationTicks: 480,
+          pitch: 64,
+          velocity: 0.5,
+        },
+      ],
+    });
+    const track = readMidi(scoreToMidi(score)).tracks[1]!;
+    const cc = track.filter((e) => (e.status & 0xf0) === 0xb0);
+    expect(cc.map((e) => [e.tick, ...e.data])).toEqual([
+      [0, 64, 127],
+      [960, 64, 64],
+      [1440, 64, 0],
+    ]);
+    const offs = track.filter((e) => (e.status & 0xf0) === 0x80);
+    // Staccato is shorter than the written 480; the pedal does not
+    // lengthen the key (the second note ends where it was written).
+    const offA = offs.find((e) => e.data[0] === 60)!;
+    expect(offA.tick).toBeLessThan(480);
+    expect(offs.find((e) => e.data[0] === 64)!.tick).toBe(960);
+    // The CC64 down sorts before the note-on at tick 0.
+    const first = track.findIndex((e) => (e.status & 0xf0) === 0xb0);
+    const on = track.findIndex((e) => (e.status & 0xf0) === 0x90);
+    expect(first).toBeLessThan(on);
+  });
+});
+
+describe("MIDI export of tuning and sections", () => {
+  const hex = (bytes: Uint8Array) => Buffer.from(bytes).toString("hex");
+
+  test("a 12-TET score without sections gains no events", () => {
+    const score = createScore({
+      tracks: [{ id: "a", name: "a", instrument: "sine" }],
+    });
+    expect(hex(scoreToMidi(score))).not.toContain("f07f7f0802");
+    expect(hex(scoreToMidi(score))).not.toContain("ff06");
+  });
+
+  test("a tuned track carries MTS key frequencies and selects them", () => {
+    const score = createScore({
+      tuning: { name: "pelog", root: 60 },
+      tracks: [{ id: "a", name: "polos", instrument: "sine" }],
+    });
+    const table = resolveTuning(score.tuning, undefined, score.key)!;
+    const keys = mtsKeys(table);
+    // Each key decodes back to its frequency within a hundredth of a cent.
+    for (const key of [60, 61, 62, 63, 64]) {
+      const [semi, msb, lsb] = keys[key]!;
+      const value = semi! + ((msb! << 7) | lsb!) / 16384;
+      const hz = 440 * 2 ** ((value - 69) / 12);
+      expect(Math.abs(1200 * Math.log2(hz / table.hz[key]!))).toBeLessThan(
+        0.01,
+      );
+    }
+    const file = hex(scoreToMidi(score));
+    expect(file).toContain("f08207" + "7f7f080200" + "40");
+    // RPN 3 (tuning program select) = program 0 on channel 0.
+    expect(file).toContain("b0650000b0640300b0060000b0657f");
+  });
+
+  test("sections are written as marker events", () => {
+    const score = createScore({
+      bars: 4,
+      sections: [
+        { name: "intro", startBar: 0, bars: 2 },
+        { name: "drop", startBar: 2, bars: 2 },
+      ],
+      tracks: [{ id: "a", name: "a", instrument: "sine" }],
+    });
+    const file = hex(scoreToMidi(score));
+    expect(file).toContain("ff0605" + Buffer.from("intro").toString("hex"));
+    expect(file).toContain("ff0604" + Buffer.from("drop").toString("hex"));
+  });
+
+  test("the longest multibyte section names are written whole and valid", () => {
+    // Names are capped at 32 UTF-16 units, so a marker is at most 96 bytes
+    // (32 three-byte characters) and never reaches the 127-byte cut.
+    for (const name of ["€".repeat(32), "🎵".repeat(16), "ü".repeat(32)]) {
+      const score = createScore({
+        bars: 2,
+        sections: [{ name, startBar: 0, bars: 2 }],
+        tracks: [{ id: "a", name: "a", instrument: "sine" }],
+      });
+      const bytes = Buffer.from(name);
+      expect(bytes.length).toBeLessThan(127);
+      const file = hex(scoreToMidi(score));
+      expect(file).toContain(
+        "ff06" +
+          bytes.length.toString(16).padStart(2, "0") +
+          bytes.toString("hex"),
+      );
+    }
+  });
+});
+
+describe("MIDI export of pitch expression", () => {
+  test("a lone note's bend becomes pitch bend; chord notes stay at the key", () => {
+    const score = createScore({
+      tempoBpm: 120,
+      bars: 1,
+      tracks: [{ id: "l", name: "lead", instrument: "sine" }],
+      notes: [
+        {
+          id: "a",
+          trackId: "l",
+          startTick: 0,
+          durationTicks: 480,
+          pitch: 64,
+          velocity: 0.8,
+          bend: [
+            { at: 0, cents: -200 },
+            { at: 0.5, cents: 0 },
+          ],
+        },
+        {
+          id: "b",
+          trackId: "l",
+          startTick: 960,
+          durationTicks: 480,
+          pitch: 60,
+          velocity: 0.8,
+          cents: 30,
+        },
+        {
+          id: "c",
+          trackId: "l",
+          startTick: 960,
+          durationTicks: 480,
+          pitch: 64,
+          velocity: 0.8,
+        },
+        {
+          id: "d",
+          trackId: "l",
+          startTick: 1440,
+          durationTicks: 240,
+          pitch: 62,
+          velocity: 0.8,
+        },
+      ],
+    });
+    const track = readMidi(scoreToMidi(score)).tracks[1]!;
+    const bends = track
+      .filter((e) => (e.status & 0xf0) === 0xe0)
+      .map((e) => [e.tick, e.data[0]! | (e.data[1]! << 7)] as const);
+    // RPN 0 sets ±24 semitones before any bend.
+    const cc = track.filter((e) => (e.status & 0xf0) === 0xb0);
+    expect(cc.slice(0, 4).map((e) => e.data)).toEqual([
+      [101, 0],
+      [100, 0],
+      [6, 24],
+      [38, 0],
+    ]);
+    // -200 cents of ±2400 is 8192 - 683 at the onset, back to centre by 240.
+    expect(bends[0]).toEqual([0, 8192 - 683]);
+    expect(bends.find(([tick]) => tick === 240)?.[1]).toBe(8192);
+    // The chord at 960 (with cents on one note) gets no bend; d has none.
+    expect(bends.every(([tick]) => tick < 960)).toBe(true);
+  });
+});
+
+describe("MIDI export of lyrics", () => {
+  test("syllables write FF 05 before their note-on; holds write nothing (golden)", () => {
+    const score = createScore({
+      tempoBpm: 120,
+      bars: 1,
+      tracks: [{ id: "v", name: "v", instrument: "piano" }],
+      notes: [
+        {
+          id: "a",
+          trackId: "v",
+          startTick: 0,
+          durationTicks: 480,
+          pitch: 60,
+          velocity: 1,
+          lyric: "hel-",
+        },
+        {
+          id: "b",
+          trackId: "v",
+          startTick: 480,
+          durationTicks: 480,
+          pitch: 62,
+          velocity: 1,
+          lyric: "lo",
+        },
+        {
+          id: "c",
+          trackId: "v",
+          startTick: 960,
+          durationTicks: 480,
+          pitch: 64,
+          velocity: 1,
+          lyric: "_",
+        },
+        {
+          id: "d",
+          trackId: "v",
+          startTick: 480,
+          durationTicks: 480,
+          pitch: 55,
+          velocity: 1,
+          lyric: "_",
+        },
+      ],
+    });
+    const bytes = scoreToMidi(score);
+    const hex = Buffer.from(bytes).toString("hex");
+    // The second track chunk: name, then lyric + note events, then the end.
+    const at = hex.indexOf("4d54726b", hex.indexOf("4d54726b") + 8);
+    expect(hex.slice(at)).toBe(
+      "4d54726b0000003b" +
+        "00ff030176" + // track name "v"
+        "00ff050468656c2d" + // FF 05 "hel-"
+        "00903c7f" + // C4 on
+        "8360803c00" + // C4 off at 480
+        "00ff05026c6f" + // FF 05 "lo" (the chord's top note), no event for its "_"
+        "0090377f00903e7f" + // G3 and D4 on
+        "836080370000803e00" + // both off at 960
+        "0090407f" + // E4 on, a "_" hold: no lyric event
+        "83608040008360ff2f00", // off at 1440, end of track at 1920
+    );
+  });
+});

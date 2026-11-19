@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * String instruments (0.6 lane A, plucked and struck): the `Track.string`
  * parameter table, the frozen preset table and the words that pick them.

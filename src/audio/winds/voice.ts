@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * One blown voice: a digital waveguide bore driven by a reed table
  * (clarinet, `reed`), a conical reed (`sax`, also oboe and bassoon), an

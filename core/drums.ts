@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Drum vocabulary shared by the parser, renderer, highway, and planner.
  *

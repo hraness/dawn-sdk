@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Collection authoring: check a catalog, propose an entry from a local
  * manifest, and build a deterministic portable catalog with an integrity

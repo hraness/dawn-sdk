@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The channel vocoder (0.7): a bank of cascaded RBJ band-passes analyses
  * the modulator, each band's follower shapes the same band of the carrier.

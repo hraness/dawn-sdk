@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * 0.7 autotune render hooks (pitch.md section 7): the sampler calls
  * `autotuneVoice` after the 0.6.1 shift step, and the clips renderer calls

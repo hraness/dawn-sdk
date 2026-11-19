@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Patches in the render (design §13 lane 3): an instrument patch track
  * plays through `runPatch`, effect patches run at the chain's patch stage

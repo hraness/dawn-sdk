@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Stereo modulation stages after pan: phaser, chorus and leslie.
  */

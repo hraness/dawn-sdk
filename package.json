@@ -1,6 +1,6 @@
 {
   "name": "@hraness/dawn-sdk",
-  "version": "0.61.0",
+  "version": "0.62.0",
   "license": "MIT",
   "type": "module",
   "description": "Build sounds, sound packs and collections for DAWN, write song scores with its TypeScript SDK, and render them to audio",
@@ -15,7 +15,8 @@
     "assets",
     "docs",
     "examples",
-    "extension-manifest.json"
+    "extension-manifest.json",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "scripts": {
     "check": "bun scripts/check.ts"
@@ -24,14 +25,23 @@
     "dawn-palette": "./src/palette/main.ts",
     "dawn-collection": "./src/collection/main.ts",
     "dawn-render": "./src/renderer/main.ts",
-    "dawn-compose": "./src/composer-plugin/main.ts"
+    "dawn-compose": "./src/composer-plugin/main.ts",
+    "dawn-project": "./src/project/main.ts"
   },
   "exports": {
     ".": "./core/sdk/v1.ts",
     "./palette": "./core/palette.ts",
     "./collection": "./core/collection.ts",
     "./composer": "./core/composer-plugin.ts",
-    "./render": "./src/renderer/cli.ts"
+    "./render": "./src/renderer/cli.ts",
+    "./browser": "./src/renderer/browser.ts",
+    "./score": "./core/score.ts",
+    "./link": "./core/link/index.ts",
+    "./diff": "./core/diff.ts",
+    "./lint": "./core/lint/index.ts",
+    "./comments": "./core/comments/events.ts",
+    "./midi": "./core/midi.ts",
+    "./trace": "./core/trace.ts"
   },
   "dependencies": {
     "@jitl/quickjs-wasmfile-release-sync": "0.32.0",

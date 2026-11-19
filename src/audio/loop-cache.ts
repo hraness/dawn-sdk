@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { createHash } from "node:crypto";
 import type { TrackScore } from "../../core/score.ts";
 import type { SampleBank } from "./samples.ts";

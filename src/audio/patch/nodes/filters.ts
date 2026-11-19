@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** Filter kernels: the TPT state-variable filter and a TPT one-pole. */
 import { at, BLOCK, flush, type Frame } from "./frame.ts";
 

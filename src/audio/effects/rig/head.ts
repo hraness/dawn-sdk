@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Amp heads (`fx.head`): preamp triode stages, a Yeh & Smith tone stack
  * ("Discretization of the '59 Fender Bassman Tone Stack", DAFx-06; Fender,

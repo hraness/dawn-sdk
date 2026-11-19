@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Filter stages: the track filter (`track.filter`, lpf/hpf/bpf with 12db,
  * 24db or ladder slope), the one-knob DJ filter, the LFO auto filter and the

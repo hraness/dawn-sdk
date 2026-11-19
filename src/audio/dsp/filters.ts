@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Small per-sample filters for 0.6 instruments. `Biquad` is the existing
  * RBJ biquad (src/audio/effects/common.ts), re-exported unchanged.

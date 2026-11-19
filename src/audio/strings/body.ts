@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Per-track string bodies and sympathetic strings (0.6 strings prototype,
  * proto/strings/strings.ts). A body is a direct path plus a bank of 0 dB

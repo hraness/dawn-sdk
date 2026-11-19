@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Formant shift at constant pitch (0.7 `fx.formant`): the throat or gender
  * knob. Per STFT frame the cepstral spectral envelope E is taken and each

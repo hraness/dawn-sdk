@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The string engine (0.6 lane A): renders a track whose instrument is
  * `"string"` and which carries `Track.string`. Each performed note plays

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Pinned installation of selected collection entries. A moving Git ref is
  * resolved once to a commit; only the selected entries' declared files are

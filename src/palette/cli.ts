@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** Local palette authoring: validate data and export a sound as a user patch. */
 import { createHash, randomUUID } from "node:crypto";
 import { constants } from "node:fs";

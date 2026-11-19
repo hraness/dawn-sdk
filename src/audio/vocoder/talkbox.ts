@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The LPC talkbox (0.7, after mda Talkbox): per 20 ms sqrt-Hann frame at
  * 50 % overlap, the modulator's spectral envelope (Levinson-Durbin, order

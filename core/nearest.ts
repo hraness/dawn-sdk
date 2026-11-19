@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * One vocabulary matcher for every "did you mean" in DAWN: instruments,
  * effects, styles, kits, rigs, sections, presets, params and verbs.

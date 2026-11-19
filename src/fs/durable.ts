@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Crash-safe file replacement: write a uniquely named temp file, fsync it,
  * rename it over the target and fsync the parent directory so the rename

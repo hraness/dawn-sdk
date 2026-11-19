@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Tuning systems: how a MIDI key becomes a frequency.
  *

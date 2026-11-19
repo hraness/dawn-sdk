@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Three-band EQ (`fx.eq`): an RBJ low shelf, a peaking mid and a high shelf
  * on the mono track signal after the amp and cab. Bands at 0 dB are skipped,

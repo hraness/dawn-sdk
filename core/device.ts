@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Programmable devices (`dawn.device/v1`): WebAssembly modules with no
  * imports that a patch node runs as an effect, a synthesizer or a note

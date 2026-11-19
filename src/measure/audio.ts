@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Audio input for the measures: stereo Float64 channels at a sample rate,
  * from a WAV file's bytes (PCM 16/24/32, float 32/64) or a render's

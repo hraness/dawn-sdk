@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The runner's view of one section for one block: flat typed arrays only,
  * so every node kernel is a plain function over offsets (no closures, no

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The modular patcher's model: a patch is a small typed graph of nodes
  * (NODE_SPECS in core/patch-nodes.ts), cables between their ports and

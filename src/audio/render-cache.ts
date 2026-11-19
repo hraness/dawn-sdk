@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * A persistent, content-addressed cache for offline renders: finished track
  * stems and bus returns (`StemStore`, consulted by `StemRenderer`), each

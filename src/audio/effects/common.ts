@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Shared DSP building blocks for the track effects chain. Everything is
  * plain float64 arithmetic in a fixed order with no clocks or ambient
@@ -11,6 +12,7 @@
  */
 import type { AutomationPoint, Track } from "../../../core/score.ts";
 import type { FxLane, FxValues } from "../../../core/fx.ts";
+import type { ReverbKernel } from "../native-dsp.ts";
 import type { DecodedSample } from "../samples.ts";
 import type { SampleWarp } from "../warp.ts";
 
@@ -18,6 +20,8 @@ import type { SampleWarp } from "../warp.ts";
 export const CONTROL_SAMPLES = 32;
 
 export type EffectContext = Readonly<{
+  /** Optional host acceleration for the algorithmic room. */
+  reverbKernel?: () => ReverbKernel | undefined;
   sampleRate: number;
   samplesPerTick: number;
   tempoBpm: number;

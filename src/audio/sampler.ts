@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Sample playback for sampler tracks, with Strudel's semantics:
  *

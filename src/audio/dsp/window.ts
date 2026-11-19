@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Grain window tables (0.6 granular, shared): 2048 + 1 entries over 0..1,
  * read by index with linear interpolation. Ported from the 0.6 granular

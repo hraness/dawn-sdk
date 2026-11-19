@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * A plucked or struck string: a single-delay-loop waveguide (Karplus-Strong
  * as extended by Jaffe and Smith 1983), ported from the 0.6 strings

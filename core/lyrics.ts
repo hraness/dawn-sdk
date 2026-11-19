@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The lyric grammar and syllable assignment (0.7) shared by `/lyrics`,
  * `set_lyrics` and the SDK's `lyrics()`. No imports: the SDK carries a copy

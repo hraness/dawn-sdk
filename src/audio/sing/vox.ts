@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Machine vox (lane V1): consonants for the sing engine. A line's notes
  * become a timeline of phone spans (onset consonants at each note's start,

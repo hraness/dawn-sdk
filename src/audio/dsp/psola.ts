@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Time-varying TD-PSOLA (Moulines and Charpentier, Speech Communication
  * 1990) for 0.7 Voice. Analysis marks sit one per period on voiced runs;

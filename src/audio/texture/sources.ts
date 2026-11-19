@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The ten texture sources. Each renders a block of two decorrelated raw
  * channels (`a`, `b`) from its own seeded generator; the voice

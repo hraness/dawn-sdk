@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The texture engine's settings (`instrument: "texture"` with a `texture`
  * field): seeded DSP beds and noises (room tone, rain, wind, vinyl, tape,

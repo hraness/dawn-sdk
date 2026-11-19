@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * English letter-to-sound for the machine-vox formant voice (lane V1):
  * context rules in the style of the NRL rules (Elovitz, Johnson, McHugh

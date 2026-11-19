@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The guitar rig stages of the track chain (`fx.stomp`, `fx.head` with its
  * gate, `fx.cab`), mono, after `distort` and before `tremolo`. Each

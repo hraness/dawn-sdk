@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Shared grain bank (0.6 granular, shared DSP): a source band-limited at
  * one level per semitone of upward read speed, so grains read at any step

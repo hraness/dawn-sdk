@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Tempo maps and score time.
  *

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The synth voice: renders one note of a track with `track.synth` (or a
  * sound only the voice knows, like `supersaw` or `white`) into the dry

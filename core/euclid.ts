@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Euclidean rhythms and T-1-style rhythm rows.
  *

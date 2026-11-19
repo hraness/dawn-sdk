@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Orbits and ducking, applied where track stems are summed.
  *

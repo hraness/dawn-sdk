@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Pitch and level trims for the wind voice, looked up from the generated
  * table (`trims.ts`, written by `bun scripts/calibrate-winds.ts`). The

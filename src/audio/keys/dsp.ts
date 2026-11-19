@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Keys-local DSP (0.6 keys lane), ported from the reviewed prototype
  * (`.plans/dawg-06/proto/keys/dsp.ts`, round 2): a modal resonator bank, an

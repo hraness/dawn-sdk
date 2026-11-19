@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** FNV-1a seeded mulberry32: integer-only, so identical on every platform. */
 export function seededRandom(seed: string): () => number {
   let hash = 0x811c9dc5;

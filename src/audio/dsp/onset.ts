@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Onset detection: SuperFlux (Böck and Widmer, "Maximum filter vibrato
  * suppression for onset detection", DAFx 2013): positive log-magnitude flux

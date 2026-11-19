@@ -1,0 +1,7 @@
+{
+  "format": "dawn.project/v1",
+  "sdk": 1,
+  "dawn": ">=0.53.0",
+  "migrations": ["0001-dawg-to-dawn"],
+  "score": 1
+}

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Band-pass banks (0.7 vocoder): RBJ biquads, their group delay and a
  * sample-rate-independent band layout. Band centres and widths depend only

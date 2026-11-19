@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Oscillators of the synth voice, behind one seam: `resolveOscillator`
  * maps a sound name to a factory, and `registerOscillatorResolver` lets

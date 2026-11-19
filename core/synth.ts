@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The synth voice: per-track sound parameters stored under `track.synth`.
  *

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * A content-addressed cache of verified collection files, shared by every
  * project of a user: `<cache>/objects/sha256/<2>/<64 hex>`. An object is

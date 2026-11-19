@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * `dawn song [dir] --composer <folder|collection/entry> [--prompt "<text>"]
  * [--seed n] [--key k] [--tempo bpm] [--bars n] [--form "name:bars ..."]

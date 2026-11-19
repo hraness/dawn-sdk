@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Vocoder (0.7 "Voice", lane vocoder): a track's sound (the carrier) shaped
  * by another track's sound (the modulator, `src`). Pure and import-light,

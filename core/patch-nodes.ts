@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The patcher's node library (`NODE_SPECS`): every node type's ports, port
  * kinds, ranges, rate and cost, declared once. Validation (core/patch.ts),

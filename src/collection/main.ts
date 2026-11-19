@@ -1,4 +1,5 @@
 #!/usr/bin/env -S bun --config=/dev/null --no-env-file --no-install
+// SPDX-License-Identifier: MIT
 /** Standalone collection authoring; never evaluates project source. */
 import { runCollectionCommand } from "./cli.ts";
 

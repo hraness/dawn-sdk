@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The vocoder stage and its built-in carrier (0.7). `applyVocoder` runs
  * right after a carrier track's voice renders into `dry` (and `dryR`), before

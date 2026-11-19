@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The 0.6 instrument engine registry. A lane registers one engine
  * (`registerEngine`) for its instrument id and its own optional Track field;

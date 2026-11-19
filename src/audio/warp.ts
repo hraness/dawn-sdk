@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Sample positions through a song's tempo map (core/tempo.ts).
  *

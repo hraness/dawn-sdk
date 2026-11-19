@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** Source kernels: `osc` (PolyBLEP saw, square, pulse; sine; triangle) and `noise`. */
 import { at, BLOCK, draw, type Frame } from "./frame.ts";
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Audio clips (0.7): files placed on a track's timeline, summed into the
  * track's dry buffer before its effect chain (sources.md section 7). The

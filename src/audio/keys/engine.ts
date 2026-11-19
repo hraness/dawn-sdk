@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The keys engine (0.6, lane keys-piano): renders a track whose instrument
  * is a piano family (grand upright felt honkytonk prepared) AND that

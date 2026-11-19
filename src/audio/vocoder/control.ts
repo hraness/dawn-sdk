@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Control values for one vocoder render: the resolved settings plus, for
  * each automated parameter, a per-sample curve read once per 32-sample block

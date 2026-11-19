@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The track effects chain: one table that drives validation, the SDK,
  * printing, diffs, the `/menu`, the `fx` prompt command and the agent tools.

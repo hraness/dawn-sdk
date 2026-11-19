@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Expressive performance (DAWN 0.5): per-note articulation, glide, bend and
  * vibrato, and per-track glide, sustain pedal, velocity curve and humanize.

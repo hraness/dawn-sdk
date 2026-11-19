@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Only catalogued studio-v1 URLs resolve locally; arbitrary URLs never do.
  *

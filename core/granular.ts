@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Granular instrument (0.6): the `Track.granular` field, its parameter
  * table, presets and validation. Pure, no audio imports; the voice lives in

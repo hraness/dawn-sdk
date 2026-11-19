@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The fixed per-track effects chain (`FX_CHAIN` in core/fx.ts):
  *

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** Math and logic kernels; every input is sampled, so envelopes stay smooth. */
 import { at, BLOCK, type Frame, put } from "./frame.ts";
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * A bowed string (0.6.1 lane f061-bowed), ported from the 0.6 strings
  * prototype's `BowedString`: the STK `Bowed` topology (Cook and Scavone)

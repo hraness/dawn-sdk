@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Envelope followers (0.7 vocoder): one-pole attack/release on |x|, and the
  * gate curve built on one. Pure functions of the input buffer, so a render

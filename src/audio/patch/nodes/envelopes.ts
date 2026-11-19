@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /** Envelope kernels: adsr, ar, slew and follow (per sample, gates sampled). */
 import { at, BLOCK, type Frame } from "./frame.ts";
 

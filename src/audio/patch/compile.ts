@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The patch compiler (design §8.1): inlines nested patches, drops nodes that
  * cannot reach `out`, colors voice and global, breaks each feedback loop at

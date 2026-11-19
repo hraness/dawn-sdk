@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Instrument words for 0.6: the one place a typed, menu, agent or SDK
  * instrument word turns into what a track stores. Pure and import-free;

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The wind engine (0.6.1): renders a `wind` track's performed notes through
  * `WindVoice` waveguides.

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Noise gate before the amp (`fx.head.gate`): a peak follower with
  * hysteresis (opens at the threshold, closes 6 dB below it), a 50 ms hold,

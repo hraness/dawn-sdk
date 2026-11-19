@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Bounded HTTPS transfers for collection installs. Every hop of a redirect is
  * validated, bodies are streamed under a byte budget and an idle and total

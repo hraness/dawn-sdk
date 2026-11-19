@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Short-time Fourier helpers on the shared radix-2 FFT (`fft.ts`): frame
  * sizes, a periodic Hann window, windowed frame reads and magnitude spectra.

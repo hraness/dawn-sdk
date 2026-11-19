@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Machine vox (0.9, lane V0): the per-note and per-track voice fields, their
  * validators, the lint over a track's lyrics and the compact inspect form

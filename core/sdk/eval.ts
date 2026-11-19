@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Evaluates a project's `song.ts` and parses the result from `unknown` into
  * a validated `TrackScore`.

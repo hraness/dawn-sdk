@@ -1,0 +1,212 @@
+// SPDX-License-Identifier: MIT
+import { minorFloor } from "../update/semver.ts";
+import { VERSION } from "../version.ts";
+import { describe, expect, test } from "bun:test";
+import { mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { SDK_VERSION } from "../../core/sdk/v1.ts";
+import {
+  initProject,
+  isProject,
+  legacyProjectHint,
+  readManifest,
+  runInitCommand,
+  sdkVersionOf,
+  SHIPPED_SDK_PATH,
+} from "./init.ts";
+
+async function scratch(): Promise<string> {
+  return mkdtemp(join(tmpdir(), "dawn-init-"));
+}
+
+describe("initProject", () => {
+  test("creates the layout once and is idempotent", async () => {
+    const dir = await scratch();
+    try {
+      const first = await initProject(dir);
+      expect(first.wrote).toEqual([
+        ".dawn/sdk/v1.ts",
+        ".dawn/sdk/tsconfig.json",
+        "dawn.json",
+        "tsconfig.json",
+        "song.ts",
+        "AGENTS.md",
+        "CLAUDE.md",
+        ".gitignore",
+      ]);
+      expect(first.sdkVersion).toBe(SDK_VERSION);
+      expect(await isProject(dir)).toBe(true);
+      expect(await readManifest(dir)).toEqual({
+        format: "dawn.project/v1",
+        sdk: 1,
+        dawn: minorFloor(VERSION),
+        migrations: [],
+        score: 1,
+        trace: { write: true, text: true, index: false },
+      });
+      expect(await readFile(join(dir, ".dawn/sdk/v1.ts"), "utf8")).toBe(
+        await readFile(SHIPPED_SDK_PATH, "utf8"),
+      );
+      expect((await readdir(join(dir, "tracks"))).length).toBe(0);
+      expect(await readFile(join(dir, ".gitignore"), "utf8")).toBe(
+        ".dawn/*\n!.dawn/sdk/\n",
+      );
+      const second = await initProject(dir);
+      expect(second.wrote).toEqual([]);
+      // Nothing outside the project.
+      expect((await readdir(dir)).sort()).toEqual([
+        ".dawn",
+        ".gitignore",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "dawn.json",
+        "song.ts",
+        "tracks",
+        "tsconfig.json",
+      ]);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("keeps user files and appends missing .gitignore lines", async () => {
+    const dir = await scratch();
+    try {
+      await writeFile(join(dir, "song.ts"), "// mine\n");
+      await writeFile(join(dir, ".gitignore"), "node_modules/");
+      const result = await initProject(dir);
+      expect(result.wrote).not.toContain("song.ts");
+      expect(await readFile(join(dir, "song.ts"), "utf8")).toBe("// mine\n");
+      expect(await readFile(join(dir, ".gitignore"), "utf8")).toBe(
+        "node_modules/\n.dawn/*\n!.dawn/sdk/\n",
+      );
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("refreshes the vendored SDK only for a newer same-major copy", async () => {
+    const dir = await scratch();
+    try {
+      const shipped = await readFile(SHIPPED_SDK_PATH, "utf8");
+      const older = shipped.replace(
+        /SDK_VERSION = "1\.\d+\.\d+"/,
+        'SDK_VERSION = "1.0.0"',
+      );
+      const newer = shipped.replace(
+        /SDK_VERSION = "1\.\d+\.\d+"/,
+        'SDK_VERSION = "1.99.0"',
+      );
+      const nextMajor = shipped.replace(
+        /SDK_VERSION = "1\.\d+\.\d+"/,
+        'SDK_VERSION = "2.0.0"',
+      );
+      await initProject(dir, { sdkSource: older });
+      expect(
+        sdkVersionOf(await readFile(join(dir, ".dawn/sdk/v1.ts"), "utf8")),
+      ).toBe("1.0.0");
+      const refreshed = await initProject(dir, { sdkSource: newer });
+      expect(refreshed.wrote).toEqual([".dawn/sdk/v1.ts"]);
+      expect(refreshed.sdkVersion).toBe("1.99.0");
+      const downgrade = await initProject(dir, { sdkSource: older });
+      expect(downgrade.wrote).toEqual([]);
+      const major = await initProject(dir, { sdkSource: nextMajor });
+      expect(major.wrote).toEqual([]);
+      expect(major.sdkVersion).toBe("1.99.0");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("dawn init prints each file once, then reports up to date", async () => {
+    const dir = await scratch();
+    try {
+      let out = "";
+      const stdout = { write: (text: string) => (out += text) };
+      expect(await runInitCommand(["init"], dir, stdout, stdout)).toBe(0);
+      expect(out.split("\n").filter(Boolean).length).toBe(9);
+      expect(out).toContain("wrote song.ts\n");
+      expect(out).toContain("a git push publishes that text");
+      out = "";
+      expect(await runInitCommand(["init"], dir, stdout, stdout)).toBe(0);
+      expect(out).toMatch(/^project up to date \(sdk 1\.\d+\.\d+\)\n$/);
+      // An absolute target is used as given, a relative one under cwd.
+      const nested = join(dir, "nested");
+      expect(await runInitCommand(["init", nested], "/", stdout, stdout)).toBe(
+        0,
+      );
+      expect(await isProject(nested)).toBe(true);
+      expect(await runInitCommand(["init", "rel"], dir, stdout, stdout)).toBe(
+        0,
+      );
+      expect(await isProject(join(dir, "rel"))).toBe(true);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("an existing AGENTS.md or CLAUDE.md is never touched", async () => {
+    const dir = await scratch();
+    try {
+      await writeFile(join(dir, "AGENTS.md"), "mine\n");
+      const first = await initProject(dir);
+      expect(first.wrote).not.toContain("AGENTS.md");
+      expect(first.wrote).not.toContain("CLAUDE.md");
+      expect(await readFile(join(dir, "AGENTS.md"), "utf8")).toBe("mine\n");
+      const other = await scratch();
+      try {
+        await writeFile(join(other, "CLAUDE.md"), "theirs\n");
+        const second = await initProject(other);
+        expect(second.wrote).toContain("AGENTS.md");
+        expect(second.wrote).not.toContain("CLAUDE.md");
+        expect(await readFile(join(other, "CLAUDE.md"), "utf8")).toBe(
+          "theirs\n",
+        );
+      } finally {
+        await rm(other, { recursive: true, force: true });
+      }
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("readManifest rejects foreign or malformed manifests", async () => {
+    const dir = await scratch();
+    try {
+      await writeFile(join(dir, "dawn.json"), '{"format":"other","sdk":1}');
+      expect(await readManifest(dir)).toBeUndefined();
+      await writeFile(join(dir, "dawn.json"), "{nope");
+      expect(await isProject(dir)).toBe(false);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("a pre-rename dawg.json points at dawn migrate, and init refuses", async () => {
+    const dir = await scratch();
+    try {
+      await writeFile(
+        join(dir, "dawg.json"),
+        '{"format":"dawg.project/v1","sdk":1}',
+      );
+      const hint = await legacyProjectHint(dir);
+      expect(hint).toContain("dawn migrate --apply");
+      const out: string[] = [];
+      const err: string[] = [];
+      const code = await runInitCommand(
+        ["init"],
+        dir,
+        { write: (text: string) => out.push(text) },
+        { write: (text: string) => err.push(text) },
+      );
+      expect(code).toBe(1);
+      expect(err.join("")).toContain("run dawn migrate");
+      expect(await isProject(dir)).toBe(false);
+      await initProject(dir);
+      expect(await legacyProjectHint(dir)).toBeUndefined();
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+});

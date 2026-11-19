@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Cross-track references (0.7). A track field that names another track (the
  * vocoder's `src`, autotune's `from`, 0.7.1 harmony's `guide`) registers

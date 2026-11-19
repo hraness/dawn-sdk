@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * ZzFX-style procedural voice for Strudel's `z_*` sounds (`z_sine`,
  * `z_triangle`, `z_sawtooth`, `z_square`, `z_tan`, `z_noise`).

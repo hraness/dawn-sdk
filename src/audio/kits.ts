@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Drum kits: the synthesized kits from `core/kits.ts` rendered sample by
  * sample, and the one catalog `/kit`, `/menu` and the agent list.

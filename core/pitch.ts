@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Pitch-name helpers shared by the command parser, the SDK and the printer.
  *

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The granular instrument (0.6): a seeded, streaming grain voice and the
  * engine that plays a track's notes with it. Ported from the 0.6 granular

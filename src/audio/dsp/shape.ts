@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * First-order antiderivative antialiasing (ADAA; Parker et al. DAFx-16,
  * Bilbao et al. IEEE SPL 2017): y = (F(x) - F(x1)) / (x - x1) for a shaper

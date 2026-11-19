@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Fitting sampler windows to the song's time (0.6 `bpm`, `len`, `fit` with
  * `fitmode`). Each algorithm turns a window (already at the render rate)

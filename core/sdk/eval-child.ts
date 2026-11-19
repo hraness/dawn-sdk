@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The evaluation subprocess (`bun --no-addons --no-install --no-env-file
  * --smol eval-child.ts`), started and reused by `eval.ts`. Each line on

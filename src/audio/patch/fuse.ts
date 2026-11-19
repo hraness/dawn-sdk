@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Fused voice blocks: the voice section compiled to one JavaScript function
  * per program (design §8.2, "compile the patch, don't interpret it"). Every

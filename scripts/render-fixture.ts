@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * The song `bun run check` renders with `dawn-render`, and the SHA-256 of
  * the WAV DAWN itself writes for it (`dawn render out.wav` in a project

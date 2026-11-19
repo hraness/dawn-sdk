@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Vowel formant tables shared by the `vowel` filter (and, from the sing
  * lane, the Klatt cascade): frequency (Hz), level (dB) and bandwidth (Hz)
