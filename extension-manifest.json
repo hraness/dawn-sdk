@@ -625,12 +625,12 @@
     },
     {
       "path": "core/lint/vocal.ts",
-      "bytes": 22597,
-      "sha256": "10668c175746f4a34056f92a72365e3e3009aa87aa73146f501649fc876c97d8",
+      "bytes": 22664,
+      "sha256": "06028194c4ed6a33ea24c8d036b55107276a9d0ee49032403c5377d6a4fe5b20",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/lint/vocal.ts",
-        "sourceSha256": "10668c175746f4a34056f92a72365e3e3009aa87aa73146f501649fc876c97d8",
+        "sourceSha256": "06028194c4ed6a33ea24c8d036b55107276a9d0ee49032403c5377d6a4fe5b20",
         "adaptation": null
       }
     },

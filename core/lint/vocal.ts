@@ -227,7 +227,13 @@ const LONG_VOWEL =
 function estimate(text: string) {
   const t = text.toLowerCase().replace(/[^a-z']/g, "");
   const onset = Math.min(3, /^[^aeiouy]*/.exec(t)![0].length);
-  const coda = Math.min(3, /[^aeiouy]*$/.exec(t)![0].length);
+  let coda = 0;
+  while (
+    coda < 3 &&
+    coda < t.length &&
+    !"aeiouy".includes(t[t.length - coda - 1]!)
+  )
+    coda++;
   return { onset: t.length ? onset : 1, coda, long: LONG_VOWEL.test(t) };
 }
 
