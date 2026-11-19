@@ -29,6 +29,12 @@ export type SdkChange = Readonly<{
 
 export const SDK_CHANGES: readonly SdkChange[] = Object.freeze([
   {
+    sdk: "1.57.0",
+    dawn: "0.65.0",
+    added: ["AmbientVoicing", "ambientVoicing", "ambientVoicingNames"],
+    render: "changed",
+  },
+  {
     sdk: "1.56.0",
     dawn: "0.64.0",
     changed: [

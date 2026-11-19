@@ -28,7 +28,7 @@
  */
 
 /** SDK release; DAWN refreshes the vendored copy when its own is newer. */
-export const SDK_VERSION = "1.56.0";
+export const SDK_VERSION = "1.57.0";
 /** Major of `SDK_VERSION`; `dawn.json` records it as `sdk`. */
 export const SDK_MAJOR = 1;
 
@@ -4018,6 +4018,351 @@ export type SynthInput = Readonly<{
   /** Any other Strudel synth parameter, e.g. `lpattack`, `fmh3`. */
   [param: string]: number | string | boolean | readonly number[] | undefined;
 }>;
+
+/** A playable sound for a score. Each voicing expands to standard editable track fields. */
+type VoicedTrack = Pick<TrackInput, "instrument" | "keys" | "synth">;
+const voicedKeys = (instrument: string, keys: KeysInput): VoicedTrack =>
+  Object.freeze({ instrument, keys: Object.freeze(keys) });
+const voicedSynth = (instrument: string, synth: SynthInput): VoicedTrack =>
+  Object.freeze({ instrument, synth: Object.freeze(synth) });
+const acousticVoice = (
+  instrument: NonNullable<TrackInput["instrument"]>,
+): VoicedTrack => Object.freeze({ instrument });
+
+const ambientVoicings = {
+  "felt-piano": (w: number) =>
+    voicedKeys("felt", {
+      hardness: 0.62 - 0.34 * w,
+      touch: 0.88,
+      felt: 0.48 + 0.46 * w,
+      strike: 0.135,
+      body: "grand",
+      after: 0.52,
+      decay: 1.09,
+      release: 1.26,
+      noise: 0.14,
+      knock: 0.24,
+      sym: 0.38,
+      unison: 1.28,
+      width: 0.78,
+    }),
+  "tine-piano": (w: number) =>
+    voicedKeys("epiano", {
+      hardness: 0.54 - 0.24 * w,
+      bark: 0.31,
+      bell: 0.46 - 0.24 * w,
+      tone: 3900 - 1500 * w,
+      vibe: 0.19,
+      vibehz: 2.1,
+      release: 1.28,
+      width: 0.71,
+    }),
+  "reed-piano": (w: number) =>
+    voicedKeys("wurli", {
+      hardness: 0.61 - 0.27 * w,
+      bark: 0.48,
+      bell: 0.18,
+      tone: 3400 - 1100 * w,
+      trem: 0.13,
+      release: 1.17,
+      width: 0.62,
+    }),
+  "prepared-piano": (w: number) =>
+    voicedKeys("prepared", {
+      hardness: 0.49 - 0.21 * w,
+      prep: 0.82,
+      felt: 0.16,
+      strike: 0.19,
+      after: 0.5,
+      knock: 0.36,
+      noise: 0.15,
+      width: 0.67,
+    }),
+  "drift-pad": (w: number) =>
+    voicedSynth("supersaw", {
+      // Restrict the saw's harmonic series so the pad leaves space for the piano hammers.
+      partials: Object.freeze([1, 0.67, 0.83, 0.24, 0.52, 0.12, 0.23, 0.08]),
+      attack: 1.32,
+      decay: 1.1,
+      sustain: 0.82,
+      release: 1.78,
+      unison: 3,
+      detune: 0.115,
+      spread: 0.76,
+      lpf: 1780 - 980 * w,
+      lpq: 0.66,
+    }),
+  "sequence-haze": (w: number) =>
+    voicedSynth("supersaw", {
+      partials: Object.freeze([0.9, 0.38, 1, 0.27, 0.34, 0.12]),
+      attack: 1.48,
+      decay: 1.15,
+      sustain: 0.71,
+      release: 1.35,
+      unison: 3,
+      detune: 0.19,
+      spread: 0.86,
+      lpf: 1260 - 480 * w,
+      lpq: 0.64,
+    }),
+  "pulse-sequence": (w: number) =>
+    voicedSynth("pulse", {
+      attack: 0.009,
+      decay: 0.19,
+      sustain: 0.13,
+      release: 0.13,
+      pw: 0.3,
+      pwrate: 0.19,
+      pwsweep: 0.15,
+      lpf: 2200 - 1150 * w,
+      lpq: 0.72,
+      lpenv: 0.58,
+      lpattack: 0.008,
+      lpdecay: 0.14,
+      lpsustain: 0.09,
+      unison: 2,
+      detune: 0.06,
+      spread: 0.56,
+    }),
+  "round-kick": (w: number) =>
+    voicedSynth("sine", {
+      attack: 0.004,
+      decay: 0.15,
+      sustain: 0.012,
+      release: 0.06,
+      fm: 0.62 - 0.3 * w,
+      fmh: 2,
+      penv: 12,
+      pattack: 0,
+      pdecay: 0.049,
+    }),
+  "offbeat-bass": (w: number) =>
+    voicedSynth("triangle", {
+      attack: 0.015,
+      decay: 0.2,
+      sustain: 0.33,
+      release: 0.09,
+      fm: 0.51 - 0.22 * w,
+      fmh: 1,
+      lpf: 1160 - 390 * w,
+    }),
+  "glass-bell": (w: number) =>
+    acousticVoice(
+      modal("crotales", {
+        mallet: "rubber",
+        hardness: 0.52 - 0.27 * w,
+        position: 0.21,
+        tilt: 1.25,
+        ring: 3.1,
+        damp: 0.19,
+        release: 0.43,
+        click: 0.055,
+      }),
+    ),
+  "soft-vibes": (w: number) =>
+    acousticVoice(
+      modal("vibes", {
+        mallet: "yarn",
+        hardness: 0.53 - 0.29 * w,
+        position: 0.41,
+        ring: 2.75,
+        tilt: 1.15,
+        damp: 0.43,
+        release: 0.35,
+        click: 0.035,
+        motor: 2.8,
+        motordepth: 0.13,
+      }),
+    ),
+  marimba: (w: number) =>
+    acousticVoice(
+      modal("marimba", {
+        mallet: "yarn",
+        hardness: 0.6 - 0.28 * w,
+        position: 0.4,
+        ring: 1.48,
+        tilt: 1.27,
+        click: 0.06,
+      }),
+    ),
+  "thumb-piano": (w: number) =>
+    acousticVoice(
+      modal("kalimba", {
+        hardness: 0.67 - 0.21 * w,
+        position: 0.68,
+        ring: 1.42,
+        tilt: 1.12,
+        buzz: 0.08,
+        click: 0.12,
+        gain: 1.18,
+      }),
+    ),
+  "frame-drum": (w: number) =>
+    acousticVoice(
+      modal("bodhran", {
+        mallet: "yarn",
+        hardness: 0.36 - 0.18 * w,
+        position: 0.31,
+        ring: 0.61,
+        damp: 0.59,
+        strikebend: 0.62,
+        strikedecay: 0.053,
+        click: 0.04,
+      }),
+    ),
+  "singing-bowl": (w: number) =>
+    acousticVoice(
+      modal("bowl", {
+        hardness: 0.37 - 0.19 * w,
+        position: 0.2,
+        ring: 3.8,
+        tilt: 0.9,
+        damp: 0.12,
+        click: 0.028,
+      }),
+    ),
+  cello: (w: number) =>
+    acousticVoice(
+      stringed("cello", {
+        bright: 0.52 - 0.25 * w,
+        pos: 0.23,
+        pressure: 0.46,
+        speed: 0.65,
+        attack: 0.39,
+        vib: 4.65,
+        vibmod: 0.14,
+        vibdelay: 0.54,
+        sord: 0.14 + 0.24 * w,
+      }),
+    ),
+  viola: (w: number) =>
+    acousticVoice(
+      stringed("viola", {
+        bright: 0.61 - 0.25 * w,
+        pos: 0.26,
+        pressure: 0.42,
+        speed: 0.62,
+        attack: 0.29,
+        vib: 5.25,
+        vibmod: 0.12,
+        vibdelay: 0.39,
+        sord: 0.16 + 0.18 * w,
+      }),
+    ),
+  harp: (w: number) =>
+    acousticVoice(
+      stringed("harp", {
+        exciter: "finger",
+        bright: 0.7 - 0.37 * w,
+        pos: 0.24,
+        damp: 0.39,
+        noise: 0.025,
+        ring: 4.3,
+        release: 0.64,
+        sym: 0.24,
+        symtune: "scale",
+      }),
+    ),
+  dulcimer: (w: number) =>
+    acousticVoice(
+      stringed("dulcimer", {
+        bright: 0.75 - 0.28 * w,
+        pos: 0.19,
+        damp: 0.44,
+        ring: 2.65,
+        sym: 0.16,
+        unison: 2,
+        detune: 0.045,
+        spread: 0.46,
+      }),
+    ),
+  "upright-bass": (w: number) =>
+    acousticVoice(
+      stringed("upright", {
+        exciter: "finger",
+        bright: 0.54 - 0.25 * w,
+        pos: 0.3,
+        mute: 0.12,
+        damp: 0.54,
+        noise: 0.035,
+        ring: 2.8,
+        release: 0.19,
+        body: "bass",
+      }),
+    ),
+  "bamboo-flute": (w: number) =>
+    acousticVoice(
+      wind("bansuri", {
+        bright: 0.59 - 0.28 * w,
+        breath: 0.56,
+        noise: 0.105,
+        reed: 0.47,
+        attack: 0.11,
+        release: 0.18,
+        vib: 4.7,
+        vibmod: 0.075,
+      }),
+    ),
+  "alto-vowel": (w: number) =>
+    acousticVoice(
+      sing("ooh", {
+        voice: "alto",
+        vowel: "u>a",
+        morph: 0.34,
+        bright: 0.54 - 0.25 * w,
+        breath: 0.16,
+        jitter: 0.15,
+        shimmer: 0.17,
+        attack: 0.78,
+        release: 1.12,
+        vib: 4.85,
+        vibmod: 0.085,
+        vibdelay: 0.63,
+      }),
+    ),
+  "tenor-vowel": (w: number) =>
+    acousticVoice(
+      sing("airy", {
+        voice: "tenor",
+        vowel: "o",
+        bright: 0.48 - 0.24 * w,
+        breath: 0.19,
+        jitter: 0.11,
+        shimmer: 0.14,
+        attack: 0.94,
+        release: 1.25,
+        vib: 4.45,
+        vibmod: 0.095,
+        vibdelay: 0.75,
+      }),
+    ),
+} satisfies Record<string, (w: number) => VoicedTrack>;
+
+/** Names accepted by ambientVoicing().
+ * @since 1.57.0
+ */
+export type AmbientVoicing = keyof typeof ambientVoicings;
+/** Enumerate the available sample-free sounds in a score editor.
+ * @since 1.57.0
+ */
+export const ambientVoicingNames = Object.freeze(
+  Object.keys(ambientVoicings) as AmbientVoicing[],
+);
+/**
+ * An editable set of instrument controls for an intimate ensemble. Warmth runs from 0 to 1.
+ * Spread the result into track({ name, ...ambientVoicing("felt-piano", 0.7), notes }).
+ * Notes, pedals, rooms and effects stay with the score.
+ * Use song({ calibration: SONG_CALIBRATION_LATEST, tracks }) for the current piano and wind response.
+ * @since 1.57.0
+ */
+export function ambientVoicing(
+  name: AmbientVoicing,
+  warmth = 0.5,
+): VoicedTrack {
+  if (!Object.hasOwn(ambientVoicings, name))
+    throw new DawnSdkError("unknown ambient voicing: " + name);
+  return ambientVoicings[name](unit(warmth, "ambient voicing warmth"));
+}
 
 /** Input to `track()`. Omitted fields keep DAWN's defaults. */
 export type TrackInput = Readonly<{

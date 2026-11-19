@@ -108,6 +108,10 @@ class Room implements Source {
 const MAX_DROPS = 48;
 
 class Rain implements Source {
+  private readonly shower: Drift;
+  private readonly eave = new Svf();
+  private nextDrip = 0;
+  private dripPan = 0.5;
   private readonly pinkA = new Pink();
   private readonly pinkB = new Pink();
   private readonly bedHpA = new Hp1();
@@ -132,6 +136,7 @@ class Rain implements Source {
     private readonly sr: number,
   ) {
     this.bedHpA.set(350, sr);
+    this.shower = new Drift(rng);
     this.bedHpB.set(350, sr);
     this.tickA.set(4200, 0.8, sr);
     this.tickB.set(4200, 0.8, sr);
@@ -172,11 +177,16 @@ class Rain implements Source {
 
   render(a: Float64Array, b: Float64Array, n: number, c: Controls): void {
     const sr = this.sr;
-    const rate = (12 + 520 * c.density * c.density) * (0.4 + 1.2 * c.shape);
+    const shower = this.shower.step(n / sr, 3.6);
+    const rate =
+      (12 + 520 * c.density * c.density) *
+      (0.4 + 1.2 * c.shape) *
+      (0.56 + 0.88 * shower);
     const bedHz = (2600 + 2600 * (1 - c.distance)) * c.sweep;
     this.bedLpA.set(bedHz, 0.6, sr);
     this.bedLpB.set(bedHz, 0.6, sr);
-    const bed = 0.12 + 0.3 * c.density + 0.15 * c.wear;
+    const bed =
+      (0.12 + 0.3 * c.density + 0.15 * c.wear) * (0.75 + 0.49 * shower);
     for (let i = 0; i < n; i += 1) {
       if ((this.next -= 1) <= 0) {
         this.next += this.rng.wait(rate) * sr;
@@ -208,6 +218,18 @@ class Rain implements Source {
       }
       l += this.tickA.process(this.impactL);
       r += this.tickB.process(this.impactR);
+      // Water gathers on an edge before it falls. These quieter, lower
+      // impacts remain distinguishable through the distant sheet of rain.
+      let drip = 0;
+      if (--this.nextDrip <= 0) {
+        this.nextDrip = (0.16 + this.rng.wait(1.1 + c.density * 2.1)) * sr;
+        this.eave.set(this.rng.range(380, 1100) * c.sweep, 8.5, sr);
+        this.dripPan = this.rng.range(0.18, 0.82);
+        drip = (0.7 + c.wear) * this.rng.range(0.65, 1.55);
+      }
+      const nearby = this.eave.process(drip);
+      l += nearby * (1 - this.dripPan);
+      r += nearby * this.dripPan;
       this.impactL = 0;
       this.impactR = 0;
       const na = this.bedLpA.process(
