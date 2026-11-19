@@ -18,7 +18,7 @@ verifies them and runs none of them.
 Bun 1.3.14 or newer runs the tools. Install a tagged release from GitHub:
 
 ```sh
-bun add github:hraness/dawn-sdk#v0.62.0
+bun add github:hraness/dawn-sdk#v0.63.0
 ```
 
 The same bytes are mirrored to npm as `@hraness/dawn-sdk`. Each
@@ -72,7 +72,7 @@ and let this buffer continue for `tailSeconds`. A worker can transfer
 `pcm.buffer` back to its page.
 
 Use fixed-tempo scores with the legacy tones, oscillator synths, modeled
-pianos and electric keys, pan, tempo-synced delay and algorithmic reverb.
+keys, strings, winds, modal percussion, the built-in singing voice, and synthetic textures. The browser entry also exports instrument, preset, and parameter definitions for score editors.
 The score can span up to 45 seconds of music, with up to 60 seconds in
 the complete buffer including release tails. Sample rates range from
 8,000 to 48,000 Hz. Unsupported instruments, routing, assets, master chains

@@ -6,6 +6,7 @@
  * and the DC blocker. Rates are per second and every random draw comes from
  * the voice's `Rng`, in a fixed order, so renders are byte-identical.
  */
+import { Water, FieldCalls, CountryRoad } from "./nature.ts";
 import type { TextureType } from "../../../core/texture.ts";
 import { Brown, Drift, Hp1, Lp1, Pink, polyBlep, Rng, Svf } from "./dsp.ts";
 
@@ -1169,5 +1170,14 @@ export function makeSource(
       return new Data(rng, sampleRate);
     case "air":
       return new Air(rng, sampleRate);
+    case "ocean":
+    case "stream":
+    case "waterfall":
+      return new Water(type, rng, sampleRate);
+    case "crickets":
+    case "birds":
+      return new FieldCalls(type, rng, sampleRate);
+    case "country-road":
+      return new CountryRoad(rng, sampleRate);
   }
 }

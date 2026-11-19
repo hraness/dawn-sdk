@@ -29,6 +29,17 @@ export type SdkChange = Readonly<{
 
 export const SDK_CHANGES: readonly SdkChange[] = Object.freeze([
   {
+    sdk: "1.55.0",
+    dawn: "0.63.0",
+    changed: [
+      {
+        symbol: "TextureType",
+        note: "Accepts ocean, stream, waterfall, crickets, birds and country-road.",
+      },
+    ],
+    render: "unchanged",
+  },
+  {
     sdk: "1.54.0",
     dawn: "0.63.0",
     added: [

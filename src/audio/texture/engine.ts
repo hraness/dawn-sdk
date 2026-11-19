@@ -58,6 +58,12 @@ export const TEXTURE_TRIM: Readonly<Record<TextureType, number>> =
     crowd: 1.564,
     data: 0.33,
     air: 0.374,
+    ocean: 0.479,
+    stream: 0.375,
+    waterfall: 0.312,
+    crickets: 0.672,
+    birds: 0.401,
+    "country-road": 1.322,
   });
 
 /** Types that always sit in their FDN (the space is the sound). */

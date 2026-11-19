@@ -28,7 +28,7 @@
  */
 
 /** SDK release; DAWN refreshes the vendored copy when its own is newer. */
-export const SDK_VERSION = "1.54.0";
+export const SDK_VERSION = "1.55.0";
 /** Major of `SDK_VERSION`; `dawn.json` records it as `sdk`. */
 export const SDK_MAJOR = 1;
 
@@ -2625,7 +2625,13 @@ export type TextureType =
   | "city"
   | "crowd"
   | "data"
-  | "air";
+  | "air"
+  | "ocean"
+  | "stream"
+  | "waterfall"
+  | "crickets"
+  | "birds"
+  | "country-road";
 
 const TEXTURE_TYPE_WORDS: readonly string[] = Object.freeze([
   "room",
@@ -2638,6 +2644,12 @@ const TEXTURE_TYPE_WORDS: readonly string[] = Object.freeze([
   "crowd",
   "data",
   "air",
+  "ocean",
+  "stream",
+  "waterfall",
+  "crickets",
+  "birds",
+  "country-road",
 ]);
 const TEXTURE_MOTION_WORDS: readonly string[] = Object.freeze([
   "steady",
