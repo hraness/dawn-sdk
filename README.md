@@ -366,3 +366,49 @@ contributions are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md) and
 ## License
 
 [MIT](LICENSE). Sounds and collections you make with it are yours to license.
+
+## Sing a vocal score
+
+With the matching DAWN CLI installed and its local voice prepared by
+`dawn setup --install`, render a score in an existing project directory.
+
+```ts
+import type { VocalScore } from "@hraness/dawn-sdk/vocals";
+import { localVocals } from "@hraness/dawn-sdk/vocals/local";
+
+const vocals = localVocals({ projectRoot: "./my-song" });
+const score: VocalScore = {
+  version: 1,
+  bpm: 120,
+  seed: 17,
+  human: 0.2,
+  phrases: [
+    {
+      id: "chorus",
+      beats: 4,
+      notes: [
+        { syl: "read", spokenAs: "red", beat: 0, len: 1, midi: 64 },
+        { syl: "~", beat: 1, len: 2, midi: 67 },
+      ],
+    },
+  ],
+};
+const result = vocals.validate(score);
+if (!result.ok) throw new Error(JSON.stringify(result.diagnostics));
+const take = await vocals.render(score);
+console.log(take.wavPath, take.sha256);
+```
+
+The portable `/vocals` entry works in browser editors. Call
+`validateVocalScore(input)` there. Use `createVocals([provider])` to supply a
+renderer with a list of voices and a `render(resolvedScore, signal)` method.
+Each voice advertises its ID, provider version, language and supported controls.
+Discover registered voices with `vocals.voices.list()`. The `/vocals/local`
+entry runs the installed CLI from a native host.
+
+Write one syllable per note, a trailing hyphen to join syllables into one word,
+and `~` to carry its vowel. An optional `spokenAs` supplies the spelling read
+by the voice while preserving the written lyric. A phrase ID and song seed
+determine its performance seed. Set a phrase's own seed to pin a particular
+variation. Take slice boundaries are fractions of WAV duration. Keep the take
+and its SHA-256 for byte-exact playback across machines.

@@ -35,6 +35,8 @@
     "./composer": "./core/composer-plugin.ts",
     "./render": "./src/renderer/cli.ts",
     "./browser": "./src/renderer/browser.ts",
+    "./vocals": "./core/vocal-score.ts",
+    "./vocals/local": "./src/vocals/local-provider.ts",
     "./ui": "./core/ui/index.ts",
     "./ui/styles.css": "./core/ui/controls.css",
     "./score": "./core/score.ts",

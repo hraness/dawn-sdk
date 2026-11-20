@@ -7,6 +7,8 @@
     "core/palette.ts",
     "core/sdk/v1.ts",
     "core/ui/index.ts",
+    "core/vocal-score.ts",
+    "src/vocals/local-provider.ts",
     "src/palette/main.ts",
     "core/composer-plugin.ts",
     "src/composer-plugin/main.ts",
@@ -16,7 +18,7 @@
     "src/project/main.ts"
   ],
   "publication": "public: github.com/hraness/dawn-sdk, npm @hraness/dawn-sdk",
-  "scope": "project format and tools (init, check, lint, migrate, link, open, comments), the score diff, the lint engine and rules, palette, collection and composer plug-in authoring, score editor controls and icons, score SDK and offline renderer; not DAWN's composer or its lint calibration",
+  "scope": "project format and tools (init, check, lint, migrate, link, open, comments), the score diff, the lint engine and rules, palette, collection and composer plug-in authoring, score editor controls and icons, vocal scores and host providers, score SDK and offline renderer; not DAWN's composer or its lint calibration",
   "admission": {
     "publicationApproved": true,
     "approval": "owner, 2026-11-15: publish as MIT; sound presets confirmed original; publish the renderer. owner, 2026-11-17: check, migrate, init, the link codec and comments are MIT. owner, 2026-11-18: the score diff and the lint engine are MIT; DAWN's lint calibration is not. owner, 2026-11-20: publish reusable DAWN instrument drawings, score editor and parameter controls in the SDK for Sleepyland",
@@ -1131,6 +1133,17 @@
       }
     },
     {
+      "path": "core/vocal-score.ts",
+      "bytes": 10261,
+      "sha256": "9bc6261aeffe71a8be66ceb700b10a914f0972c65f0e8928d9b2bf77e228beb1",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/vocal-score.ts",
+        "sourceSha256": "9bc6261aeffe71a8be66ceb700b10a914f0972c65f0e8928d9b2bf77e228beb1",
+        "adaptation": null
+      }
+    },
+    {
       "path": "core/vocoder.ts",
       "bytes": 15582,
       "sha256": "7ac2c0fca237c00bc235e947d9d84d77dc47699fa4ce674716e00c15cae8e51e",
@@ -1308,8 +1321,8 @@
     },
     {
       "path": "package.json",
-      "bytes": 1647,
-      "sha256": "714372ca33de7022b586ab9c8cd8520785a348961a2ca9f695bb6abb863adc78",
+      "bytes": 1744,
+      "sha256": "7a17bea3922b0733a2bf0380e92cec07293a9425e272997b4eb4aef10ed82fc2",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
@@ -1317,8 +1330,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 15643,
-      "sha256": "07098710bdacf4da2c79f5f3d0a6026499097d7250469fed785410484b05bc5d",
+      "bytes": 17349,
+      "sha256": "ca5ede380e2e090e0e0b758b42bc575182a9a1d290c6d5f8545a8b60369e07d3",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
@@ -3664,6 +3677,17 @@
       "provenance": {
         "sourcePath": "src/version.ts",
         "sourceSha256": "9f8e4c675abb6cd39cb235df43c2e3e6bf3f12f08eacf0f8cbddc4fbe2767853",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/vocals/local-provider.ts",
+      "bytes": 2159,
+      "sha256": "637e1786896a6acd5bd3d696ffba36f10e79c21518d6ff98890058b30c423bc9",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/vocals/local-provider.ts",
+        "sourceSha256": "637e1786896a6acd5bd3d696ffba36f10e79c21518d6ff98890058b30c423bc9",
         "adaptation": null
       }
     },
