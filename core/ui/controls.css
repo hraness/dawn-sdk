@@ -1,0 +1,98 @@
+/* SPDX-License-Identifier: MIT */
+/* A compact, theme-inheriting default. Import @hraness/dawn-sdk/ui/styles.css
+   to use it, or style these component classes in your own application. */
+.dawn-piano-roll {
+  display: grid;
+  grid-template-columns: 3em minmax(0, 1fr);
+  grid-template-rows: 1.6em minmax(0, 1fr);
+  block-size: 16em;
+  overflow: hidden;
+  border: 1px solid currentColor;
+}
+.dawn-piano-roll .roll-beats {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  overflow: hidden;
+}
+.dawn-piano-roll .roll-beats span {
+  overflow: hidden;
+  padding-inline-start: 0.25em;
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+.dawn-piano-roll .bar-start {
+  font-weight: 700;
+}
+.dawn-piano-roll .roll-axis {
+  display: grid;
+  grid-auto-rows: 1fr;
+  min-block-size: 0;
+}
+.dawn-piano-roll .roll-axis div {
+  min-block-size: 0;
+  overflow: hidden;
+  font-size: 0.7em;
+}
+.dawn-piano-roll .black-key {
+  background: color-mix(in srgb, currentColor 20%, transparent);
+}
+.dawn-piano-roll .roll-plot {
+  position: relative;
+  overflow: hidden;
+  --grid-line: color-mix(in srgb, currentColor 18%, transparent);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size:
+    var(--beat-width) 100%,
+    100% var(--row-height);
+}
+.dawn-piano-roll .octave-line {
+  position: absolute;
+  inset-inline: 0;
+  border-top: 1px solid var(--grid-line);
+  pointer-events: none;
+}
+.dawn-piano-roll .roll-note {
+  position: absolute;
+  box-sizing: border-box;
+  min-inline-size: 2px;
+  block-size: var(--row-height);
+  padding: 0;
+  border: 1px solid Canvas;
+  background: currentColor;
+  color: inherit;
+}
+.dawn-piano-roll .roll-note:is(:focus-visible, [aria-pressed="true"]) {
+  outline: 2px solid Highlight;
+  z-index: 1;
+}
+.dawn-parameter {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+  font: inherit;
+}
+.dawn-parameter [data-part="label"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+}
+.dawn-parameter [data-part="control"] {
+  min-inline-size: 0;
+  color: inherit;
+  font: inherit;
+}
+.dawn-parameter [data-part="rail"] {
+  flex: 1;
+  min-inline-size: 3em;
+}
+.dawn-parameter [type="range"] {
+  inline-size: 100%;
+  margin: 0;
+  accent-color: currentColor;
+}
+.dawn-parameter [data-part="value"] {
+  font-variant-numeric: tabular-nums;
+}

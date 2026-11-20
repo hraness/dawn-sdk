@@ -1,11 +1,12 @@
 {
   "schema": "dawn.extension-source-candidate/v1",
-  "version": "0.65.0",
+  "version": "0.66.0",
   "entrypoints": [
     "core/collection.ts",
     "src/collection/main.ts",
     "core/palette.ts",
     "core/sdk/v1.ts",
+    "core/ui/index.ts",
     "src/palette/main.ts",
     "core/composer-plugin.ts",
     "src/composer-plugin/main.ts",
@@ -15,10 +16,10 @@
     "src/project/main.ts"
   ],
   "publication": "public: github.com/hraness/dawn-sdk, npm @hraness/dawn-sdk",
-  "scope": "project format and tools (init, check, lint, migrate, link, open, comments), the score diff, the lint engine and rules, palette, collection and composer plug-in authoring, score SDK and offline renderer; not DAWN's composer or its lint calibration",
+  "scope": "project format and tools (init, check, lint, migrate, link, open, comments), the score diff, the lint engine and rules, palette, collection and composer plug-in authoring, score editor controls and icons, score SDK and offline renderer; not DAWN's composer or its lint calibration",
   "admission": {
     "publicationApproved": true,
-    "approval": "owner, 2026-11-15: publish as MIT; sound presets confirmed original; publish the renderer. owner, 2026-11-17: check, migrate, init, the link codec and comments are MIT. owner, 2026-11-18: the score diff and the lint engine are MIT; DAWN's lint calibration is not",
+    "approval": "owner, 2026-11-15: publish as MIT; sound presets confirmed original; publish the renderer. owner, 2026-11-17: check, migrate, init, the link codec and comments are MIT. owner, 2026-11-18: the score diff and the lint engine are MIT; DAWN's lint calibration is not. owner, 2026-11-20: publish reusable DAWN instrument drawings, score editor and parameter controls in the SDK for Sleepyland",
     "licenseBasis": "MIT, declared by core/sdk/LICENSE and the SPDX line in each source file, and by the owner; the studio sounds are CC0-1.0"
   },
   "files": [
@@ -361,12 +362,12 @@
     },
     {
       "path": "core/fx.ts",
-      "bytes": 55829,
-      "sha256": "1656d8ba90c2b26ffbe32e5d35a8d793e0c5d52731e8a0e5a0955a89283b253b",
+      "bytes": 52767,
+      "sha256": "b7604bd601458506c4ba17f04d9b937750bfb572c98bead77df0cbc4d9b436c0",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/fx.ts",
-        "sourceSha256": "1656d8ba90c2b26ffbe32e5d35a8d793e0c5d52731e8a0e5a0955a89283b253b",
+        "sourceSha256": "b7604bd601458506c4ba17f04d9b937750bfb572c98bead77df0cbc4d9b436c0",
         "adaptation": null
       }
     },
@@ -393,6 +394,17 @@
       }
     },
     {
+      "path": "core/icons/instruments.ts",
+      "bytes": 6019,
+      "sha256": "fc1526fa535ad13103f5f6abcdc8068853c69cbf5e4c243611673b709dfde9c6",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/icons/instruments.ts",
+        "sourceSha256": "fc1526fa535ad13103f5f6abcdc8068853c69cbf5e4c243611673b709dfde9c6",
+        "adaptation": null
+      }
+    },
+    {
       "path": "core/ids.ts",
       "bytes": 1752,
       "sha256": "e56c39344dbf685623af00f4426af67ffe50bf68fed3423cfa396ab67a4bfdc9",
@@ -405,12 +417,12 @@
     },
     {
       "path": "core/instruments.ts",
-      "bytes": 19062,
-      "sha256": "067b5e4cdb7a4674fe246b320613baf647b64c7008ed0cd659def616e7dae7c5",
+      "bytes": 19121,
+      "sha256": "2cbd279e1f9288dcb2b1a979cdbe62a4e8540d6b2bdaca90a5f62a37167247f5",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/instruments.ts",
-        "sourceSha256": "067b5e4cdb7a4674fe246b320613baf647b64c7008ed0cd659def616e7dae7c5",
+        "sourceSha256": "2cbd279e1f9288dcb2b1a979cdbe62a4e8540d6b2bdaca90a5f62a37167247f5",
         "adaptation": null
       }
     },
@@ -932,6 +944,17 @@
       }
     },
     {
+      "path": "core/space-effect-params.ts",
+      "bytes": 3249,
+      "sha256": "93aae1f9eca7223e9d17ca947393308ef42cd40693587cbf3115ccc10c9f8cdb",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/space-effect-params.ts",
+        "sourceSha256": "93aae1f9eca7223e9d17ca947393308ef42cd40693587cbf3115ccc10c9f8cdb",
+        "adaptation": null
+      }
+    },
+    {
       "path": "core/strings.ts",
       "bytes": 25490,
       "sha256": "43326660264c99808b5cdf9c249dd780c5455e87dcbb4fdb40d2bc4aeadea16b",
@@ -1016,6 +1039,94 @@
       "provenance": {
         "sourcePath": "core/tuning.ts",
         "sourceSha256": "e28a0a30b20cd3f186af4b4ea4c464ee532a23c8c3a9de24a753d40b69a0a8e1",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/ui/controls.css",
+      "bytes": 2389,
+      "sha256": "1f071e2bd2512312f366771482a0fd6e04b6e5ff2553c92a1c2ac3f30f2669d5",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/ui/controls.css",
+        "sourceSha256": "1f071e2bd2512312f366771482a0fd6e04b6e5ff2553c92a1c2ac3f30f2669d5",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/ui/icons.test.ts",
+      "bytes": 4163,
+      "sha256": "a704c6b1557e893853dee8ae1706a5c2a57ca92b9a9f47b0cab421a840d99795",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/ui/icons.test.ts",
+        "sourceSha256": "a704c6b1557e893853dee8ae1706a5c2a57ca92b9a9f47b0cab421a840d99795",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/ui/icons.ts",
+      "bytes": 10251,
+      "sha256": "a97ae2af61464f45838e4f8b3c1cd3fcc5141610452c38de2b97b888b33a830b",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/ui/icons.ts",
+        "sourceSha256": "a97ae2af61464f45838e4f8b3c1cd3fcc5141610452c38de2b97b888b33a830b",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/ui/index.ts",
+      "bytes": 203,
+      "sha256": "b6cbbd327829a57a1be5666e9ae2db0bc2c68fd7cd3d714b9ffd47ab372844bc",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/ui/index.ts",
+        "sourceSha256": "b6cbbd327829a57a1be5666e9ae2db0bc2c68fd7cd3d714b9ffd47ab372844bc",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/ui/parameter-control.test.ts",
+      "bytes": 3478,
+      "sha256": "c3ddf15ec23762c9743c8b9513b807d6402f0b8c0270436c833e957596ce7746",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/ui/parameter-control.test.ts",
+        "sourceSha256": "c3ddf15ec23762c9743c8b9513b807d6402f0b8c0270436c833e957596ce7746",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/ui/parameter-control.ts",
+      "bytes": 8843,
+      "sha256": "90ba42e34f603c14fef2426fac1097d7069f13266e3a42cc9c0098174b3ea745",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/ui/parameter-control.ts",
+        "sourceSha256": "90ba42e34f603c14fef2426fac1097d7069f13266e3a42cc9c0098174b3ea745",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/ui/piano-roll.test.ts",
+      "bytes": 3566,
+      "sha256": "e01cfa0703982921d605fb0a5760f10eb1e9a140fd52cd7376e73b4d55d4147f",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/ui/piano-roll.test.ts",
+        "sourceSha256": "e01cfa0703982921d605fb0a5760f10eb1e9a140fd52cd7376e73b4d55d4147f",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "core/ui/piano-roll.ts",
+      "bytes": 9354,
+      "sha256": "642200513206a4307a0937a7ebfdda7deb6d920ac8adb3932937fbaad6bd35b4",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "core/ui/piano-roll.ts",
+        "sourceSha256": "642200513206a4307a0937a7ebfdda7deb6d920ac8adb3932937fbaad6bd35b4",
         "adaptation": null
       }
     },
@@ -1197,8 +1308,8 @@
     },
     {
       "path": "package.json",
-      "bytes": 1528,
-      "sha256": "659506686ccf69362a712a9aa86db97399a10e4f5f94702d73708a1a0b96b61c",
+      "bytes": 1647,
+      "sha256": "ac2c9d847456af77f7ea97104257f3872141115f7459a5dc4d5830256353137e",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
@@ -1206,8 +1317,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 13787,
-      "sha256": "9cb9aa782c2d093d7a86327935155e1017aa3390b0d32f8bd57490de42e3781a",
+      "bytes": 15149,
+      "sha256": "27723450204791232349c19b08dfbeb2b5246d01fa1f6d4a9844729f927fb627",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
@@ -2717,6 +2828,28 @@
       "provenance": {
         "sourcePath": "src/composer-plugin/main.ts",
         "sourceSha256": "6ce2cf7970c14cf747fe8110d24a9eb2bc4a8b62353de6babb1b94ec3c17b49d",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/doc/format.test.ts",
+      "bytes": 15628,
+      "sha256": "5c755218efb11ab95ddf0269c11b1fa6493fceb53eee634061733ee7022f2b46",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/doc/format.test.ts",
+        "sourceSha256": "5c755218efb11ab95ddf0269c11b1fa6493fceb53eee634061733ee7022f2b46",
+        "adaptation": null
+      }
+    },
+    {
+      "path": "src/doc/format.ts",
+      "bytes": 37352,
+      "sha256": "3b9088387399ed2f900d0b4be613d4581276b1d5a0dfe0e871244ead3f009c31",
+      "license": "MIT",
+      "provenance": {
+        "sourcePath": "src/doc/format.ts",
+        "sourceSha256": "3b9088387399ed2f900d0b4be613d4581276b1d5a0dfe0e871244ead3f009c31",
         "adaptation": null
       }
     },

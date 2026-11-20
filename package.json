@@ -1,6 +1,6 @@
 {
   "name": "@hraness/dawn-sdk",
-  "version": "0.65.0",
+  "version": "0.66.0",
   "license": "MIT",
   "type": "module",
   "description": "Build sounds, sound packs and collections for DAWN, write song scores with its TypeScript SDK, and render them to audio",
@@ -35,13 +35,16 @@
     "./composer": "./core/composer-plugin.ts",
     "./render": "./src/renderer/cli.ts",
     "./browser": "./src/renderer/browser.ts",
+    "./ui": "./core/ui/index.ts",
+    "./ui/styles.css": "./core/ui/controls.css",
     "./score": "./core/score.ts",
     "./link": "./core/link/index.ts",
     "./diff": "./core/diff.ts",
     "./lint": "./core/lint/index.ts",
     "./comments": "./core/comments/events.ts",
     "./midi": "./core/midi.ts",
-    "./trace": "./core/trace.ts"
+    "./trace": "./core/trace.ts",
+    "./doc": "./src/doc/format.ts"
   },
   "dependencies": {
     "@jitl/quickjs-wasmfile-release-sync": "0.32.0",

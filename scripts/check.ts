@@ -111,21 +111,29 @@ const score = sdk.song({
 if (typeof score !== "object" || score === null)
   fail("song() returned no score");
 
-const browser = await Bun.build({
-  entrypoints: [
-    fileURLToPath(import.meta.resolve("@hraness/dawn-sdk/browser")),
-  ],
-  target: "browser",
-  minify: true,
-});
-if (!browser.success || browser.outputs.length !== 1)
-  fail("the public browser entry did not bundle on its own");
+for (const entry of ["browser", "ui"]) {
+  const bundle = await Bun.build({
+    entrypoints: [
+      fileURLToPath(import.meta.resolve("@hraness/dawn-sdk/" + entry)),
+    ],
+    target: "browser",
+    minify: true,
+  });
+  if (!bundle.success || bundle.outputs.length !== 1)
+    fail("the public " + entry + " entry did not bundle on its own");
+  if (
+    new Bun.Transpiler({ loader: "js" }).scanImports(
+      await bundle.outputs[0]!.text(),
+    ).length
+  )
+    fail("the " + entry + " bundle contains external imports");
+}
 if (
-  new Bun.Transpiler({ loader: "js" }).scanImports(
-    await browser.outputs[0]!.text(),
-  ).length > 0
+  !existsSync(
+    fileURLToPath(import.meta.resolve("@hraness/dawn-sdk/ui/styles.css")),
+  )
 )
-  fail("the browser bundle contains external imports");
+  fail("the public score editor stylesheet is missing");
 
 const scratch = mkdtempSync(join(tmpdir(), "dawn-sdk-check-"));
 const runIn = (cwd: string, code: number, ...args: string[]) => {

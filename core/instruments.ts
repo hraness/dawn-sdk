@@ -40,7 +40,7 @@ type InstrumentWordRow = Readonly<{
  * Words that keep their pre-0.6 meaning forever: they resolve to
  * themselves, whatever rows the lanes add.
  */
-export const LEGACY_WORDS: readonly string[] = Object.freeze([
+export const LEGACY_WORDS: readonly string[] = /* @__PURE__ */ Object.freeze([
   "piano",
   "pluck",
   "bass",
@@ -60,8 +60,10 @@ export const LEGACY_WORDS: readonly string[] = Object.freeze([
   "lead",
 ]);
 
+type WordRows = readonly InstrumentWordRow[];
+
 /** 0.6 instrument words; each lane appends its own block. */
-export const INSTRUMENT_WORDS: readonly InstrumentWordRow[] = Object.freeze([
+export const INSTRUMENT_WORDS: WordRows = /* @__PURE__ */ Object.freeze([
   // strings (f06-strings): plucked presets of the string engine. Legacy
   // sitar/ebass keep today's voice (`string preset sitar` reaches the
   // engine), jangle is the rig alias (the guitar lane maps its 12string to the
