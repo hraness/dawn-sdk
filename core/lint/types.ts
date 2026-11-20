@@ -12,6 +12,7 @@ export const LINT_RULES = Object.freeze([
   "key.scale",
   "key.clash",
   "key.tuning",
+  "harmony.low-second",
   "harmony.part-rub",
   "harmony.vocal-rub",
   "voice.motion",

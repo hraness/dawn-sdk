@@ -1,6 +1,6 @@
 {
   "schema": "dawn.extension-source-candidate/v1",
-  "version": "0.66.2",
+  "version": "0.66.3",
   "entrypoints": [
     "core/collection.ts",
     "src/collection/main.ts",
@@ -571,45 +571,45 @@
     },
     {
       "path": "core/lint/engine.test.ts",
-      "bytes": 14546,
-      "sha256": "e84937abd358c3be75cd2623c71ef4bbbe0f22c3630e70269bd1552164896a16",
+      "bytes": 18137,
+      "sha256": "25fc94dd7fce2947747bed6cacc6e0bbdba1d9f38552a07a7c617c5cc8f09a0a",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/lint/engine.test.ts",
-        "sourceSha256": "e84937abd358c3be75cd2623c71ef4bbbe0f22c3630e70269bd1552164896a16",
+        "sourceSha256": "25fc94dd7fce2947747bed6cacc6e0bbdba1d9f38552a07a7c617c5cc8f09a0a",
         "adaptation": null
       }
     },
     {
       "path": "core/lint/harmony.ts",
-      "bytes": 14892,
-      "sha256": "6286168ff40938a31637ff39e29d22cac772b6a1e538d82d022006eaa37c23b8",
+      "bytes": 18061,
+      "sha256": "01751259e90540deff6411f86690bb529d4735b4b550262e477b26765b7e6e92",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/lint/harmony.ts",
-        "sourceSha256": "6286168ff40938a31637ff39e29d22cac772b6a1e538d82d022006eaa37c23b8",
+        "sourceSha256": "01751259e90540deff6411f86690bb529d4735b4b550262e477b26765b7e6e92",
         "adaptation": null
       }
     },
     {
       "path": "core/lint/index.ts",
-      "bytes": 8419,
-      "sha256": "da0c9d7a9455bf6bad994998bffb11531cfcf74cf32474af06e669bc324d89ea",
+      "bytes": 8477,
+      "sha256": "64a2f85fbe895f7beb6a74e1c396c925e95a8b5cf3ee88b354be5cb4a46b7358",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/lint/index.ts",
-        "sourceSha256": "da0c9d7a9455bf6bad994998bffb11531cfcf74cf32474af06e669bc324d89ea",
+        "sourceSha256": "64a2f85fbe895f7beb6a74e1c396c925e95a8b5cf3ee88b354be5cb4a46b7358",
         "adaptation": null
       }
     },
     {
       "path": "core/lint/model.ts",
-      "bytes": 23263,
-      "sha256": "ccf3b7bc85b1587cc678cdabb3d5070041e295585384f9f30f824ebd099a16fe",
+      "bytes": 24398,
+      "sha256": "c60a9b6f8f84fa63629812bbffdcbe7b430126db8e824b9ee01831e76370a7e4",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/lint/model.ts",
-        "sourceSha256": "ccf3b7bc85b1587cc678cdabb3d5070041e295585384f9f30f824ebd099a16fe",
+        "sourceSha256": "c60a9b6f8f84fa63629812bbffdcbe7b430126db8e824b9ee01831e76370a7e4",
         "adaptation": null
       }
     },
@@ -626,12 +626,12 @@
     },
     {
       "path": "core/lint/types.ts",
-      "bytes": 5401,
-      "sha256": "aa9c7ee8f7920f2b7b00a4ba2038a5e5b59b1a13b36cf3285ab1450f9314179d",
+      "bytes": 5425,
+      "sha256": "b926283ce82c32ffa14edb6e4a41e3662d7f06c7ea4f9b62682e689b8bfd9618",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/lint/types.ts",
-        "sourceSha256": "aa9c7ee8f7920f2b7b00a4ba2038a5e5b59b1a13b36cf3285ab1450f9314179d",
+        "sourceSha256": "b926283ce82c32ffa14edb6e4a41e3662d7f06c7ea4f9b62682e689b8bfd9618",
         "adaptation": null
       }
     },
@@ -1309,7 +1309,7 @@
     {
       "path": "package.json",
       "bytes": 1647,
-      "sha256": "973e695a5bd96c2dd9afaf2808ceb7cf595e38b01d8010df83088848657b09bf",
+      "sha256": "714372ca33de7022b586ab9c8cd8520785a348961a2ca9f695bb6abb863adc78",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
@@ -1317,8 +1317,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 15292,
-      "sha256": "41497760e12a54701e6a19b53a26d7751c7edae5a571ba098ed33d6bdcf64988",
+      "bytes": 15643,
+      "sha256": "07098710bdacf4da2c79f5f3d0a6026499097d7250469fed785410484b05bc5d",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"

@@ -18,7 +18,7 @@ verifies them and runs none of them.
 Bun 1.3.14 or newer runs the tools. Install a tagged release from GitHub:
 
 ```sh
-bun add github:hraness/dawn-sdk#v0.66.2
+bun add github:hraness/dawn-sdk#v0.66.3
 ```
 
 The same bytes are mirrored to npm as `@hraness/dawn-sdk`. Each
@@ -285,11 +285,16 @@ ok · 0 tracks, 0 notes · types 110 ms · eval 83 ms · score version 1
 - `lint` reads the score without rendering it and reports what is wrong
   with the music, each finding with a rule, a place and a fix: a note
   outside the key or against the bar's chord, a clash held over the bass, a
-  semitone between parts on a strong beat, a sung line outside its register
+  semitone between parts on a strong beat, a sustained low second, a sung line outside its register
   or too fast to say, a stressed syllable on a weak position, a chorus
   thinner than its verse and, with `--album <dir>`, two songs that are too
   alike. It exits 1 on an error; `--json` prints the report. A project's
   `lint.json` declares its chords, its vocal books and what it allows.
+  The `harmony.low-second` warning names both pitches and tracks when a second
+  with its lower note below C3 lasts at least half a beat. From C3 through B3
+  it checks semitones held for a full beat. An octave change or
+  a shorter overlap can separate the parts. A rule-scoped `allow` entry
+  records an intentional cluster.
 - `link` writes the score as a link and `open` turns a link back into a
   project. The link is the whole score: nothing is uploaded.
 - `migrate` shows what an older project needs as a diff and exits 3 when

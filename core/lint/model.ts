@@ -7,6 +7,9 @@
  * pure pass over plain arrays.
  */
 import { chordPitchClasses, parseChord, parseKey, scaleOf } from "../chords.ts";
+import { isDrumInstrument } from "../drums.ts";
+import { resolveInstrumentWord } from "../instruments.ts";
+import { SOUND_ALIASES, SYNTH_SOUNDS } from "../synth.ts";
 import type {
   BookStress,
   LintAllow,
@@ -207,11 +210,39 @@ export function keyScale(key: string): readonly number[] {
   return scaleOf(parsed);
 }
 
-export function isUnpitched(track: ScoreTrack): boolean {
+/** Legacy display convention: drum- and effect-named parts use a hit lane. */
+export function usesHitNotation(track: ScoreTrack): boolean {
   if (track.kit || DRUM_INSTRUMENTS.test(String(track.instrument ?? "")))
     return true;
   if (UNPITCHED_ID.test(track.id)) return true;
   return UNPITCHED_PATCH.test(JSON.stringify(track.patch ?? ""));
+}
+
+/** A note on these sources selects an event rather than its sounding pitch. */
+export function isUnpitched(track: ScoreTrack): boolean {
+  const instrument = track.instrument ?? "";
+  const sound = SOUND_ALIASES[instrument] ?? instrument;
+  if (track.kit || isDrumInstrument(instrument) || instrument === "texture")
+    return true;
+  if (["white", "pink", "brown", "crackle", "z_noise"].includes(sound))
+    return true;
+  // A synth kick or modal frame drum still follows the MIDI note. The track
+  // id is only a hint for older or custom instruments with no known renderer.
+  if (
+    (SYNTH_SOUNDS as readonly string[]).includes(sound) ||
+    [
+      "string",
+      "modal",
+      "wind",
+      "sing",
+      "keys",
+      "wavetable",
+      "sampler",
+    ].includes(instrument) ||
+    resolveInstrumentWord(instrument)
+  )
+    return false;
+  return usesHitNotation(track);
 }
 
 export function sectionKind(name: string): SectionKind {

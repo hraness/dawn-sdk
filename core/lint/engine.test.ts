@@ -7,6 +7,7 @@
  * as they are, and the ones that do are given a calibration.
  */
 import { describe, expect, test } from "bun:test";
+import type { LintConfig } from "./types.ts";
 import { CALIBRATION } from "./calibration.ts";
 import {
   formatFindings,
@@ -140,6 +141,119 @@ const TEST_CALIBRATION: LintCalibration = {
     interlude: { parent: "ballad", calibrated: false, patch: {} },
   },
 };
+
+describe("bass voicings", () => {
+  const rubs = (s: unknown, config: LintConfig = {}) =>
+    lintSong(s, { config, rules: ["harmony"] }).findings.filter(
+      (finding) => finding.rule === "harmony.low-second",
+    );
+
+  test("reports the actual off-grid overlap in the sounding register", () => {
+    const s = score([
+      note("bow", 0, 3.78, 3.32, 38),
+      note("bass", 1, 0.03, 2.56, 36),
+    ]);
+    const findings = rubs(s, { harmony: ["Cadd9", "Cadd9"] });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({
+      severity: "warn",
+      where: { bar: 1, beat: 0.03, track: "bow" },
+      pitch: 38,
+    });
+    expect(findings[0]!.message).toContain(
+      "bass (C2) and bow (D2) overlap for 2.56 beats",
+    );
+  });
+
+  test("catches a chord on one track and counts overlap across a barline", () => {
+    const s = score([
+      note("keys", 0, 3.5, 1, 46),
+      note("keys", 0, 3.75, 0.5, 48),
+    ]);
+    expect(rubs(s)[0]!.message).toContain("keys (Bb2) and keys (C3)");
+    const minor = score([
+      note("keys", 0, 0, 1, 47),
+      note("bow", 0, 0.5, 1, 48),
+    ]);
+    expect(rubs(minor)[0]!.message).toContain("a semitone");
+  });
+
+  test("a lower-middle semitone needs a full beat even when both notes belong to the chord", () => {
+    for (const [low, high, hold, count] of [
+      [55, 56, 1.66, 1],
+      [55, 56, 0.99, 0],
+      [55, 57, 2, 0],
+      [59, 60, 1, 1],
+      [60, 61, 2, 0],
+      [55, 68, 1.66, 0],
+    ] as const) {
+      const s = score([
+        note("tenor", 0, 0.2, 3, low),
+        note("keys", 0, 0.4, hold, high),
+      ]);
+      expect(rubs(s, { harmony: ["Abmaj7"] })).toHaveLength(count);
+    }
+  });
+
+  test("lets short, octave-spaced and upper extensions pass", () => {
+    for (const [lo, hi, at, len] of [
+      [36, 38, 0.8, 2],
+      [36, 38, 1, 1],
+      [36, 50, 0, 1],
+      [48, 50, 0, 1],
+      [36, 36, 0, 1],
+    ]) {
+      expect(
+        rubs(score([note("a", 0, 0, 1, lo!), note("b", 0, at!, len!, hi!)])),
+      ).toEqual([]);
+    }
+  });
+
+  test("honours either track's scoped allowance and reports an unexempt later bar", () => {
+    const s = score([
+      note("piano", 0, 3, 2, 37),
+      note("bass", 0, 3.25, 1.75, 36),
+    ]);
+    const allow = {
+      rule: "harmony.low-second",
+      track: "bass",
+      pcs: ["C"],
+      reason: "deliberate cluster",
+    };
+    expect(rubs(s, { allow: [allow] })).toEqual([]);
+    expect(
+      rubs(s, { allow: [{ ...allow, bars: [0, 1] }] })[0]!.where,
+    ).toMatchObject({ bar: 1, beat: 0 });
+  });
+
+  test("reads the real instruments on drum-named parts and ignores MIDI selectors", () => {
+    const tracks = [
+      { id: "kick", instrument: "sine" },
+      { id: "tom-bell", instrument: "modal", modal: { preset: "bell" } },
+      { id: "shore", instrument: "texture", texture: { type: "ocean" } },
+      { id: "chip", instrument: "texture", texture: { type: "porcelain" } },
+      { id: "hits", instrument: "drumkit" },
+      { id: "air", instrument: "pink" },
+      { id: "snare-legacy" },
+    ];
+    const fixture = score(tracks.map((t) => note(t.id, 0, 0, 1, 37)));
+    const report = lintSong(
+      {
+        ...fixture,
+        tracks,
+        notes: fixture.notes.map((n) => ({ ...n, cents: 45 })),
+      },
+      { rules: ["key"] },
+    );
+    for (const rule of ["key.scale", "key.tuning"])
+      expect(
+        report.findings
+          .filter((f) => f.rule === rule)
+          .map((f) => f.where.track)
+          .sort(),
+      ).toEqual(["kick", "tom-bell"]);
+  });
+});
 
 describe("rules that read no threshold", () => {
   test("a note outside the key is a key.scale error; an allow entry with a reason clears it", () => {
