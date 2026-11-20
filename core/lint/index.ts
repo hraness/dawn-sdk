@@ -20,7 +20,12 @@ import {
   sectionDensity,
   trickRules,
 } from "./arrangement.ts";
-import { keyRules, rubRules, voiceLeadingRules } from "./harmony.ts";
+import {
+  keyRules,
+  lowSecondRules,
+  rubRules,
+  voiceLeadingRules,
+} from "./harmony.ts";
 import { allowMatches, songModel, type SongModel } from "./model.ts";
 import {
   lintStyle,
@@ -80,6 +85,7 @@ type Rule = (
 const RULES: readonly (readonly [RuleGroup[], Rule])[] = [
   [["key"], keyRules],
   [["harmony"], rubRules],
+  [["harmony"], lowSecondRules],
   [["voice"], voiceLeadingRules],
   [["register"], registerRules],
   [["vocal"], silenceRules],

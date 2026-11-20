@@ -147,6 +147,86 @@ export function keyRules(m: SongModel, style: LintStyle, emit: Emit): void {
 }
 
 /**
+ * Sustained seconds below C3 and longer semitones in the octave above.
+ * Compare the written registers,
+ * even where both pitches belong to the chord. A ninth above the bass is a
+ * different voicing. The overlap starts at the later onset, on or off grid.
+ */
+export function lowSecondRules(
+  m: SongModel,
+  _style: LintStyle,
+  emit: Emit,
+): void {
+  const minHold = m.tpb / 2;
+  const notes = [...m.notes, ...m.sung]
+    .filter((n) => n.pitch <= 60 && n.ticks >= minHold && n.velocity > 0)
+    .sort(
+      (a, b) =>
+        a.tick - b.tick || a.pitch - b.pitch || a.track.localeCompare(b.track),
+    );
+  // At each pitch/track the longest active note covers every shorter double.
+  const active = new Map<number, Map<string, Sounding>>();
+  const reported = new Set<string>();
+  const name = (pitch: number) => pcName(pitch) + (Math.floor(pitch / 12) - 1);
+  const rule = "harmony.low-second";
+  for (const n of notes) {
+    const end = n.tick + n.ticks;
+    for (const delta of [-2, -1, 1, 2]) {
+      const nearby = active.get(n.pitch + delta);
+      if (!nearby) continue;
+      for (const [track, other] of nearby) {
+        const until = Math.min(end, other.tick + other.ticks);
+        if (other.tick + other.ticks < n.tick + minHold) {
+          nearby.delete(track);
+          continue;
+        }
+        const low = n.pitch < other.pitch ? n : other;
+        const high = n.pitch < other.pitch ? other : n;
+        if (low.pitch >= 60 || (low.pitch >= 48 && Math.abs(delta) !== 1))
+          continue;
+        const hold = low.pitch < 48 ? minHold : m.tpb;
+        // If the start falls in a deliberate exception, check any remaining
+        // overlap after the exempt bar. Retain short overlaps across a barline.
+        let from = n.tick;
+        while (until - from >= hold) {
+          const bar = Math.floor(from / m.tpBar);
+          if (
+            allowedPc(m, rule, low.track, bar, mod12(low.pitch)) ||
+            allowedPc(m, rule, high.track, bar, mod12(high.pitch))
+          ) {
+            from = (bar + 1) * m.tpBar;
+            continue;
+          }
+          const key = JSON.stringify([
+            bar,
+            low.track,
+            high.track,
+            low.pitch,
+            high.pitch,
+          ]);
+          if (!reported.has(key)) {
+            reported.add(key);
+            emit({
+              rule,
+              severity: "warn",
+              where: where(m, high, from),
+              pitch: high.pitch,
+              message: `${low.track} (${name(low.pitch)}) and ${high.track} (${name(high.pitch)}) overlap for ${((until - from) / m.tpb).toFixed(2)} beats, a ${Math.abs(delta) === 1 ? "semitone" : "whole tone"} in the ${low.pitch < 48 ? "bass" : "lower middle register"}`,
+              fix: `raise ${high.track}'s ${name(high.pitch)} an octave, shorten the overlap, or allow this voicing with a reason`,
+            });
+          }
+          break;
+        }
+      }
+    }
+    const atPitch = active.get(n.pitch) ?? new Map<string, Sounding>();
+    const held = atPitch.get(n.track);
+    if (!held || held.tick + held.ticks < end) atPitch.set(n.track, n);
+    active.set(n.pitch, atPitch);
+  }
+}
+
+/**
  * Simultaneous seconds on strong beats (beats 1 and 3): a note that starts
  * on the beat a semitone (or minor ninth) from another part's note still
  * sounding there, both at least half a beat long. A written part's note
