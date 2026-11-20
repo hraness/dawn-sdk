@@ -195,7 +195,14 @@ class Voice {
     withFdn: boolean,
   ) {
     const rng = new Rng(seed, sr);
-    this.source = makeSource(settings.type, rng, sr, settings.mains);
+    this.source = makeSource(
+      settings.type,
+      rng,
+      sr,
+      settings.mains,
+      plan.length / sr,
+      velocity,
+    );
     const shape = fdnShape(settings.type, settings.distance);
     // The FDN draws from its own stream so the source's draws never shift.
     this.fdn = withFdn

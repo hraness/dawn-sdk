@@ -1166,8 +1166,96 @@ class Air implements Source {
   }
 }
 
-/** Individual bristles or paper creases excite a moving surface and its body. */
-class Friction implements Source {
+/**
+ * A wire fan drawing alternating arcs on a coated snare head. Friction
+ * excites a broad skin resonance and a softer, filtered wire buzz. Brief
+ * notes land with the brush tips; firmer contact brings up two damped head
+ * modes, while a long note keeps the fan against the head through the turn.
+ */
+class SnareBrush implements Source {
+  private readonly skin = new Svf();
+  private readonly wires = new Svf();
+  private readonly wireDamping = new Svf();
+  private readonly headHz: number;
+  private readonly headDecay: number;
+  private readonly rimDecay: number;
+  private readonly bristleDecay: number;
+  private age = 0;
+  private length = 0;
+  private direction = 1;
+  private nextBristles = 0;
+  private bristles = 0;
+  private head = 0;
+  private rim = 0;
+  private angle = 0;
+
+  constructor(
+    private readonly rng: Rng,
+    private readonly sr: number,
+    private readonly heldSeconds: number,
+    private readonly velocity: number,
+  ) {
+    this.headHz = rng.range(177, 191);
+    this.headDecay = Math.exp(-1 / (sr * 0.038));
+    this.rimDecay = Math.exp(-1 / (sr * 0.022));
+    this.bristleDecay = Math.exp(-1 / (sr * 0.009));
+  }
+
+  render(a: Float64Array, b: Float64Array, n: number, c: Controls) {
+    const sr = this.sr;
+    this.skin.set(440 * c.sweep, 1.1, sr);
+    this.wires.set((1250 + 800 * c.wear) * c.sweep, 0.85, sr);
+    this.wireDamping.set((2300 + 1100 * c.wear) * c.sweep, 0.62, sr);
+    // Short strokes emphasize the contact of the tips. Use a continuous
+    // blend so trimming a note by one tick cannot switch its articulation.
+    const dab = Math.max(0, 1 - this.heldSeconds / 0.38);
+    const headAngle = (TAU * this.headHz * Math.sqrt(c.sweep)) / sr;
+    for (let i = 0; i < n; i++) {
+      if (this.age >= this.length && i < c.heldSamples) {
+        const sweepSeconds =
+          (0.77 - 0.39 * c.density) * this.rng.range(0.86, 1.14);
+        this.length = Math.max(
+          1,
+          Math.round(Math.min(this.heldSeconds, sweepSeconds) * sr),
+        );
+        this.age = 0;
+        this.angle = 0;
+        this.direction *= -1;
+        const touch =
+          this.rng.range(0.85, 1.08) * (0.12 + 0.88 * this.velocity);
+        this.head = touch * (0.065 + 0.4 * dab);
+        this.rim = touch * (0.035 + 0.15 * dab);
+      }
+      const phase = Math.min(1, this.age / this.length);
+      const arc = 4 * phase * (1 - phase);
+      const pressure = i < c.heldSamples ? 0.19 + 0.81 * arc : 0;
+      if (--this.nextBristles <= 0) {
+        const speed = (50 + 105 * c.density) * (0.5 + arc);
+        this.nextBristles = (this.rng.range(0.55, 1.45) * sr) / speed;
+        this.bristles = this.rng.range(0.22, 0.62) * pressure;
+      }
+      this.bristles *= this.bristleDecay;
+      const friction = this.rng.noise() * (this.bristles + 0.48 * pressure);
+      const skin = this.skin.process(friction) * 0.8;
+      const wire = this.wires.process(friction);
+      this.wireDamping.process(wire);
+      const sweep = this.wireDamping.low * (0.62 + 0.28 * c.wear);
+      const tap =
+        this.head * Math.sin(this.angle) +
+        this.rim * Math.sin(1.68 * this.angle);
+      this.angle += headAngle;
+      this.age++;
+      this.head *= this.headDecay;
+      this.rim *= this.rimDecay;
+      const pan = this.direction * (phase - 0.5) * 0.42;
+      a[i] = tap + skin + sweep * (1 - pan);
+      b[i] = tap + skin + sweep * (1 + pan);
+    }
+  }
+}
+
+/** A sheet buckles at a succession of creases as it moves. */
+class Paper implements Source {
   private readonly surface = new Svf();
   private readonly body = new Svf();
   private nextStroke = 0;
@@ -1179,25 +1267,18 @@ class Friction implements Source {
   private readonly grainDecay: number;
 
   constructor(
-    private readonly paper: boolean,
     private readonly rng: Rng,
     private readonly sr: number,
   ) {
-    this.grainDecay = Math.exp(-1 / (sr * (paper ? 0.0012 : 0.0032)));
+    this.grainDecay = Math.exp(-1 / (sr * 0.0012));
   }
 
   render(a: Float64Array, b: Float64Array, n: number, c: Controls) {
-    const paper = this.paper;
-    this.surface.set(
-      (paper ? 3100 : 1850) * (0.7 + c.wear) * c.sweep,
-      0.85,
-      this.sr,
-    );
-    this.body.set((paper ? 840 : 270) * c.sweep, paper ? 3.8 : 1.65, this.sr);
+    this.surface.set(3100 * (0.7 + c.wear) * c.sweep, 0.85, this.sr);
+    this.body.set(840 * c.sweep, 3.8, this.sr);
     for (let i = 0; i < n; i++) {
       if (--this.nextStroke <= 0 && i < c.heldSamples) {
-        this.duration =
-          this.rng.range(paper ? 0.12 : 0.19, paper ? 0.38 : 0.46) * this.sr;
+        this.duration = this.rng.range(0.12, 0.38) * this.sr;
         this.nextStroke =
           this.duration + this.rng.wait(1.6 + 7 * c.density) * this.sr;
         this.age = 0;
@@ -1208,20 +1289,17 @@ class Friction implements Source {
       const pressure = Math.sin(Math.PI * phase);
       let buckle = 0;
       if (phase < 1 && --this.nextGrain <= 0) {
-        const rate =
-          (paper ? 28 : 145) * (0.25 + pressure * (0.55 + c.density));
+        const rate = 28 * (0.25 + pressure * (0.55 + c.density));
         this.nextGrain = Math.max(1, this.rng.wait(rate) * this.sr);
         this.grain += this.rng.range(0.18, 0.75) * pressure;
-        buckle = this.rng.bi() * pressure * (paper ? 2.4 : 0.5);
+        buckle = this.rng.bi() * pressure * 2.4;
       }
       this.grain *= this.grainDecay;
       const noise = this.rng.noise();
       const scrape = this.surface.process(
-        noise * (this.grain + pressure * (paper ? 0.07 : 0.28)),
+        noise * (this.grain + pressure * 0.07),
       );
-      const body = this.body.process(
-        buckle + noise * pressure * (paper ? 0.11 : 0.35),
-      );
+      const body = this.body.process(buckle + noise * pressure * 0.11);
       const movement = this.pan + (phase - 0.5) * 0.22;
       a[i] = body + scrape * (1 - movement);
       b[i] = body + scrape * (1 + movement);
@@ -1293,11 +1371,14 @@ export function makeSource(
   rng: Rng,
   sampleRate: number,
   mains: number,
+  heldSeconds: number,
+  velocity: number,
 ): Source {
   switch (type) {
     case "brush":
+      return new SnareBrush(rng, sampleRate, heldSeconds, velocity);
     case "paper":
-      return new Friction(type === "paper", rng, sampleRate);
+      return new Paper(rng, sampleRate);
     case "porcelain":
       return new Porcelain(rng, sampleRate);
     case "room":

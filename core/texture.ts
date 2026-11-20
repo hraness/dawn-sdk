@@ -339,7 +339,7 @@ export const TEXTURE_LANE_PARAMS: readonly Readonly<{
 export const MAX_TEXTURE_VOICES = 8;
 
 /** Joins the stem cache key so a DSP change re-renders texture stems. */
-export const TEXTURE_ENGINE_VERSION = 2;
+export const TEXTURE_ENGINE_VERSION = 3;
 
 /**
  * A texture track's ring-out after its last note-off, in seconds: the
