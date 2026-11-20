@@ -1,6 +1,6 @@
 {
   "schema": "dawn.extension-source-candidate/v1",
-  "version": "0.66.0",
+  "version": "0.66.1",
   "entrypoints": [
     "core/collection.ts",
     "src/collection/main.ts",
@@ -890,12 +890,12 @@
     },
     {
       "path": "core/sdk/v1.ts",
-      "bytes": 609565,
-      "sha256": "1231b1a6c638427265b13e9e8f9de9ba7a666c96d12c4bb3f108133e2dfa62db",
+      "bytes": 609624,
+      "sha256": "60ac0295ccaf82c2ac386f57c9ac7c54a8b7733f3d6451f5a89343982d8132c4",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/sdk/v1.ts",
-        "sourceSha256": "1231b1a6c638427265b13e9e8f9de9ba7a666c96d12c4bb3f108133e2dfa62db",
+        "sourceSha256": "60ac0295ccaf82c2ac386f57c9ac7c54a8b7733f3d6451f5a89343982d8132c4",
         "adaptation": null
       }
     },
@@ -1309,7 +1309,7 @@
     {
       "path": "package.json",
       "bytes": 1647,
-      "sha256": "ac2c9d847456af77f7ea97104257f3872141115f7459a5dc4d5830256353137e",
+      "sha256": "1cd02c683a1fc7f1183fc1027794f2d0556cf0eba308c7de58921463b0ec35b3",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
@@ -1318,7 +1318,7 @@
     {
       "path": "README.md",
       "bytes": 15149,
-      "sha256": "27723450204791232349c19b08dfbeb2b5246d01fa1f6d4a9844729f927fb627",
+      "sha256": "bb158a5cf1d8971bc0cae136be641c9fa915a5dd6b9f85bb70168c85bfea96de",
       "license": "MIT",
       "provenance": {
         "generatedBy": "scripts/export-extension-sdk.ts"
