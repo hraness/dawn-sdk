@@ -38,6 +38,7 @@ const REPOSITORY_FILES = new Set([
   "SECURITY.md",
   "scripts/check.ts",
   "scripts/render-fixture.ts",
+  ".github/actionlint.yaml",
   ".github/workflows/ci.yml",
   ".github/workflows/release.yml",
   ".github/workflows/auto-tag.yml",

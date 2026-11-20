@@ -26,7 +26,7 @@ jobs:
     # both receive these exact bytes.
     name: Build
     if: github.event_name == 'push'
-    runs-on: ubuntu-24.04
+    runs-on: hraness-cf
     timeout-minutes: 15
     permissions:
       contents: read
@@ -103,7 +103,7 @@ jobs:
     name: GitHub Release
     if: github.event_name == 'push'
     needs: build
-    runs-on: ubuntu-24.04
+    runs-on: hraness-cf
     timeout-minutes: 5
     permissions:
       contents: write
@@ -148,7 +148,7 @@ jobs:
     if: >-
       always() && (github.event_name == 'workflow_dispatch' ||
       needs.publish.result == 'success')
-    runs-on: ubuntu-24.04
+    runs-on: hraness-cf
     timeout-minutes: 15
     permissions:
       contents: read
