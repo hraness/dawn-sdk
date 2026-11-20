@@ -1235,14 +1235,17 @@ class SnareBrush implements Source {
         this.bristles = this.rng.range(0.22, 0.62) * pressure;
       }
       this.bristles *= this.bristleDecay;
-      const friction = this.rng.noise() * (this.bristles + 0.48 * pressure);
+      const noise = this.rng.noise();
+      const friction = noise * (this.bristles + 0.48 * pressure);
       const skin = this.skin.process(friction) * 0.8;
-      const wire = this.wires.process(friction);
+      // The snares beneath the shell buzz briefly in sympathy with a tip
+      // stroke, including the interval after the brush lifts.
+      const headWave = Math.sin(this.angle);
+      const rattle = this.head * (0.5 + 0.8 * Math.abs(headWave));
+      const wire = this.wires.process(friction + noise * rattle);
       this.wireDamping.process(wire);
       const sweep = this.wireDamping.low * (0.62 + 0.28 * c.wear);
-      const tap =
-        this.head * Math.sin(this.angle) +
-        this.rim * Math.sin(1.68 * this.angle);
+      const tap = this.head * headWave + this.rim * Math.sin(1.68 * this.angle);
       this.angle += headAngle;
       this.age++;
       this.head *= this.headDecay;

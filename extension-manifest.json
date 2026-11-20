@@ -2437,12 +2437,12 @@
     },
     {
       "path": "src/audio/texture/sources.ts",
-      "bytes": 50436,
-      "sha256": "6c84fef069f4f388ff2697eaed02bb1bddf5f2d0cf2ef5f8d37a89f47fce4e43",
+      "bytes": 50701,
+      "sha256": "8fa27c4a63e4ec483b5e0bf51aafc8bd1dd6ad3bcf4a0b3ac2e382075d509f56",
       "license": "MIT",
       "provenance": {
         "sourcePath": "src/audio/texture/sources.ts",
-        "sourceSha256": "6c84fef069f4f388ff2697eaed02bb1bddf5f2d0cf2ef5f8d37a89f47fce4e43",
+        "sourceSha256": "8fa27c4a63e4ec483b5e0bf51aafc8bd1dd6ad3bcf4a0b3ac2e382075d509f56",
         "adaptation": null
       }
     },
