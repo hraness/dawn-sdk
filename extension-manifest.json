@@ -1088,23 +1088,23 @@
     },
     {
       "path": "core/ui/parameter-control.test.ts",
-      "bytes": 1573,
-      "sha256": "54874c4df6ccfc0a4cef6d6a668c47b81e0815257a611f27685dc547932b9be9",
+      "bytes": 3478,
+      "sha256": "c3ddf15ec23762c9743c8b9513b807d6402f0b8c0270436c833e957596ce7746",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/ui/parameter-control.test.ts",
-        "sourceSha256": "54874c4df6ccfc0a4cef6d6a668c47b81e0815257a611f27685dc547932b9be9",
+        "sourceSha256": "c3ddf15ec23762c9743c8b9513b807d6402f0b8c0270436c833e957596ce7746",
         "adaptation": null
       }
     },
     {
       "path": "core/ui/parameter-control.ts",
-      "bytes": 8230,
-      "sha256": "0e906db9996d5afb25439eb1410562d136cbbf741fd7830788ab8d80ca16a897",
+      "bytes": 8843,
+      "sha256": "90ba42e34f603c14fef2426fac1097d7069f13266e3a42cc9c0098174b3ea745",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/ui/parameter-control.ts",
-        "sourceSha256": "0e906db9996d5afb25439eb1410562d136cbbf741fd7830788ab8d80ca16a897",
+        "sourceSha256": "90ba42e34f603c14fef2426fac1097d7069f13266e3a42cc9c0098174b3ea745",
         "adaptation": null
       }
     },

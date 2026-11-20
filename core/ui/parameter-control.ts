@@ -192,21 +192,35 @@ export function createParameterControl<S extends ParamSpec>(
     input.setAttribute("aria-valuetext", text);
     readout.textContent = text;
   };
+  let preview: number | undefined;
+  let committedThumb = "";
   const syncThumb = () => {
+    preview = undefined;
     input.value = String(scale.toAxis(value));
+    committedThumb = input.value;
     paint();
   };
   // Let the browser own the thumb during a drag. Reassigning its native value
   // from an input event can suppress the final change event in WebKit.
   input.oninput = () => {
-    paint(scale.fromAxis(input.valueAsNumber));
+    preview = scale.fromAxis(input.valueAsNumber);
+    paint(preview);
+  };
+  const commitThumb = () => {
+    if (preview === undefined && input.value === committedThumb) return;
+    const next = preview ?? scale.fromAxis(input.valueAsNumber);
+    const changed = next !== value;
+    value = next;
+    syncThumb();
+    if (changed) change(value);
   };
   input.onpointercancel = syncThumb;
-  input.onchange = () => {
-    value = scale.fromAxis(input.valueAsNumber);
-    syncThumb();
-    change(value);
+  // A WebKit touch tap can emit input and pointerup without a change event.
+  // Other browsers may emit both. Committing the same thumb position is a no-op.
+  input.onpointerup = (event) => {
+    if (event.pointerType === "touch" && preview !== undefined) commitThumb();
   };
+  input.onchange = commitThumb;
   input.onkeydown = (event) => {
     if (event.altKey || event.ctrlKey || event.metaKey || event.isComposing)
       return;

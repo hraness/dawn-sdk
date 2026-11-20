@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: MIT
 import { test, expect } from "bun:test";
 import { TRACK_EFFECT_SPECS } from "../fx.ts";
-import { parameterScale, spaceEffectParameters } from "./parameter-control.ts";
+import {
+  createParameterControl,
+  parameterScale,
+  spaceEffectParameters,
+} from "./parameter-control.ts";
 
 test("effect controls use DAWN's current validation and rendering parameter specifications", () => {
   expect(spaceEffectParameters.delay).toBe(TRACK_EFFECT_SPECS.delay.params);
@@ -32,4 +36,64 @@ test("frequency faders space octaves evenly and nudge in sixths of an octave", (
   expect(() => parameterScale(spaceEffectParameters.delay.mix, 0)).toThrow(
     RangeError,
   );
+});
+
+test("a touch tap commits once with or without a following native change; cancellation restores the committed thumb", () => {
+  // Supply the DOM surface the fader writes. Deliver the native input, pointerup,
+  // change and cancel sequences directly so this also runs in the SDK's Bun suite.
+  let range!: HTMLInputElement;
+  const doc = {
+    createElement(tag: string) {
+      const node = {
+        dataset: {},
+        style: { setProperty() {} },
+        append() {},
+        setAttribute() {},
+        value: "",
+        get valueAsNumber() {
+          return Number(this.value);
+        },
+      };
+      if (tag === "input") range = node as unknown as HTMLInputElement;
+      return node;
+    },
+  } as unknown as Document;
+  const edits: number[] = [];
+  createParameterControl(doc, {
+    label: "Room",
+    spec: spaceEffectParameters.reverb.mix,
+    value: 0.307,
+    presentation: "fader",
+    step: 0.01,
+    onChange: (v) => edits.push(v),
+  });
+  const preview = (nativeValue: string) => {
+    range.value = nativeValue;
+    range.oninput!.call(range, { type: "input" } as InputEvent);
+    expect(range.value).toBe(nativeValue); // Until release, the native thumb owns its axis.
+  };
+  const release = () =>
+    range.onpointerup!.call(range, { pointerType: "touch" } as PointerEvent);
+  const change = () => range.onchange!.call(range, new Event("change"));
+
+  release();
+  change();
+  expect(range.value).toBe("0.307");
+  expect(edits).toEqual([]);
+  preview("0.426");
+  expect(edits).toEqual([]);
+  release();
+  expect(edits).toEqual([0.43]);
+  change();
+  expect(edits).toEqual([0.43]);
+  preview("0.517");
+  change();
+  release();
+  expect(edits).toEqual([0.43, 0.52]);
+  preview("0.725");
+  range.onpointercancel!.call(range, {} as PointerEvent);
+  release();
+  change();
+  expect(range.value).toBe("0.52");
+  expect(edits).toEqual([0.43, 0.52]);
 });
