@@ -259,7 +259,7 @@ export function createPianoRollGrid(
     !host.hasAttribute("aria-label") &&
     !host.hasAttribute("aria-labelledby")
   ) {
-    host.setAttribute("aria-label", events ? "Sound events" : "Piano roll");
+    host.setAttribute("aria-label", "Score");
   }
   host.replaceChildren(corner, markers, axis, plot);
   const place = (element: HTMLElement, note: RollNote) => {

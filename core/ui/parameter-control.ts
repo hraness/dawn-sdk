@@ -15,6 +15,8 @@ export type ParameterControlOptions<S extends ParamSpec> = {
   presentation?: "field" | "fader";
   /** Override the increment of a numeric fader (e.g. 0.01 for percent mix). */
   step?: number;
+  /** Number of minor increments for Page Up and Page Down (default 10). */
+  pageSteps?: number;
   format?: (value: number) => string;
   optionLabel?: (id: string) => string;
   onChange: (value: Value[S["kind"]]) => void;
@@ -157,6 +159,11 @@ export function createParameterControl<S extends ParamSpec>(
     return wrapper;
   }
 
+  const pageSteps = options.pageSteps ?? 10;
+  if (!Number.isSafeInteger(pageSteps) || pageSteps <= 0)
+    throw new RangeError(
+      "A fader page needs a positive integer number of steps",
+    );
   input.type = "range";
   input.min = String(scale.lower);
   input.max = String(scale.upper);
@@ -170,30 +177,34 @@ export function createParameterControl<S extends ParamSpec>(
   readout.className = "fader-value";
   readout.dataset.part = "value";
   readout.setAttribute("aria-hidden", "true");
-  const paint = () => {
-    const axis = scale.toAxis(value);
-    input.value = String(axis);
+  const paint = (displayValue = value) => {
+    const axis = scale.toAxis(displayValue);
     rail.style.setProperty(
       "--fader-fill",
       (100 * (axis - scale.lower)) / (scale.upper - scale.lower) + "%",
     );
     const text =
-      options.format?.(value) ??
-      Number(value.toPrecision(5)) + (spec.unit ? " " + spec.unit : "");
+      options.format?.(displayValue) ??
+      Number(displayValue.toPrecision(5)) + (spec.unit ? " " + spec.unit : "");
     input.setAttribute("aria-valuemin", String(spec.min));
     input.setAttribute("aria-valuemax", String(spec.max));
-    input.setAttribute("aria-valuenow", String(value));
+    input.setAttribute("aria-valuenow", String(displayValue));
     input.setAttribute("aria-valuetext", text);
     readout.textContent = text;
   };
-  // Update the readout during a gesture; commit the score only on change.
-  input.oninput = () => {
-    value = scale.fromAxis(input.valueAsNumber);
+  const syncThumb = () => {
+    input.value = String(scale.toAxis(value));
     paint();
   };
+  // Let the browser own the thumb during a drag. Reassigning its native value
+  // from an input event can suppress the final change event in WebKit.
+  input.oninput = () => {
+    paint(scale.fromAxis(input.valueAsNumber));
+  };
+  input.onpointercancel = syncThumb;
   input.onchange = () => {
     value = scale.fromAxis(input.valueAsNumber);
-    paint();
+    syncThumb();
     change(value);
   };
   input.onkeydown = (event) => {
@@ -209,10 +220,10 @@ export function createParameterControl<S extends ParamSpec>(
         value = scale.nudge(value, -1);
         break;
       case "PageUp":
-        value = scale.nudge(value, 10);
+        value = scale.nudge(value, pageSteps);
         break;
       case "PageDown":
-        value = scale.nudge(value, -10);
+        value = scale.nudge(value, -pageSteps);
         break;
       case "Home":
         value = spec.min;
@@ -224,11 +235,11 @@ export function createParameterControl<S extends ParamSpec>(
         return;
     }
     event.preventDefault();
-    paint();
+    syncThumb();
     change(value);
   };
   rail.append(input);
   wrapper.append(rail, readout);
-  paint();
+  syncThumb();
   return wrapper;
 }

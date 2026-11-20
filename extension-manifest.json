@@ -1099,12 +1099,12 @@
     },
     {
       "path": "core/ui/parameter-control.ts",
-      "bytes": 7699,
-      "sha256": "a924ad26d45f08fb80b46088b8b02d7b068f9810cef0c931307c5bcd2da02001",
+      "bytes": 8230,
+      "sha256": "0e906db9996d5afb25439eb1410562d136cbbf741fd7830788ab8d80ca16a897",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/ui/parameter-control.ts",
-        "sourceSha256": "a924ad26d45f08fb80b46088b8b02d7b068f9810cef0c931307c5bcd2da02001",
+        "sourceSha256": "0e906db9996d5afb25439eb1410562d136cbbf741fd7830788ab8d80ca16a897",
         "adaptation": null
       }
     },
@@ -1121,12 +1121,12 @@
     },
     {
       "path": "core/ui/piano-roll.ts",
-      "bytes": 9385,
-      "sha256": "4c0f234560d9d72e21c43fead86d217fdaeb97943ab2f43be2fddafcbc03f022",
+      "bytes": 9354,
+      "sha256": "642200513206a4307a0937a7ebfdda7deb6d920ac8adb3932937fbaad6bd35b4",
       "license": "MIT",
       "provenance": {
         "sourcePath": "core/ui/piano-roll.ts",
-        "sourceSha256": "4c0f234560d9d72e21c43fead86d217fdaeb97943ab2f43be2fddafcbc03f022",
+        "sourceSha256": "642200513206a4307a0937a7ebfdda7deb6d920ac8adb3932937fbaad6bd35b4",
         "adaptation": null
       }
     },
