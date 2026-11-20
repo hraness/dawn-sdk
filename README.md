@@ -18,7 +18,7 @@ verifies them and runs none of them.
 Bun 1.3.14 or newer runs the tools. Install a tagged release from GitHub:
 
 ```sh
-bun add github:hraness/dawn-sdk#v0.66.0
+bun add github:hraness/dawn-sdk#v0.66.1
 ```
 
 The same bytes are mirrored to npm as `@hraness/dawn-sdk`. Each
