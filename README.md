@@ -18,7 +18,7 @@ verifies them and runs none of them.
 Bun 1.3.14 or newer runs the tools. Install a tagged release from GitHub:
 
 ```sh
-bun add github:hraness/dawn-sdk#v0.65.0
+bun add github:hraness/dawn-sdk#v0.66.0
 ```
 
 The same bytes are mirrored to npm as `@hraness/dawn-sdk`. Each
@@ -80,6 +80,50 @@ The score can span up to 45 seconds of music, with up to 60 seconds in
 the complete buffer including release tails. Sample rates range from
 8,000 to 48,000 Hz. Unsupported instruments, routing, assets, master chains
 and arranged forms raise a score validation error. [Play the open-source browser example](https://sleepy.land/).
+
+## Build a browser score editor
+
+Import the optional editor controls and stylesheet in your browser app. The roll
+uses DAWN note ticks and MIDI pitches. Each note is a button that your app can
+connect to its inspector or audio transport.
+
+```ts
+import {
+  createParameterControl,
+  createPianoRollGrid,
+  parameterIcon,
+  spaceEffectParameters,
+} from "@hraness/dawn-sdk/ui";
+import "@hraness/dawn-sdk/ui/styles.css";
+
+const notes = [{ startTick: 0, durationTicks: 96, pitch: 62, velocity: 0.6 }];
+const host = document.createElement("div");
+const roll = createPianoRollGrid(host, {
+  notes,
+  bars: 1,
+  beatsPerBar: 4,
+  ticksPerBeat: 96,
+});
+for (const note of notes) roll.addNote(note);
+
+const effects = { reverb: { mix: 0.25 } };
+const room = createParameterControl(document, {
+  label: "Room",
+  icon: parameterIcon("reverb.mix"),
+  spec: spaceEffectParameters.reverb.mix,
+  value: effects.reverb.mix,
+  presentation: "fader",
+  onChange: (mix) => {
+    effects.reverb.mix = mix;
+  },
+});
+document.body.append(host, room);
+```
+
+For an instrument label, `instrumentIcon(track)` selects the drawing from the
+track’s instrument and preset. `createIcon(document, name)` returns a decorative
+SVG alongside your label. `DAWN_ICON_PATHS` exposes the same drawings for a
+component framework, canvas or native vector renderer.
 
 ## Write your own palette
 
@@ -255,9 +299,9 @@ ok · 0 tracks, 0 notes · types 110 ms · eval 83 ms · score version 1
 
 Each command prints its messages as DAWN does, so `dawn check` in a message
 is `dawn-project check` here. The score class, the link codec, the score
-diff, the lint, the comment events, MIDI export and the trace envelope are
-also importable: `@hraness/dawn-sdk/score`, `/link`, `/diff`, `/lint`,
-`/comments`, `/midi` and `/trace`.
+diff, the lint, the comment events, MIDI export, the trace envelope and the
+score document reader are also importable: `@hraness/dawn-sdk/score`,
+`/link`, `/diff`, `/lint`, `/comments`, `/midi`, `/trace` and `/doc`.
 
 ```ts
 import { diffScores } from "@hraness/dawn-sdk/diff";
