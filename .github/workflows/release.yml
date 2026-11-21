@@ -148,7 +148,8 @@ jobs:
     if: >-
       always() && (github.event_name == 'workflow_dispatch' ||
       needs.publish.result == 'success')
-    runs-on: hraness-cf
+    # npm trusted publishing requires a GitHub-hosted runner.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
