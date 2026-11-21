@@ -122,12 +122,6 @@ import {
   type SongStyle,
 } from "./style-provenance.ts";
 import {
-  normalizeSongVideo,
-  SongVideoError,
-  type SongVideo,
-} from "./song-video.ts";
-
-import {
   SCORE_VERSION,
   ScoreVersionError,
   upgradeScore,
@@ -1239,8 +1233,6 @@ export type TrackScoreData = Readonly<{
   master?: SongMaster | null;
   /** Which style and seed made the song (core/style-provenance.ts); absent is none. */
   style?: SongStyle | null;
-  /** The song's authored music video (core/song-video.ts); absent is derived. */
-  video?: SongVideo | null;
   /** Song sections (0.5); absent or empty means none. */
   sections?: readonly Section[];
   /** Song form (0.5): the order sections play in; absent plays the score straight through. */
@@ -1282,8 +1274,6 @@ export class TrackScore {
   declare readonly master?: SongMaster;
   /** Absent without a style, so older scores are unchanged. */
   declare readonly style?: SongStyle;
-  /** Absent without an authored video, so older scores are unchanged. */
-  declare readonly video?: SongVideo;
   /** Song sections in bar order; empty when the song has none. */
   readonly sections: readonly Section[];
   /** Song form; empty plays the score straight through. */
@@ -1390,15 +1380,6 @@ export class TrackScore {
       throw error;
     }
     if (style) this.style = style;
-    let video: SongVideo | undefined;
-    try {
-      video = normalizeSongVideo(data.video);
-    } catch (error) {
-      if (error instanceof SongVideoError)
-        throw new ScoreValidationError(error.message, "invalid-score");
-      throw error;
-    }
-    if (video) this.video = video;
     const sections = normalizeSections(data.sections ?? []);
     const form = normalizeForm(data.form ?? [], sections);
     // Sections count bars in one meter; meter changes would move them.
@@ -1545,11 +1526,6 @@ export class TrackScore {
     return new TrackScore({ ...this.toJSON(), style });
   }
 
-  /** Record (or clear, `null`) the song's authored music video. */
-  withVideo(video: SongVideo | null): TrackScore {
-    return new TrackScore({ ...this.toJSON(), video });
-  }
-
   toJSON(): TrackScoreData & { version: typeof SCORE_VERSION } {
     return {
       version: SCORE_VERSION,
@@ -1564,7 +1540,6 @@ export class TrackScore {
       notes: this.notes,
       ...(this.master ? { master: this.master } : {}),
       ...(this.style ? { style: this.style } : {}),
-      ...(this.video ? { video: this.video } : {}),
       ...(this.sections.length > 0 ? { sections: this.sections } : {}),
       ...(this.form.length > 0 ? { form: this.form } : {}),
       ...(this.loopSection === undefined
@@ -1945,11 +1920,6 @@ export type ScoreOperation =
       style: SongStyle | null;
     }>
   | Readonly<{
-      /** The song's authored music video; null clears it. */
-      type: "setVideo";
-      video: SongVideo | null;
-    }>
-  | Readonly<{
       /** Replaces a track's audio clips (0.7); null clears them. */
       type: "setClips";
       trackId: string;
@@ -2026,7 +1996,6 @@ export function applyScoreOperation(
   if (operation.type === "setCalibration")
     return score.withCalibration(operation.calibration);
   if (operation.type === "setStyle") return score.withStyle(operation.style);
-  if (operation.type === "setVideo") return score.withVideo(operation.video);
   if (operation.type === "setSections")
     return score.withSections(
       operation.sections,
@@ -2245,7 +2214,6 @@ export function scoreFromJSON(value: unknown): TrackScore {
     notes: readonly NoteInput[];
     master?: SongMaster;
     style?: SongStyle;
-    video?: SongVideo;
     sections?: readonly Section[];
     form?: readonly FormEntry[];
     loopSection?: string | null;
@@ -2282,9 +2250,6 @@ export function scoreFromJSON(value: unknown): TrackScore {
   // Checked by the constructor (core/style-provenance.ts).
   if (value.style !== undefined && value.style !== null)
     data.style = value.style as SongStyle;
-  // Checked by the constructor (core/song-video.ts).
-  if (value.video !== undefined && value.video !== null)
-    data.video = value.video as SongVideo;
   // Shapes are checked by the constructor (normalizeSections, normalizeForm).
   if (value.sections !== undefined)
     data.sections = optionalArray(value.sections) as readonly Section[];

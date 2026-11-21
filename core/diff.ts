@@ -492,8 +492,6 @@ function songOperations(a: TrackScore, b: TrackScore): ScoreOperation[] {
     emit({ type: "setCalibration", calibration: b.calibration ?? null });
   if (!deepEqual(song.style, b.style))
     emit({ type: "setStyle", style: b.style ?? null });
-  if (!deepEqual(song.video, b.video))
-    emit({ type: "setVideo", video: b.video ?? null });
   if (sectionsDiffer()) setSections();
   if (!deepEqual(song.loop, b.loop))
     emit({ type: "setLoop", loop: b.loop ?? null });

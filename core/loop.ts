@@ -12,7 +12,6 @@ import {
   type Track,
 } from "./score.ts";
 import type { SongMaster } from "./master.ts";
-import type { SongVideo } from "./song-video.ts";
 import type { SongStyle } from "./style-provenance.ts";
 import type { Tuning } from "./tuning.ts";
 
@@ -36,8 +35,6 @@ export type TrackLoopV1 = Readonly<{
   master?: SongMaster;
   /** Which style and seed made the song (quality-08); absent means none. */
   style?: SongStyle;
-  /** The song's authored music video (SDK 1.52.0); absent means derived. */
-  video?: SongVideo;
   /** Song sections (0.5); omitted when the song has none. */
   sections?: readonly Section[];
   /** Song form (0.5); omitted when empty. */
@@ -69,7 +66,6 @@ export function encodeLoopDocument(score: TrackScore): TrackLoopV1 {
     notes: score.notes,
     ...(score.master ? { master: score.master } : {}),
     ...(score.style ? { style: score.style } : {}),
-    ...(score.video ? { video: score.video } : {}),
     ...(score.sections.length > 0 ? { sections: score.sections } : {}),
     ...(score.form.length > 0 ? { form: score.form } : {}),
     ...(score.loopSection === undefined
